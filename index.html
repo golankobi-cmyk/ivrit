@@ -1,0 +1,1819 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>עברית · Vincenzo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* softened palette: calmer slate-navy, gentler gold, warm paper */
+  --bg:#1b2733; --bg2:#1f2d3b; --panel:#243341; --panel2:#26384a; --raise:#2c3e51;
+  --paper:#f4efe6; --warm:#e9e2d4; --muted:#9aabba; --faint:#6f8294;
+  --gold:#cbb279; --gold2:#ddc890; --goldsoft:#3a3a2a;
+  --line:rgba(203,178,121,.16); --line2:rgba(255,255,255,.06);
+  --good:#6fae86; --bad:#cf8a7c; --info:#7fa8c9;
+  --shadow:0 14px 40px -20px rgba(0,0,0,.5);
+  --serif:'Spectral',Georgia,serif; --sans:'Outfit',system-ui,sans-serif; --heb:'Assistant','Heebo',sans-serif;
+  --r:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--warm);font-family:var(--sans);-webkit-font-smoothing:antialiased;line-height:1.55;overflow-x:hidden}
+/* Hebrew is lighter, modern, not bold/biblical */
+.heb{font-family:var(--heb);direction:rtl;unicode-bidi:embed;font-weight:400}
+.heb.lg{font-size:28px;font-weight:300;color:var(--paper)}
+.heb.b{font-weight:500}
+.app{display:flex;min-height:100vh}
+/* sidebar (desktop) */
+.side{width:230px;flex:0 0 230px;background:linear-gradient(180deg,#1a2530,#1b2835);
+  border-right:1px solid var(--line);padding:20px 13px;position:sticky;top:0;height:100vh;
+  display:flex;flex-direction:column;gap:3px;overflow:auto;z-index:30}
+.brand{display:flex;align-items:baseline;gap:9px;padding:4px 10px 14px}
+.brand .he{font-family:var(--heb);font-weight:600;font-size:27px;color:var(--gold2);direction:rtl}
+.brand small{color:var(--faint);font-family:var(--serif);font-style:italic;font-size:12.5px}
+.nav{display:flex;flex-direction:column;gap:1px}
+.nav button{all:unset;display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:10px;
+  cursor:pointer;color:#aebccb;font-size:14px;transition:.16s}
+.nav button .ic{width:17px;text-align:center;opacity:.8;font-size:14px}
+.nav button:hover{background:rgba(203,178,121,.07);color:var(--paper)}
+.nav button.on{background:rgba(203,178,121,.13);color:var(--gold2);box-shadow:inset 2px 0 0 var(--gold)}
+.side .foot{margin-top:auto;padding:10px;color:var(--faint);font-size:11px;line-height:1.5}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--bad);margin-inline-end:6px;vertical-align:middle}
+.dot.ok{background:var(--good)}
+/* main */
+.main{flex:1;min-width:0;padding:30px 38px 90px;max-width:1060px}
+h1{font-family:var(--serif);font-weight:600;font-size:31px;letter-spacing:-.01em;color:var(--paper)}
+h2{font-family:var(--serif);font-weight:600;font-size:20px;color:var(--gold2);margin:24px 0 12px}
+h3{font-family:var(--sans);font-weight:600;font-size:14.5px;color:var(--paper);margin:0 0 4px}
+h4{color:var(--gold2);font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;margin-bottom:7px;font-weight:600}
+p{color:#cbd6e0;font-size:14.5px}
+.lead{color:var(--muted);font-family:var(--serif);font-style:italic;font-size:15.5px;margin-top:4px}
+.card{background:linear-gradient(180deg,var(--panel),var(--bg2));border:1px solid var(--line);
+  border-radius:var(--r);padding:18px 20px;box-shadow:var(--shadow)}
+.grid{display:grid;gap:14px}
+.g3{grid-template-columns:repeat(3,1fr)} .g2{grid-template-columns:repeat(2,1fr)} .g4{grid-template-columns:repeat(4,1fr)}
+.pill{display:inline-block;font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--gold2);
+  border:1px solid var(--line);border-radius:999px;padding:3px 9px}
+.tag{font-size:10px;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:1px 7px;white-space:nowrap}
+.lvl{font-size:10px;font-weight:600;letter-spacing:.04em;border-radius:6px;padding:2px 7px}
+.lvl.a1{background:rgba(111,174,134,.16);color:#9ed3b3} .lvl.a2{background:rgba(127,168,201,.16);color:#a9cbe6}
+.lvl.b1{background:rgba(203,178,121,.16);color:var(--gold2)} .lvl.b2{background:rgba(207,138,124,.16);color:#e3a99c}
+.btn{all:unset;cursor:pointer;background:linear-gradient(180deg,var(--gold2),var(--gold));color:#2a230f;
+  font-weight:600;font-size:13px;padding:9px 15px;border-radius:10px;transition:.15s;text-align:center}
+.btn:hover{filter:brightness(1.05);transform:translateY(-1px)}
+.btn:active{transform:none}
+.btn.ghost{background:transparent;color:var(--gold2);border:1px solid var(--line)}
+.btn.sm{padding:6px 11px;font-size:12px}
+.btn.full{display:block;width:100%}
+.row{display:flex;align-items:center;gap:11px;flex-wrap:wrap}
+.spread{justify-content:space-between}
+.tl{color:var(--gold2);font-style:italic;font-family:var(--serif);font-size:13.5px}
+.en{color:#cbd6e0}
+.muted{color:var(--muted)} .faint{color:var(--faint)}
+.stat{display:flex;flex-direction:column;gap:1px}
+.stat b{font-family:var(--serif);font-size:30px;color:var(--gold2);font-weight:600}
+.stat span{color:var(--faint);font-size:11.5px;text-transform:uppercase;letter-spacing:.05em}
+.bar{height:7px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden;margin-top:8px}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2))}
+/* list item (master) */
+.item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;border:1px solid var(--line);
+  border-radius:12px;background:var(--panel);margin-bottom:9px;cursor:pointer;transition:.15s}
+.item:hover{border-color:rgba(203,178,121,.4);background:var(--panel2);transform:translateX(2px)}
+.item.done{border-color:rgba(111,174,134,.4)}
+.item .meta{display:flex;flex-direction:column;gap:3px;min-width:0}
+.item .meta .t{font-weight:600;color:var(--paper);font-size:14.5px}
+.chev{color:var(--faint);font-size:18px}
+/* detail */
+.back{all:unset;cursor:pointer;color:var(--gold2);font-size:13px;display:inline-flex;align-items:center;gap:6px;margin-bottom:6px}
+.back:hover{color:var(--gold)}
+.sec{border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:var(--panel);margin-bottom:12px}
+.stage{display:flex;gap:12px;align-items:flex-start;margin-bottom:8px}
+.stage .n{flex:0 0 26px;height:26px;border-radius:8px;background:rgba(203,178,121,.14);color:var(--gold2);
+  display:grid;place-items:center;font-size:12px;font-weight:600;font-family:var(--serif)}
+table{width:100%;border-collapse:collapse;font-size:14px;margin-top:4px}
+th,td{text-align:start;padding:7px 10px;border-bottom:1px solid var(--line2)}
+th{color:var(--gold2);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+td .heb{font-size:17px}
+/* confidence */
+.rate{display:flex;gap:5px;align-items:center}
+.rate b{width:25px;height:25px;border-radius:7px;border:1px solid var(--line);display:grid;place-items:center;
+  cursor:pointer;color:var(--muted);font-size:12px}
+.rate b.on{background:var(--gold);color:#2a230f;border-color:var(--gold)}
+/* tabs within a section */
+.subtabs{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 16px;border-bottom:1px solid var(--line);padding-bottom:0}
+.subtabs button{all:unset;cursor:pointer;padding:8px 13px;color:var(--muted);font-size:13px;border-bottom:2px solid transparent;margin-bottom:-1px}
+.subtabs button.on{color:var(--gold2);border-bottom-color:var(--gold)}
+/* speak button + clickable word */
+.spk{all:unset;cursor:pointer;width:32px;height:32px;border-radius:9px;border:1px solid var(--line);
+  display:grid;place-items:center;color:var(--gold2);font-size:14px;flex:0 0 auto;transition:.15s}
+.spk:hover{background:rgba(203,178,121,.1)}
+.w{cursor:pointer;border-bottom:1px dotted transparent;transition:.12s}
+.w:hover{border-bottom-color:var(--gold);color:var(--gold2)}
+/* story sentence */
+.s-sent{padding:11px 13px;border-radius:11px;border:1px solid transparent;transition:.15s;margin-bottom:2px}
+.s-sent:hover{background:rgba(203,178,121,.05);border-color:var(--line)}
+.s-sent .heb{font-size:21px;font-weight:300;color:var(--paper);display:block}
+.s-sent .tl{display:block;margin-top:2px}
+.s-sent .en{display:block;color:var(--muted);font-size:13px}
+.s-sent .pmark{all:unset;cursor:pointer;color:var(--gold2);font-size:13px;margin-inline-start:4px}
+/* chat */
+.chat{display:flex;flex-direction:column;gap:9px;max-height:48vh;overflow:auto;padding:6px 2px}
+.msg{max-width:80%;padding:10px 14px;border-radius:14px;font-size:15px;line-height:1.5}
+.msg.ai{align-self:flex-start;background:var(--panel2);border:1px solid var(--line);border-bottom-left-radius:4px}
+.msg.me{align-self:flex-end;background:linear-gradient(180deg,var(--gold2),var(--gold));color:#2a230f;border-bottom-right-radius:4px}
+.msg .heb{font-size:18px;font-weight:300}
+.msg.me .heb{font-weight:400}
+.typing{align-self:flex-start;color:var(--faint);font-size:13px;padding:4px 10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chips button{all:unset;cursor:pointer;font-size:13px;border:1px solid var(--line);border-radius:999px;padding:6px 11px;color:#aebccb}
+.chips button:hover{background:rgba(203,178,121,.1);color:var(--gold2)}
+/* inputs */
+.inp,textarea,select{width:100%;background:#172430;border:1px solid var(--line);border-radius:11px;
+  color:var(--warm);padding:10px 13px;font-family:var(--sans);font-size:14px}
+.inp.heb,textarea.heb{font-family:var(--heb);font-size:18px;font-weight:300;direction:rtl}
+.inp:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold)}
+textarea{min-height:120px;resize:vertical}
+label{display:block;font-size:12px;color:var(--muted);margin:14px 0 5px;letter-spacing:.02em}
+.range{width:100%;accent-color:var(--gold)}
+/* switch */
+.switch{display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+.switch input{display:none}
+.track{width:40px;height:23px;border-radius:99px;background:#34495e;position:relative;transition:.2s}
+.track::after{content:"";position:absolute;top:3px;left:3px;width:17px;height:17px;border-radius:50%;background:#fff;transition:.2s}
+.switch input:checked+.track{background:var(--gold)}
+.switch input:checked+.track::after{left:20px}
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:16px;flex-wrap:wrap}
+.note{font-size:12.5px;color:var(--muted);background:rgba(203,178,121,.05);border:1px solid var(--line);border-radius:10px;padding:10px 13px;margin-top:12px}
+.info{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;border:1px solid var(--line);color:var(--info);font-size:10px;cursor:help;font-style:italic;font-family:var(--serif);position:relative}
+.info:hover .tip{display:block}
+.tip{display:none;position:absolute;top:22px;left:50%;transform:translateX(-50%);width:240px;background:#0f1922;border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-size:12px;color:#cbd6e0;z-index:50;font-style:normal;font-family:var(--sans);text-align:start;line-height:1.45;box-shadow:var(--shadow)}
+.kbd{font-family:var(--heb);direction:rtl;font-size:36px;font-weight:300;color:var(--paper);text-align:center}
+.cell{border:1px solid var(--line);border-radius:11px;padding:13px 8px;text-align:center;cursor:pointer;background:var(--panel);transition:.15s}
+.cell:hover{background:var(--panel2);border-color:rgba(203,178,121,.4)}
+.cell small{display:block;color:var(--faint);font-size:10.5px;margin-top:4px}
+/* answer states */
+.ans-ok{color:var(--good)} .ans-bad{color:var(--bad)}
+.feedback{font-size:13px;margin-top:6px}
+/* toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#0f1922;border:1px solid var(--gold);
+  color:var(--paper);padding:11px 18px;border-radius:11px;font-size:13.5px;opacity:0;transition:.25s;z-index:100;box-shadow:var(--shadow)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* word popover */
+.pop{position:fixed;background:#0f1922;border:1px solid var(--gold);border-radius:12px;padding:13px 15px;z-index:90;box-shadow:var(--shadow);max-width:260px;display:none}
+.pop.show{display:block}
+.pop .hw{font-family:var(--heb);font-size:24px;font-weight:300;color:var(--paper);direction:rtl}
+/* mobile bottom nav */
+.mobnav{display:none}
+@media(max-width:860px){
+  .app{flex-direction:column}
+  .side{display:none}
+  .main{padding:18px 15px 96px;max-width:100%}
+  .g3,.g2,.g4{grid-template-columns:1fr}
+  h1{font-size:26px}
+  .mobnav{display:flex;position:fixed;bottom:0;left:0;right:0;background:#16212c;border-top:1px solid var(--line);
+    z-index:40;padding:6px 4px calc(6px + env(safe-area-inset-bottom));overflow-x:auto;gap:2px}
+  .mobnav button{all:unset;cursor:pointer;flex:1 0 auto;min-width:60px;text-align:center;color:#9aabba;font-size:10px;padding:6px 4px;border-radius:9px}
+  .mobnav button .ic{display:block;font-size:16px;margin-bottom:2px}
+  .mobnav button.on{color:var(--gold2);background:rgba(203,178,121,.12)}
+  .mobtop{display:flex !important}
+}
+.mobtop{display:none;align-items:center;justify-content:space-between;padding:12px 15px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:20}
+.mobtop .he{font-family:var(--heb);font-weight:600;font-size:22px;color:var(--gold2)}
+
+/* ===== teaching-engine UI ===== */
+.km{display:flex;gap:8px;flex-wrap:wrap}
+.km .b{flex:1;min-width:120px;border:1px solid var(--line);border-radius:11px;padding:11px 13px;background:var(--panel)}
+.km .b b{font-family:var(--serif);font-size:24px;display:block}
+.km .b span{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--faint)}
+.km .enc b{color:#9aabba} .km .weak b{color:#e3a99c} .km .fam b{color:#a9cbe6} .km .mas b{color:#9ed3b3}
+.mbar{height:9px;border-radius:99px;overflow:hidden;display:flex;margin-top:10px;background:rgba(255,255,255,.05)}
+.mbar i{height:100%}
+.mpill{font-size:9.5px;font-weight:600;letter-spacing:.03em;border-radius:6px;padding:2px 6px;white-space:nowrap}
+.mpill.enc{background:rgba(154,171,186,.16);color:#9aabba} .mpill.weak{background:rgba(207,138,124,.18);color:#e3a99c}
+.mpill.fam{background:rgba(127,168,201,.18);color:#a9cbe6} .mpill.mas{background:rgba(111,174,134,.2);color:#9ed3b3} .mpill.new{background:rgba(203,178,121,.14);color:var(--gold2)}
+/* stepper */
+.stepper{display:flex;gap:6px;margin:14px 0 18px}
+.stepper .st{flex:1;height:5px;border-radius:99px;background:rgba(255,255,255,.07)}
+.stepper .st.on{background:var(--gold)} .stepper .st.done{background:var(--good)}
+.steplabel{display:flex;align-items:center;gap:8px;color:var(--gold2);font-size:12px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:10px}
+/* lesson card grid for vocab intro */
+.wcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.wcard{border:1px solid var(--line);border-radius:12px;padding:13px;background:var(--panel);cursor:pointer;transition:.15s;text-align:center}
+.wcard:hover{background:var(--panel2);border-color:rgba(203,178,121,.4)}
+.wcard .h{font-family:var(--heb);direction:rtl;font-weight:300;font-size:23px;color:var(--paper)}
+.wcard .t{color:var(--gold2);font-style:italic;font-family:var(--serif);font-size:12px;margin-top:2px}
+.wcard .e{color:var(--muted);font-size:12.5px}
+/* drill */
+.drill{}
+.dprog{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.dprog .track{flex:1;height:7px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden}
+.dprog .track i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2))}
+.dprog .num{color:var(--faint);font-size:12.5px;white-space:nowrap}
+.qprompt{text-align:center;margin:8px 0 18px}
+.qprompt .big{font-family:var(--heb);direction:rtl;font-weight:300;font-size:34px;color:var(--paper)}
+.qprompt .en{font-size:20px;color:var(--paper)}
+.qprompt .sub{color:var(--muted);font-size:13px;margin-top:4px}
+.opts{display:grid;gap:9px}
+.opt{all:unset;cursor:pointer;border:1px solid var(--line);border-radius:11px;padding:13px 16px;background:var(--panel);font-size:16px;transition:.12s;text-align:center}
+.opt:hover{background:var(--panel2)}
+.opt.heb{font-family:var(--heb);direction:rtl;font-weight:300;font-size:22px}
+.opt.ok{background:rgba(111,174,134,.18);border-color:var(--good);color:#bfe6cd}
+.opt.bad{background:rgba(207,138,124,.16);border-color:var(--bad);color:#f0c4ba}
+.banner{margin-top:14px;border-radius:11px;padding:12px 15px;font-size:14px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.banner.ok{background:rgba(111,174,134,.14);border:1px solid var(--good)}
+.banner.bad{background:rgba(207,138,124,.12);border:1px solid var(--bad)}
+.banner .lbl{font-weight:600;font-size:11px;letter-spacing:.05em;text-transform:uppercase;opacity:.9}
+.flash{border:1px solid var(--line);border-radius:16px;background:var(--panel);padding:34px 20px;text-align:center;cursor:pointer;min-height:160px;display:flex;flex-direction:column;justify-content:center;gap:8px}
+.flash .h{font-family:var(--heb);direction:rtl;font-weight:300;font-size:40px;color:var(--paper)}
+.lock{opacity:.55;cursor:not-allowed}
+.lock .chev{color:var(--faint)}
+.modepick{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:11px}
+.modepick .m{border:1px solid var(--line);border-radius:13px;padding:16px;background:var(--panel);cursor:pointer;transition:.15s}
+.modepick .m:hover{background:var(--panel2);border-color:rgba(203,178,121,.4);transform:translateY(-2px)}
+.modepick .m h3{margin-bottom:4px}
+.modepick .m p{font-size:12.5px;color:var(--muted)}
+.modepick .m .cnt{color:var(--gold2);font-size:12px;margin-top:6px;font-weight:600}
+</style>
+</head>
+<body>
+<div class="mobtop">
+  <span class="he">עברית</span>
+  <span class="faint" style="font-size:12px">Vincenzo</span>
+</div>
+<div class="app">
+  <aside class="side">
+    <div class="brand"><span class="he">עברית</span><small>for Vincenzo</small></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="foot">
+      <div><span class="dot" id="syncDot"></span><span id="syncTxt">checking…</span></div>
+      <div style="margin-top:6px">Modern Hebrew · A1 to B2</div>
+    </div>
+  </aside>
+  <main class="main" id="main"></main>
+</div>
+<nav class="mobnav" id="mobnav"></nav>
+<div class="toast" id="toast"></div>
+<div class="pop" id="pop"></div>
+
+<script>
+/* ===================================================================
+   IVRIT · private Hebrew learning app for Vincenzo
+   Teaching engine: Course path · feedback drills · mastery + weak-spots
+=================================================================== */
+const USER_ID='vincenzo';
+const DRIVE_FOLDER='1jqZwxO-5IhaiMxn7WkS0_EDadN_4VQlr';
+const SUPA_URL='https://ygstriddcprzalnisbql.supabase.co';
+const SUPA_KEY='sb_publishable_QbkZ3-OMXm-LiIoZw3lApA_BzhOUtlS';
+const LS='ivrit_state_'+USER_ID;
+
+const defaultState={
+  user:USER_ID, nikud:true, rate:0.9, voiceURI:'',
+  streak:0, lastDay:null, xp:0,
+  mastery:{},                 // key -> {s:0..3, n, c, due}
+  grammar:{},                 // grammar topic id -> confidence 1..5
+  course:{done:{}, lesson:1}, // done lessons + current lesson pointer
+  stories:{}, dailyDone:{},
+  customVocab:[], writeEntries:[], writeDraft:'',
+  cfg:{anthropicKey:''},
+  updated:Date.now()
+};
+let S=load();
+function load(){try{return deepMerge(structuredClone(defaultState),JSON.parse(localStorage.getItem(LS))||{})}catch(e){return structuredClone(defaultState)}}
+function deepMerge(a,b){for(const k in b){if(b[k]&&typeof b[k]==='object'&&!Array.isArray(b[k])){a[k]=deepMerge(a[k]||{},b[k])}else{a[k]=b[k]}}return a}
+function save(){S.updated=Date.now();localStorage.setItem(LS,JSON.stringify(S));syncUp();}
+function touchDay(){const d=new Date().toDateString();if(S.lastDay!==d){const gap=S.lastDay?(new Date(d)-new Date(S.lastDay)):0;S.streak=(S.lastDay&&gap<=864e5*1.6)?S.streak+1:1;S.lastDay=d;}}
+function addXP(n){S.xp=(S.xp||0)+n;}
+
+/* ---------- Hebrew display: nikud + correct unvowelled (ktiv male) ---------- */
+function stripN(t){return t.replace(/[\u0591-\u05C7]/g,'')}
+function H(v,plain){ if(S.nikud) return v; return (plain!=null&&plain!=='')?plain:stripN(v); }
+function hebClick(v,plain,cls){
+  const shown=H(v,plain);const words=shown.split(/(\s+)/);
+  return `<span class="heb ${cls||''}" dir="rtl">`+words.map(w=>{
+    if(/^\s+$/.test(w)||w==='')return w;
+    return `<span class="w" data-word="${encodeURIComponent(w)}">${w}</span>`;
+  }).join('')+`</span>`;
+}
+
+/* ---------- Speech ---------- */
+let voices=[];
+function loadVoices(){voices=speechSynthesis.getVoices()||[]}
+if('speechSynthesis'in window){loadVoices();speechSynthesis.onvoiceschanged=loadVoices;}
+function heVoice(){if(S.voiceURI){const v=voices.find(v=>v.voiceURI===S.voiceURI);if(v)return v;}return voices.find(v=>v.lang&&v.lang.toLowerCase().startsWith('he'))||null;}
+function hasHeVoice(){return !!heVoice()}
+function speak(t){if(!('speechSynthesis'in window))return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(stripN(t));u.lang='he-IL';const v=heVoice();if(v)u.voice=v;u.rate=S.rate||0.9;speechSynthesis.speak(u);}
+let queue=[];
+function speakSeq(arr){if(!('speechSynthesis'in window))return;speechSynthesis.cancel();queue=arr.slice();next();
+  function next(){if(!queue.length)return;const u=new SpeechSynthesisUtterance(stripN(queue.shift()));u.lang='he-IL';const v=heVoice();if(v)u.voice=v;u.rate=S.rate||0.9;u.onend=()=>setTimeout(next,180);speechSynthesis.speak(u);}}
+
+/* ---------- Supabase sync ---------- */
+async function syncUp(){if(!SUPA_URL||!SUPA_KEY){setSync(false);return;}
+  try{const r=await fetch(SUPA_URL+'/rest/v1/progress?on_conflict=user_id',{method:'POST',
+    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},
+    body:JSON.stringify([{user_id:USER_ID,state:S,updated_at:new Date(S.updated).toISOString()}])});setSync(r.ok);}catch(e){setSync(false)}}
+async function syncDown(){if(!SUPA_URL||!SUPA_KEY){setSync(false);return;}
+  try{const r=await fetch(SUPA_URL+'/rest/v1/progress?user_id=eq.'+USER_ID+'&select=state,updated_at',{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+    if(r.ok){const rows=await r.json();if(rows&&rows[0]&&rows[0].state&&(rows[0].state.updated||0)>(S.updated||0)){S=deepMerge(structuredClone(defaultState),rows[0].state);localStorage.setItem(LS,JSON.stringify(S));render();}setSync(true);}else setSync(false);}catch(e){setSync(false)}}
+function setSync(ok){const d=document.getElementById('syncDot'),t=document.getElementById('syncTxt');if(!d)return;d.className='dot'+(ok?' ok':'');t.textContent=ok?'synced across devices':'offline (saved on device)';}
+
+/* ---------- Backup ---------- */
+function backupJSON(){const name='ivrit-backup-'+new Date().toISOString().slice(0,10)+'.json';const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();toast('Backup downloaded: '+name);}
+function importJSON(file){const r=new FileReader();r.onload=e=>{try{S=deepMerge(structuredClone(defaultState),JSON.parse(e.target.result));save();render();toast('Backup restored')}catch(_){toast('Invalid file')}};r.readAsText(file);}
+
+/* ---------- toast ---------- */
+let toastT;function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2200);}
+
+/* ---- ALEPH-BET (all 22 + finals) ---- */
+const ALEFBET=[
+ ["א","alef","silent / vowel carrier",""],["ב","bet","b (בּ) / v (ב)",""],["ג","gimel","g (as in go)",""],
+ ["ד","dalet","d",""],["ה","he","h",""],["ו","vav","v / o / u",""],["ז","zayin","z",""],
+ ["ח","chet","ch (throat)",""],["ט","tet","t",""],["י","yod","y / i",""],["כ","kaf","k (כּ) / kh (כ)","ך"],
+ ["ל","lamed","l",""],["מ","mem","m","ם"],["נ","nun","n","ן"],["ס","samech","s",""],
+ ["ע","ayin","silent / guttural carrier",""],["פ","pe","p (פּ) / f (פ)","ף"],["צ","tzadi","tz","ץ"],
+ ["ק","kuf","k",""],["ר","resh","r (French-like)",""],["ש","shin (שׁ) / sin (שׂ)","sh / s",""],["ת","tav","t",""]
+];
+/* ---- NIKUD lessons (modern explanation) ---- */
+const NIKUD=[
+ {sign:"בַ",name:"Patach",sound:"a",note:"Short 'a' as in Italian casa."},
+ {sign:"בָ",name:"Kamatz",sound:"a",note:"Also 'a' in modern Hebrew. Same sound as patach for speakers today."},
+ {sign:"בֶ",name:"Segol",sound:"e",note:"'e' as in Italian bene."},
+ {sign:"בֵ",name:"Tzere",sound:"e",note:"Also 'e', slightly longer. Sounds the same today."},
+ {sign:"בִ",name:"Chirik",sound:"i",note:"'i' as in Italian vino. With a yod (בִי) it is the same sound."},
+ {sign:"בֹ",name:"Cholam",sound:"o",note:"'o' as in sole. Often written with a vav (בּוֹ) in unvowelled text."},
+ {sign:"בֻ",name:"Kubutz",sound:"u",note:"'u' as in luna. In unvowelled text usually becomes a vav (בּוּ)."},
+ {sign:"בּוּ",name:"Shuruk",sound:"u",note:"The vav-with-dot 'u'. This is how 'u' usually looks without nikud."},
+ {sign:"בְ",name:"Sheva",sound:"(silent / very short)",note:"Either silent or a tiny 'e'. Disappears in fast speech."}
+];
+
+/* ---- BINYANIM (the 7 verb patterns) ---- */
+const BINYANIM=[
+ {id:"paal",name:"פָּעַל",tl:"Pa'al (Qal)",voice:"active, simple",
+  desc:"The simplest and most common pattern. Plain active actions.",
+  ex:[["כָּתַב","katav","he wrote"],["אָכַל","achal","he ate"],["הָלַךְ","halach","he walked"]],
+  note:"Most basic everyday verbs live here: לכתוב, לאכול, ללכת, לשתות. Your starting point."},
+ {id:"nifal",name:"נִפְעַל",tl:"Nif'al",voice:"passive / middle of Pa'al",
+  desc:"Usually the passive or 'it happens to itself' counterpart of Pa'al.",
+  ex:[["נִכְתַּב","nichtav","it was written"],["נוֹלַד","nolad","he was born"],["נִכְנַס","nichnas","he entered"]],
+  note:"Several daily verbs are secretly Nif'al: להיכנס, להישאר, להיוולד, להיפגש."},
+ {id:"piel",name:"פִּעֵל",tl:"Pi'el",voice:"active, often intensive",
+  desc:"Active, frequently intensive or with a 'do thoroughly' flavour. Marked by a doubled middle letter.",
+  ex:[["דִּבֵּר","diber","he spoke"],["בִּשֵּׁל","bishel","he cooked"],["סִפֵּר","siper","he told"]],
+  note:"Very productive: לדבר, לבשל, לספר, לנקות, ללמד. Present begins with מְ."},
+ {id:"pual",name:"פֻּעַל",tl:"Pu'al",voice:"passive of Pi'el",
+  desc:"The passive partner of Pi'el. 'It was done (intensively).'",
+  ex:[["דֻּבַּר","dubar","it was spoken about"],["בֻּשַּׁל","bushal","it was cooked"],["סֻפַּר","supar","it was told"]],
+  note:"Less common in speech, mostly heard as adjectives: מְבֻשָּׁל (cooked), מְסֻדָּר (arranged)."},
+ {id:"hifil",name:"הִפְעִיל",tl:"Hif'il",voice:"active, causative",
+  desc:"Causative: to make something happen or bring about a state.",
+  ex:[["הִתְחִיל","hitchil","he began"],["הֵבִין","hevin","he understood"],["הִזְמִין","hizmin","he invited / ordered"]],
+  note:"Causative pairs: בָּא come → הֵבִיא bring. Daily: להבין, להכיר, להרגיש, להתחיל."},
+ {id:"hufal",name:"הֻפְעַל",tl:"Huf'al",voice:"passive of Hif'il",
+  desc:"The passive partner of Hif'il. 'It was made to happen.'",
+  ex:[["הֻזְמַן","huzman","he/it was invited"],["הֻסְבַּר","husbar","it was explained"],["הֻחְלַט","huchlat","it was decided"]],
+  note:"Mostly formal / written. Recognise it; you rarely produce it early."},
+ {id:"hitpael",name:"הִתְפַּעֵל",tl:"Hitpa'el",voice:"reflexive / reciprocal",
+  desc:"You do it to yourself, or people do it to each other. Marked by the מִתְ prefix.",
+  ex:[["הִתְלַבֵּשׁ","hitlabesh","he got dressed"],["הִתְעוֹרֵר","hit'orer","he woke up"],["הִתְגַּעְגֵּעַ","hitga'age'a","he missed / longed"]],
+  note:"Maps cleanly to Italian -si verbs: vestirsi, svegliarsi. Daily: להתלבש, להתקלח, להתחתן, להתגעגע."}
+];
+
+/* ---- GRAMMAR: chapters A1 to B2, each with stages ---- */
+const GRAMMAR=[
+ {id:1,t:"The Alphabet",lvl:"A1",sum:"22 letters, right to left, 5 final forms.",
+  stages:[
+   {h:"How it works",p:"Hebrew has 22 consonants written right to left. Vowels are small marks (nikud) added under or beside letters, not letters of their own. Five letters take a different shape at the end of a word."},
+   {h:"The good news for you",p:"The vowel sounds map almost exactly onto Italian a, e, i, o, u. Your ear is already trained. The real work is three things: the throat sound ח and soft כ, the French-style ר, and reading right to left."},
+   {h:"The dagesh dot",p:"A dot inside three letters flips the sound: בּ b / ב v, כּ k / כ kh, פּ p / פ f. Same letter, two sounds, decided by a dot and by position."},
+   {h:"See the full chart",p:"Open the Alphabet tab in Pronunciation to tap every letter and hear it."}
+  ]},
+ {id:2,t:"Nikud: the vowel marks",lvl:"A1",sum:"How the vowel system works, and why modern texts drop it.",
+  stages:[
+   {h:"What nikud is",p:"Nikud are the dots and dashes that tell you the vowels. Beginners rely on them. But everyday modern Hebrew (newspapers, signs, texts) is written without nikud."},
+   {h:"Why we drop it later",p:"Because real Hebrew has no nikud, you must learn to read words by their consonant skeleton. When you remove the marks, Hebrew compensates by adding letters (mainly ו and י). This fuller spelling is called ktiv male."},
+   {h:"Example",p:"חֲנוּת and חנות are the same word (shop). But תָּכְנִית becomes תוכנית when unvowelled, an extra vav appears. That is why this app stores the real unvowelled spelling, not a naive strip."},
+   {h:"Use the toggle",p:"Turn nikud off (top of any content screen, or in Settings) once shapes feel familiar. Practise reading the bare form."}
+  ]},
+ {id:3,t:"Present Tense (Pa'al)",lvl:"A1",sum:"Only four forms. No 'am/is/are'.",
+  stages:[
+   {h:"The rule",p:"In the present, a Hebrew verb behaves like an adjective. It has only four forms, agreeing by gender and number. The pronoun carries the person. There is no helper verb."},
+   {h:"Table (כותב, to write)",tbl:[["m.sg",["כּוֹתֵב","כותב"],"kotev"],["f.sg",["כּוֹתֶבֶת","כותבת"],"kotevet"],["m.pl",["כּוֹתְבִים","כותבים"],"kotvim"],["f.pl",["כּוֹתְבוֹת","כותבות"],"kotvot"]]},
+   {h:"Examples",ex:[[["אֲנִי לוֹמֵד עִבְרִית","אני לומד עברית"],"ani lomed ivrit","I learn Hebrew"],[["אֲנַחְנוּ גָּרִים בְּבֶּרְלִין","אנחנו גרים בברלין"],"anachnu garim be-Berlin","we live in Berlin"]]},
+   {h:"Italian trap",p:"Italian conjugates by person (parlo, parli, parla); Hebrew present does not. It feels too easy. But you cannot drop the pronoun the way Italian does: 'parlo' must be אני מדבר."}
+  ]},
+ {id:4,t:"Nouns & Gender",lvl:"A1",sum:"Every noun is m or f, like Italian.",
+  stages:[
+   {h:"The rule",p:"Every noun is masculine or feminine. Feminine often ends ־ָה or ־ֶת. Plurals are usually ־ים (m) and ־ות (f), with exceptions you memorise."},
+   {h:"Table",tbl:[["house (m)",["בַּיִת","בית"],"→ בתים batim"],["apartment (f)",["דִּירָה","דירה"],"→ דירות dirot"],["table (m)",["שֻׁלְחָן","שולחן"],"→ שולחנות (m, ־ות!)"]]},
+   {h:"Italian trap",p:"You already think in genders, which helps. But genders do not always match across languages, and endings can lie (שולחן is masculine but takes ־ות). Learn each noun with its gender, exactly like il/la."}
+  ]},
+ {id:5,t:"Article ה & Object אֶת",lvl:"A1",sum:"No 'a/an'. 'The' is a prefix. אֶת marks a definite object.",
+  stages:[
+   {h:"The rule",p:"There is no word for 'a/an'. 'The' is the prefix הַ. When a direct object is definite, Hebrew marks it with אֶת, a word with no English or Italian equivalent."},
+   {h:"Examples",ex:[[["אֲנִי פּוֹתֵחַ אֶת הַחַלּוֹן","אני פותח את החלון"],"ani pote'ach et ha-chalon","I open the window"],[["אֲנִי שׁוֹתֶה קָפֶה","אני שותה קפה"],"ani shote kafe","I drink coffee (indefinite, no את)"]]},
+   {h:"Rule of thumb",p:"Definite object → use את. Indefinite → nothing. Proper names count as definite: אני אוהב את קובי."},
+   {h:"Contraction",p:"Prepositions fuse with הַ: בְּ+הבית → בבית, לְ+השוק → לשוק."}
+  ]},
+ {id:6,t:"Adjectives",lvl:"A1",sum:"After the noun, agree in gender/number, double the ה.",
+  stages:[
+   {h:"The rule",p:"Adjectives come after the noun (like Italian) and agree in gender and number. If the noun is definite, the adjective also takes הַ."},
+   {h:"Table",tbl:[["big house (m)",["בַּיִת גָּדוֹל","בית גדול"],"bayit gadol"],["big apt (f)",["דִּירָה גְּדוֹלָה","דירה גדולה"],"dira gdola"],["the big house",["הַבַּיִת הַגָּדוֹל","הבית הגדול"],"both take ה"]]},
+   {h:"Italian trap",p:"Italian also places adjectives after the noun (casa grande), so you start ahead. New: double definiteness. Both noun and adjective carry ה. Forgetting the second ה is the classic slip."}
+  ]},
+ {id:7,t:"Numbers & Time",lvl:"A1",sum:"Numbers have m and f forms. Telling the time.",
+  stages:[
+   {h:"The rule",p:"Numbers have masculine and feminine forms. The feminine is used for counting aloud and with feminine nouns; masculine nouns take the longer masculine forms."},
+   {h:"Table 1 to 5",tbl:[["1",["אַחַת / אֶחָד","אחת / אחד"],"f / m"],["2",["שְׁתַּיִם / שְׁנַיִם","שתיים / שניים"],"f / m"],["3",["שָׁלוֹשׁ / שְׁלוֹשָׁה","שלוש / שלושה"],"f / m"]]},
+   {h:"Telling time",ex:[[["מָה הַשָּׁעָה?","מה השעה?"],"ma ha-sha'a?","what time is it?"],[["הַשָּׁעָה שָׁלוֹשׁ","השעה שלוש"],"ha-sha'a shalosh","it's three"]]},
+   {h:"Italian trap",p:"Harder than Italian, where numbers do not change. The feminine form is the default for counting, which feels backwards. '2' is special: שתיים alone, שתי before a noun."}
+  ]},
+ {id:8,t:"Past Tense (Pa'al)",lvl:"A2",sum:"Conjugates by person with suffixes, like Italian.",
+  stages:[
+   {h:"The rule",p:"Unlike the present, the past conjugates by person with suffixes, much more like Italian. The root stays visible; the vowels shift."},
+   {h:"Table (כתב)",tbl:[["I",["כָּתַבְתִּי","כתבתי"],"katavti"],["you m",["כָּתַבְתָּ","כתבת"],"katavta"],["he",["כָּתַב","כתב"],"katav"],["she",["כָּתְבָה","כתבה"],"katva"],["we",["כָּתַבְנוּ","כתבנו"],"katavnu"]]},
+   {h:"Italian trap",p:"Relief after the article-free present: it conjugates by person like Italian. One Hebrew past covers both 'I wrote' and 'I was writing'. There is no ho scritto vs scrivevo split; context decides."}
+  ]},
+ {id:9,t:"Future Tense (Pa'al)",lvl:"A2",sum:"Prefixes mark the person.",
+  stages:[
+   {h:"The rule",p:"The future uses prefixes: א (I), ת (you/she), י (he), נ (we)."},
+   {h:"Table (כתב)",tbl:[["I",["אֶכְתֹּב","אכתוב"],"echtov"],["you m",["תִּכְתֹּב","תכתוב"],"tichtov"],["he",["יִכְתֹּב","יכתוב"],"yichtov"],["we",["נִכְתֹּב","נכתוב"],"nichtov"]]},
+   {h:"Useful twist",p:"Spoken Hebrew uses the future for soft requests and 'let's': תרצה קפה? = would you like coffee? נלך = let's go."}
+  ]},
+ {id:10,t:"Pronouns & 'to be'",lvl:"A2",sum:"No present 'to be'. It returns in past/future.",
+  stages:[
+   {h:"The rule",p:"There is no present-tense verb 'to be'. 'I am Italian' is simply אני איטלקי. In past and future, 'to be' reappears (היה / יהיה)."},
+   {h:"Examples",ex:[[["קוֹבִּי הוּא הַבַּעַל שֶׁלִּי","קובי הוא הבעל שלי"],"Kobi hu ha-ba'al sheli","Kobi is my husband"],[["אֶתְמוֹל הָיָה קַר","אתמול היה קר"],"etmol haya kar","yesterday it was cold"]]},
+   {h:"Bonus",p:"The past of 'to be' also means 'had': היה לי כלב = I had a dog. This leads into possession next."}
+  ]},
+ {id:11,t:"Possession: yesh / shel / smichut",lvl:"A2",sum:"No verb 'to have'. Construct chains.",
+  stages:[
+   {h:"The rule",p:"No verb 'to have'. Possession is יש לי ('there is to me'). Ownership uses של. Linking two nouns often uses smichut, a construct chain."},
+   {h:"Table",tbl:[["I have",["יֵשׁ לִי","יש לי"],"yesh li"],["I don't have",["אֵין לִי","אין לי"],"ein li"],["Shabbat meal",["אֲרוּחַת שַׁבָּת","ארוחת שבת"],"smichut"]]},
+   {h:"Trap",p:"In a definite smichut chain only the LAST noun takes ה: בית הקפה, not הבית קפה."}
+  ]},
+ {id:12,t:"Questions",lvl:"A2",sum:"Intonation, not inversion. Question words.",
+  stages:[
+   {h:"The rule",p:"Yes/no questions use statement word order with rising intonation. There is no 'do/does' and no inversion. Information questions start with a question word."},
+   {h:"Question words",tbl:[["what",["מַה","מה"],"ma"],["where",["אֵיפֹה","איפה"],"eifo"],["how much",["כַּמָּה","כמה"],"kama"],["from where",["מֵאַיִן","מאיין"],"me-ayin"]]},
+   {h:"Note",p:"A name: איך קוראים לך? (literally 'how do they call you?'). Italian helps, it also questions by intonation."}
+  ]},
+ {id:13,t:"Binyanim overview",lvl:"A2",sum:"The 7 verb patterns. The backbone of Hebrew verbs.",
+  stages:[
+   {h:"Why this matters",p:"Every Hebrew verb sits in one of 7 patterns (binyanim) built on a 3-letter root. The pattern tells you the voice (active, passive, reflexive, causative). This is the single most important idea for reading verbs."},
+   {h:"The seven",p:"Pa'al (simple active), Nif'al (passive/middle), Pi'el (active intensive), Pu'al (its passive), Hif'il (causative), Huf'al (its passive), Hitpa'el (reflexive)."},
+   {h:"Study them properly",p:"Open the Binyanim tab. Each one expands with its meaning, its present-tense marker, and real verbs you use."}
+  ]},
+ {id:14,t:"Pi'el in depth",lvl:"A2",sum:"מְ prefix, doubled middle letter.",
+  stages:[
+   {h:"Recognise it",p:"Present-tense Pi'el starts with מְ and doubles the middle root letter. Many everyday verbs live here whether or not they feel 'intensive'."},
+   {h:"Table (דיבר)",tbl:[["present",["מְדַבֵּר","מדבר"],"medaber"],["past I",["דִּבַּרְתִּי","דיברתי"],"dibarti"],["future I",["אֲדַבֵּר","אדבר"],"adaber"]]},
+   {h:"Your verbs",p:"לדבר, לבשל, לספר, לנקות, ללמד, לטייל, לחכות."}
+  ]},
+ {id:15,t:"Hif'il in depth",lvl:"B1",sum:"Causative: make something happen.",
+  stages:[
+   {h:"Recognise it",p:"Causative meaning: enlarge, bring in, begin. Present uses a מ prefix and a long י inside."},
+   {h:"Table",tbl:[["begin",["מַתְחִיל","מתחיל"],"matchil"],["understand",["מֵבִין","מבין"],"mevin"],["know (person)",["מַכִּיר","מכיר"],"makir"]]},
+   {h:"Italian edge",p:"Hebrew splits 'know' exactly like Italian: יודע = sapere (facts), מכיר = conoscere (people). You beat English speakers here."}
+  ]},
+ {id:16,t:"Hitpa'el in depth",lvl:"B1",sum:"Reflexive, מִתְ prefix.",
+  stages:[
+   {h:"Recognise it",p:"Reflexive or reciprocal: actions to oneself, or to each other. Present starts with מִתְ."},
+   {h:"Table",tbl:[["get dressed",["מִתְלַבֵּשׁ","מתלבש"],"mitlabesh"],["wake up",["מִתְעוֹרֵר","מתעורר"],"mit'orer"],["miss/long",["מִתְגַּעְגֵּעַ","מתגעגע"],"mitga'age'a"]]},
+   {h:"Italian edge",p:"Maps onto Italian -si verbs: vestirsi → מתלבש, svegliarsi → מתעורר. Trap: with roots starting ס/שׁ/צ the ת swaps place (הסתכל)."}
+  ]},
+ {id:17,t:"Nif'al in depth",lvl:"B1",sum:"Passive / middle, נ prefix.",
+  stages:[
+   {h:"Recognise it",p:"Usually the passive or middle of Pa'al. Present starts with נ."},
+   {h:"Table",tbl:[["enters",["נִכְנָס","נכנס"],"nichnas"],["stays",["נִשְׁאָר","נשאר"],"nish'ar"],["is born",["נוֹלַד","נולד"],"nolad"]]},
+   {h:"Trap",p:"Very common verbs are secretly Nif'al: נולד, נכנס, נשאר. For states, speech prefers an adjective: החנות סגורה (closed)."}
+  ]},
+ {id:18,t:"Prepositions + suffixes",lvl:"B1",sum:"'to me' is one fused word.",
+  stages:[
+   {h:"The rule",p:"Prepositions fuse with pronouns as suffixes instead of staying separate."},
+   {h:"Table",tbl:[["to me",["לִי","לי"],"li"],["to him",["לוֹ","לו"],"lo"],["with me",["אִתִּי","איתי"],"iti"],["our",["שֶׁלָּנוּ","שלנו"],"shelanu"]]},
+   {h:"Where it bites",p:"Drill לי / לך / לו first; they ride on daily verbs like עוזר (help) and נותן (give)."}
+  ]},
+ {id:19,t:"Irregular roots",lvl:"B1",sum:"Gutturals, hollow, doubled letters.",
+  stages:[
+   {h:"The families",p:"Some roots bend the patterns: gutturals (א ה ח ע ר), hollow roots with a vav/yod middle (בא, קם), and doubled-letter roots. They bend predictably, not randomly."},
+   {h:"Table (hollow: קם)",tbl:[["present",["קָם","קם"],"kam"],["past I",["קַמְתִּי","קמתי"],"kamti"],["future I",["אָקוּם","אקום"],"akum"]]},
+   {h:"Strategy",p:"Drill the daily hollow verbs as a family: בא, קם, שם, רץ, גר."}
+  ]},
+ {id:20,t:"Shem Peula (gerund/noun of action)",lvl:"B1",sum:"Turning verbs into 'the act of…'.",
+  stages:[
+   {h:"The idea",p:"Each binyan has a noun form for the action itself, like Italian's -zione/-mento. From לבשל (cook) comes בישול (cooking)."},
+   {h:"Patterns",tbl:[["Pa'al",["כְּתִיבָה","כתיבה"],"writing"],["Pi'el",["בִּישּׁוּל","בישול"],"cooking"],["Hif'il",["הַזְמָנָה","הזמנה"],"an order / invitation"]]},
+   {h:"Use",p:"These let you say 'I love cooking' (אני אוהב בישול) without a second verb."}
+  ]},
+ {id:21,t:"Subordinate clauses (ש־)",lvl:"B2",sum:"'that', 'who', 'which' with one word: ש.",
+  stages:[
+   {h:"The rule",p:"The single prefix ש links clauses: 'that', 'who', 'which'. It attaches to the next word."},
+   {h:"Examples",ex:[[["אֲנִי חוֹשֵׁב שֶׁזֶּה יָפֶה","אני חושב שזה יפה"],"ani choshev she-ze yafe","I think that it's beautiful"],[["הָאִישׁ שֶׁגָּר כָּאן","האיש שגר כאן"],"ha-ish she-gar kan","the man who lives here"]]},
+   {h:"Build up",p:"Combine with כי (because), אם (if), כדי (in order to), כאשר/כש (when) for full B2 sentences."}
+  ]},
+ {id:22,t:"Comparatives & superlatives",lvl:"B2",sum:"more, less, the most.",
+  stages:[
+   {h:"The rule",p:"Comparative: יותר (more) / פחות (less) + מ (than). Superlative: הכי (the most) or ביותר."},
+   {h:"Examples",ex:[[["בֶּרְלִין גְּדוֹלָה יוֹתֵר מֵרוֹזוֹלִינִי","ברלין גדולה יותר מרוזוליני"],"Berlin gdola yoter me-Rosolini","Berlin is bigger than Rosolini"],[["הַיּוֹם הֲכִי יָפֶה","היום הכי יפה"],"ha-yom hachi yafe","the most beautiful day"]]}
+  ]},
+ {id:23,t:"Conditional (would)",lvl:"B2",sum:"Hypotheticals with היה + present.",
+  stages:[
+   {h:"The rule",p:"To say 'would', Hebrew uses היה plus the present form. For unreal conditions: אם + past, then היה + present."},
+   {h:"Examples",ex:[[["הָיִיתִי רוֹצֶה לִנְסֹעַ","הייתי רוצה לנסוע"],"hayiti rotze linso'a","I would like to travel"],[["אִם הָיָה לִי זְמַן, הָיִיתִי בָּא","אם היה לי זמן הייתי בא"],"im haya li zman, hayiti ba","if I had time, I would come"]]}
+  ]}
+];
+
+/* ---- VOCABULARY: many categories (A1 to B2) ---- */
+const VOCAB=[
+ {cat:"Greetings & basics",lvl:"A1",words:[
+  [["שָׁלוֹם","שלום"],"shalom","hello / peace","ciao"],[["תּוֹדָה","תודה"],"toda","thank you","grazie"],
+  [["תּוֹדָה רַבָּה","תודה רבה"],"toda raba","thank you very much","grazie mille"],[["בְּבַקָּשָׁה","בבקשה"],"bevakasha","please / welcome","prego"],
+  [["סְלִיחָה","סליחה"],"slicha","sorry / excuse me","scusa"],[["כֵּן","כן"],"ken","yes","sì"],[["לֹא","לא"],"lo","no / not","no"],
+  [["אוּלַי","אולי"],"ulay","maybe","forse"],[["בְּסֵדֶר","בסדר"],"beseder","okay","va bene"],
+  [["מַה שְׁלוֹמְךָ","מה שלומך"],"ma shlomcha","how are you? (m)","come stai?"],[["מַה נִּשְׁמָע","מה נשמע"],"ma nishma","what's up?","come va?"],
+  [["לְהִתְרָאוֹת","להתראות"],"lehitra'ot","see you","arrivederci"],[["בֹּקֶר טוֹב","בוקר טוב"],"boker tov","good morning","buongiorno"],
+  [["עֶרֶב טוֹב","ערב טוב"],"erev tov","good evening","buonasera"],[["לַיְלָה טוֹב","לילה טוב"],"layla tov","good night","buonanotte"],
+  [["מַזָּל טוֹב","מזל טוב"],"mazal tov","congratulations","congratulazioni"],[["בְּהַצְלָחָה","בהצלחה"],"behatzlacha","good luck","in bocca al lupo"],
+  [["בְּתֵיאָבוֹן","בתיאבון"],"beteavon","enjoy your meal","buon appetito"],[["בְּרוּכִים הַבָּאִים","ברוכים הבאים"],"bruchim haba'im","welcome (pl)","benvenuti"],
+  [["סַבָּבָּה","סבבה"],"sababa","cool (slang)","figo"],[["יֵשׁ","יש"],"yesh","there is / I have","c'è"],[["אֵין","אין"],"ein","there isn't","non c'è"],
+  [["רֶגַע","רגע"],"rega","one moment","un attimo"],[["בְּדִיּוּק","בדיוק"],"bidiyuk","exactly","esatto"],[["נָכוֹן","נכון"],"nachon","correct","giusto"],
+  [["מְאוֹד","מאוד"],"me'od","very","molto"],[["קְצָת","קצת"],"ktzat","a little","un po'"],[["הַרְבֵּה","הרבה"],"harbe","a lot","tanto"]]},
+ {cat:"Family & people",lvl:"A1",words:[
+  [["מִשְׁפָּחָה","משפחה"],"mishpacha","family","famiglia"],[["אַבָּא","אבא"],"aba","dad","papà"],[["אִמָּא","אמא"],"ima","mom","mamma"],
+  [["בֵּן","בן"],"ben","son","figlio"],[["בַּת","בת"],"bat","daughter","figlia"],[["אָח","אח"],"ach","brother","fratello"],
+  [["אָחוֹת","אחות"],"achot","sister","sorella"],[["בַּעַל","בעל"],"ba'al","husband","marito"],[["אִשָּׁה","אישה"],"isha","wife / woman","moglie"],
+  [["סַבָּא","סבא"],"saba","grandfather","nonno"],[["סָבְתָא","סבתא"],"savta","grandmother","nonna"],[["דּוֹד","דוד"],"dod","uncle","zio"],
+  [["דּוֹדָה","דודה"],"doda","aunt","zia"],[["יֶלֶד","ילד"],"yeled","child / boy","bambino"],[["יַלְדָּה","ילדה"],"yalda","girl","bambina"],
+  [["תִּינוֹק","תינוק"],"tinok","baby","neonato"],[["חָבֵר","חבר"],"chaver","friend (m)","amico"],[["חֲבֵרָה","חברה"],"chavera","friend (f)","amica"],
+  [["שָׁכֵן","שכן"],"shachen","neighbour","vicino"],[["אוֹרֵחַ","אורח"],"oreach","guest","ospite"],[["כֶּלֶב","כלב"],"kelev","dog","cane"],
+  [["חָתוּל","חתול"],"chatul","cat","gatto"],[["אִישׁ","איש"],"ish","man / person","uomo"],[["אֲנָשִׁים","אנשים"],"anashim","people","persone"]]},
+ {cat:"Pronouns & function",lvl:"A1",words:[
+  [["אֲנִי","אני"],"ani","I","io"],[["אַתָּה","אתה"],"ata","you (m)","tu (m)"],[["אַתְּ","את"],"at","you (f)","tu (f)"],
+  [["הוּא","הוא"],"hu","he","lui"],[["הִיא","היא"],"hi","she","lei"],[["אֲנַחְנוּ","אנחנו"],"anachnu","we","noi"],
+  [["אַתֶּם","אתם"],"atem","you (m pl)","voi"],[["הֵם","הם"],"hem","they (m)","loro"],[["שֶׁל","של"],"shel","of","di"],
+  [["שֶׁלִּי","שלי"],"sheli","my / mine","mio"],[["עִם","עם"],"im","with","con"],[["עַל","על"],"al","on / about","su"],
+  [["תַּחַת","תחת"],"tachat","under","sotto"],[["לְיַד","ליד"],"leyad","next to","accanto"],[["בֵּין","בין"],"bein","between","tra"],
+  [["אֶת","את"],"et","(object marker)","(nessuno)"],[["כִּי","כי"],"ki","because","perché"],[["אֲבָל","אבל"],"aval","but","ma"],
+  [["אוֹ","או"],"o","or","o"],[["גַּם","גם"],"gam","also","anche"],[["רַק","רק"],"rak","only","solo"]]},
+ {cat:"Numbers",lvl:"A1",words:[
+  [["אֶפֶס","אפס"],"efes","zero","zero"],[["אַחַת","אחת"],"achat","one (f)","uno"],[["שְׁתַּיִם","שתיים"],"shtayim","two (f)","due"],
+  [["שָׁלוֹשׁ","שלוש"],"shalosh","three (f)","tre"],[["אַרְבַּע","ארבע"],"arba","four (f)","quattro"],[["חָמֵשׁ","חמש"],"chamesh","five (f)","cinque"],
+  [["שֵׁשׁ","שש"],"shesh","six (f)","sei"],[["שֶׁבַע","שבע"],"sheva","seven (f)","sette"],[["שְׁמוֹנֶה","שמונה"],"shmone","eight (f)","otto"],
+  [["תֵּשַׁע","תשע"],"tesha","nine (f)","nove"],[["עֶשֶׂר","עשר"],"eser","ten (f)","dieci"],[["עֶשְׂרִים","עשרים"],"esrim","twenty","venti"],
+  [["מֵאָה","מאה"],"me'a","hundred","cento"],[["אֶלֶף","אלף"],"elef","thousand","mille"],[["מִסְפָּר","מספר"],"mispar","number","numero"],
+  [["רִאשׁוֹן","ראשון"],"rishon","first","primo"],[["שֵׁנִי","שני"],"sheni","second","secondo"],[["אַחֲרוֹן","אחרון"],"acharon","last","ultimo"],
+  [["חֲצִי","חצי"],"chatzi","half","metà"],[["פַּעַם","פעם"],"pa'am","once / a time","una volta"]]},
+ {cat:"Home & interior design",lvl:"A1",words:[
+  [["בַּיִת","בית"],"bayit","house","casa"],[["דִּירָה","דירה"],"dira","apartment","appartamento"],[["חֶדֶר","חדר"],"cheder","room","stanza"],
+  [["מִטְבָּח","מטבח"],"mitbach","kitchen","cucina"],[["סָלוֹן","סלון"],"salon","living room","soggiorno"],[["מִרְפֶּסֶת","מרפסת"],"mirpeset","balcony","balcone"],
+  [["גִּינָה","גינה"],"gina","garden","giardino"],[["דֶּלֶת","דלת"],"delet","door","porta"],[["חַלּוֹן","חלון"],"chalon","window","finestra"],
+  [["קִיר","קיר"],"kir","wall","parete"],[["רִצְפָּה","רצפה"],"ritzpa","floor","pavimento"],[["שֻׁלְחָן","שולחן"],"shulchan","table","tavolo"],
+  [["כִּסֵּא","כיסא"],"kise","chair","sedia"],[["סַפָּה","ספה"],"sapa","sofa","divano"],[["מִטָּה","מיטה"],"mita","bed","letto"],
+  [["אָרוֹן","ארון"],"aron","closet","armadio"],[["מַדָּף","מדף"],"madaf","shelf","mensola"],[["מְנוֹרָה","מנורה"],"menora","lamp","lampada"],
+  [["תְּאוּרָה","תאורה"],"te'ura","lighting","illuminazione"],[["שָׁטִיחַ","שטיח"],"shati'ach","rug","tappeto"],[["מַרְאָה","מראה"],"mar'a","mirror","specchio"],
+  [["צֶבַע","צבע"],"tzeva","colour / paint","colore"],[["עִצּוּב","עיצוב"],"itzuv","design","design"],[["עִצּוּב פְּנִים","עיצוב פנים"],"itzuv pnim","interior design","design d'interni"],
+  [["סִגְנוֹן","סגנון"],"signon","style","stile"],[["חוֹמֶר","חומר"],"chomer","material","materiale"],[["עֵץ","עץ"],"etz","wood","legno"],
+  [["אֶבֶן","אבן"],"even","stone","pietra"],[["זְכוּכִית","זכוכית"],"zchuchit","glass","vetro"],[["מַתֶּכֶת","מתכת"],"matechet","metal","metallo"],
+  [["תַּנּוּר","תנור"],"tanur","stove / oven","stufa"],[["מִקְלַחַת","מקלחת"],"miklachat","shower","doccia"],[["סָאוּנָה","סאונה"],"sauna","sauna","sauna"],
+  [["מַדְרֵגוֹת","מדרגות"],"madregot","stairs","scale"],[["מַעֲלִית","מעלית"],"ma'alit","elevator","ascensore"],[["מַפְתֵּחַ","מפתח"],"mafte'ach","key","chiave"]]},
+ {cat:"Food & drink",lvl:"A1",words:[
+  [["אֹכֶל","אוכל"],"ochel","food","cibo"],[["מַיִם","מים"],"mayim","water","acqua"],[["לֶחֶם","לחם"],"lechem","bread","pane"],
+  [["חָלָב","חלב"],"chalav","milk","latte"],[["גְּבִינָה","גבינה"],"gvina","cheese","formaggio"],[["בֵּיצָה","ביצה"],"beitza","egg","uovo"],
+  [["בָּשָׂר","בשר"],"basar","meat","carne"],[["עוֹף","עוף"],"of","chicken","pollo"],[["דָּג","דג"],"dag","fish","pesce"],
+  [["יָרָק","ירק"],"yarak","vegetable","verdura"],[["פְּרִי","פרי"],"pri","fruit","frutto"],[["תַּפּוּחַ","תפוח"],"tapu'ach","apple","mela"],
+  [["עַגְבָנִיָּה","עגבנייה"],"agvaniya","tomato","pomodoro"],[["מְלָפְפוֹן","מלפפון"],"melafefon","cucumber","cetriolo"],[["בָּצָל","בצל"],"batzal","onion","cipolla"],
+  [["שׁוּם","שום"],"shum","garlic","aglio"],[["אֹרֶז","אורז"],"orez","rice","riso"],[["פַּסְטָה","פסטה"],"pasta","pasta","pasta"],
+  [["שֶׁמֶן זַיִת","שמן זית"],"shemen zayit","olive oil","olio d'oliva"],[["מֶלַח","מלח"],"melach","salt","sale"],[["סֻכָּר","סוכר"],"sukar","sugar","zucchero"],
+  [["חוּמּוּס","חומוס"],"chumus","hummus","hummus"],[["פָלָאפֶל","פלאפל"],"falafel","falafel","falafel"],[["סָלָט","סלט"],"salat","salad","insalata"],
+  [["מָרָק","מרק"],"marak","soup","zuppa"],[["חַלָּה","חלה"],"chala","challah","challah"],[["יַיִן","יין"],"yayin","wine","vino"],
+  [["בִּירָה","בירה"],"bira","beer","birra"],[["קָפֶה","קפה"],"kafe","coffee","caffè"],[["תֵּה","תה"],"te","tea","tè"],
+  [["עוּגָה","עוגה"],"uga","cake","torta"],[["גְּלִידָה","גלידה"],"glida","ice cream","gelato"],[["אֲרוּחָה","ארוחה"],"arucha","meal","pasto"],
+  [["מִסְעָדָה","מסעדה"],"mis'ada","restaurant","ristorante"],[["תַּפְרִיט","תפריט"],"tafrit","menu","menù"],[["חֶשְׁבּוֹן","חשבון"],"cheshbon","bill","conto"],
+  [["כּוֹס","כוס"],"kos","glass / cup","bicchiere"],[["צַלַּחַת","צלחת"],"tzalachat","plate","piatto"],[["שׁוּק","שוק"],"shuk","market","mercato"]]},
+ {cat:"Berlin daily life",lvl:"A2",words:[
+  [["עִיר","עיר"],"ir","city","città"],[["רְחוֹב","רחוב"],"rechov","street","strada"],[["כִּכָּר","כיכר"],"kikar","square","piazza"],
+  [["חֲנוּת","חנות"],"chanut","shop","negozio"],[["סוּפֶּרְמַרְקֶט","סופרמרקט"],"supermarket","supermarket","supermercato"],[["תַּחֲנָה","תחנה"],"tachana","station","stazione"],
+  [["רַכֶּבֶת","רכבת"],"rakevet","train","treno"],[["אוֹטוֹבּוּס","אוטובוס"],"otobus","bus","autobus"],[["אוֹפַנַּיִים","אופניים"],"ofanayim","bicycle","bicicletta"],
+  [["מְכוֹנִית","מכונית"],"mechonit","car","macchina"],[["כְּבִישׁ","כביש"],"kvish","road","strada"],[["כֶּסֶף","כסף"],"kesef","money","denaro"],
+  [["מְחִיר","מחיר"],"mechir","price","prezzo"],[["יָקָר","יקר"],"yakar","expensive","caro"],[["זוֹל","זול"],"zol","cheap","economico"],
+  [["מִשְׂרָד","משרד"],"misrad","office","ufficio"],[["דֹּאַר","דואר"],"do'ar","post / mail","posta"],[["בַּנְק","בנק"],"bank","bank","banca"],
+  [["מַחְשֵׁב","מחשב"],"machshev","computer","computer"],[["טֶלֶפוֹן","טלפון"],"telefon","telephone","telefono"],[["הוֹדָעָה","הודעה"],"hoda'a","message","messaggio"],
+  [["גֶּרְמָנִית","גרמנית"],"germanit","German (lang)","tedesco"],[["גֶּרְמַנְיָה","גרמניה"],"germanya","Germany","Germania"]]},
+ {cat:"Travel & places",lvl:"A2",words:[
+  [["נְסִיעָה","נסיעה"],"nesi'a","journey","viaggio"],[["טִיסָה","טיסה"],"tisa","flight","volo"],[["שְׂדֵה תְּעוּפָה","שדה תעופה"],"sde te'ufa","airport","aeroporto"],
+  [["מָטוֹס","מטוס"],"matos","airplane","aereo"],[["דַּרְכּוֹן","דרכון"],"darkon","passport","passaporto"],[["כַּרְטִיס","כרטיס"],"kartis","ticket","biglietto"],
+  [["מָלוֹן","מלון"],"malon","hotel","albergo"],[["חוֹף","חוף"],"chof","beach","spiaggia"],[["יָם","ים"],"yam","sea","mare"],
+  [["נָמֵל","נמל"],"namel","port","porto"],[["מַפָּה","מפה"],"mapa","map","mappa"],[["מִזְוָדָה","מזוודה"],"mizvada","suitcase","valigia"],
+  [["תַּיָּר","תייר"],"tayar","tourist","turista"],[["יִשְׂרָאֵל","ישראל"],"yisra'el","Israel","Israele"],[["אִיטַלְיָה","איטליה"],"italya","Italy","Italia"],
+  [["סִיצִילְיָה","סיציליה"],"sitzilya","Sicily","Sicilia"],[["מְדִינָה","מדינה"],"medina","country","paese"],[["גְּבוּל","גבול"],"gvul","border","confine"],
+  [["כְּתוֹבֶת","כתובת"],"ktovet","address","indirizzo"],[["דֶּרֶךְ","דרך"],"derech","way / road","via"],[["יָמִינָה","ימינה"],"yamina","to the right","a destra"],
+  [["שְׂמֹאלָה","שמאלה"],"smola","to the left","a sinistra"],[["יָשָׁר","ישר"],"yashar","straight","dritto"],[["קָרוֹב","קרוב"],"karov","near","vicino"],
+  [["רָחוֹק","רחוק"],"rachok","far","lontano"]]},
+ {cat:"Time & calendar",lvl:"A2",words:[
+  [["זְמַן","זמן"],"zman","time","tempo"],[["שָׁעָה","שעה"],"sha'a","hour","ora"],[["דַּקָּה","דקה"],"daka","minute","minuto"],
+  [["שְׁנִיָּה","שנייה"],"shniya","second","secondo"],[["יוֹם","יום"],"yom","day","giorno"],[["שָׁבוּעַ","שבוע"],"shavua","week","settimana"],
+  [["חוֹדֶשׁ","חודש"],"chodesh","month","mese"],[["שָׁנָה","שנה"],"shana","year","anno"],[["הַיּוֹם","היום"],"hayom","today","oggi"],
+  [["מָחָר","מחר"],"machar","tomorrow","domani"],[["אֶתְמוֹל","אתמול"],"etmol","yesterday","ieri"],[["עַכְשָׁיו","עכשיו"],"achshav","now","adesso"],
+  [["בּוֹקֶר","בוקר"],"boker","morning","mattina"],[["עֶרֶב","ערב"],"erev","evening","sera"],[["לַיְלָה","לילה"],"layla","night","notte"],
+  [["יוֹם רִאשׁוֹן","יום ראשון"],"yom rishon","Sunday","domenica"],[["יוֹם שֵׁנִי","יום שני"],"yom sheni","Monday","lunedì"],[["שַׁבָּת","שבת"],"shabat","Saturday","sabato"],
+  [["סוֹף שָׁבוּעַ","סוף שבוע"],"sof shavua","weekend","fine settimana"],[["חַג","חג"],"chag","holiday","festa"],[["יוֹם הוּלֶדֶת","יום הולדת"],"yom huledet","birthday","compleanno"],
+  [["תַּאֲרִיךְ","תאריך"],"taarich","date","data"]]},
+ {cat:"Body & health",lvl:"A2",words:[
+  [["גּוּף","גוף"],"guf","body","corpo"],[["רֹאשׁ","ראש"],"rosh","head","testa"],[["פָּנִים","פנים"],"panim","face","viso"],
+  [["עַיִן","עין"],"ayin","eye","occhio"],[["אֹזֶן","אוזן"],"ozen","ear","orecchio"],[["אַף","אף"],"af","nose","naso"],
+  [["פֶּה","פה"],"pe","mouth","bocca"],[["שֵׁן","שן"],"shen","tooth","dente"],[["יָד","יד"],"yad","hand / arm","mano"],
+  [["רֶגֶל","רגל"],"regel","leg / foot","gamba"],[["לֵב","לב"],"lev","heart","cuore"],[["בֶּטֶן","בטן"],"beten","stomach","pancia"],
+  [["גַּב","גב"],"gav","back","schiena"],[["שֵׂעָר","שיער"],"se'ar","hair","capelli"],[["בָּרִיא","בריא"],"bari","healthy","sano"],
+  [["חוֹלֶה","חולה"],"choleh","sick","malato"],[["כְּאֵב","כאב"],"ke'ev","pain","dolore"],[["רוֹפֵא","רופא"],"rofe","doctor","medico"],
+  [["בֵּית חוֹלִים","בית חולים"],"beit cholim","hospital","ospedale"],[["תְּרוּפָה","תרופה"],"trufa","medicine","medicina"],[["חוֹם","חום"],"chom","fever / heat","febbre"],
+  [["עָיֵף","עייף"],"ayef","tired","stanco"],[["רָעֵב","רעב"],"ra'ev","hungry","affamato"],[["צָמֵא","צמא"],"tzame","thirsty","assetato"]]},
+ {cat:"Weather & seasons",lvl:"A2",words:[
+  [["מֶזֶג אֲוִיר","מזג אוויר"],"mezeg avir","weather","tempo (meteo)"],[["שֶׁמֶשׁ","שמש"],"shemesh","sun","sole"],[["גֶּשֶׁם","גשם"],"geshem","rain","pioggia"],
+  [["שֶׁלֶג","שלג"],"sheleg","snow","neve"],[["רוּחַ","רוח"],"ruach","wind","vento"],[["עָנָן","ענן"],"anan","cloud","nuvola"],
+  [["שָׁמַיִים","שמיים"],"shamayim","sky","cielo"],[["חַם","חם"],"cham","hot","caldo"],[["קַר","קר"],"kar","cold","freddo"],
+  [["חֲמִים","חמים"],"chamim","warm","tiepido"],[["יָבֵשׁ","יבש"],"yavesh","dry","asciutto"],[["רָטוֹב","רטוב"],"ratov","wet","bagnato"],
+  [["בָּהִיר","בהיר"],"bahir","clear / bright","sereno"],[["עוֹנָה","עונה"],"ona","season","stagione"],[["אָבִיב","אביב"],"aviv","spring","primavera"],
+  [["קַיִץ","קיץ"],"kayitz","summer","estate"],[["סְתָיו","סתיו"],"stav","autumn","autunno"],[["חֹרֶף","חורף"],"choref","winter","inverno"],
+  [["מַעֲלוֹת","מעלות"],"ma'alot","degrees","gradi"]]},
+ {cat:"Colours & clothing",lvl:"A2",words:[
+  [["לָבָן","לבן"],"lavan","white","bianco"],[["שָׁחוֹר","שחור"],"shachor","black","nero"],[["אָדוֹם","אדום"],"adom","red","rosso"],
+  [["כָּחֹל","כחול"],"kachol","blue","blu"],[["יָרוֹק","ירוק"],"yarok","green","verde"],[["צָהוֹב","צהוב"],"tzahov","yellow","giallo"],
+  [["כָּתֹם","כתום"],"katom","orange","arancione"],[["חוּם","חום"],"chum","brown","marrone"],[["אָפֹר","אפור"],"afor","grey","grigio"],
+  [["וָרֹד","ורוד"],"varod","pink","rosa"],[["זָהָב","זהב"],"zahav","gold","oro"],[["כֶּסֶף","כסף"],"kesef","silver","argento"],
+  [["בֶּגֶד","בגד"],"beged","garment","indumento"],[["בְּגָדִים","בגדים"],"bgadim","clothes","vestiti"],[["חוּלְצָה","חולצה"],"chultza","shirt","maglia"],
+  [["מִכְנָסַיִים","מכנסיים"],"michnasayim","trousers","pantaloni"],[["נַעֲלַיִים","נעליים"],"na'alayim","shoes","scarpe"],[["מְעִיל","מעיל"],"me'il","coat","cappotto"],
+  [["כּוֹבַע","כובע"],"kova","hat","cappello"],[["שִׂמְלָה","שמלה"],"simla","dress","vestito"],[["מִשְׁקָפַיִים","משקפיים"],"mishkafayim","glasses","occhiali"]]},
+ {cat:"Common adjectives",lvl:"A2",words:[
+  [["גָּדוֹל","גדול"],"gadol","big","grande"],[["קָטָן","קטן"],"katan","small","piccolo"],[["טוֹב","טוב"],"tov","good","buono"],
+  [["רַע","רע"],"ra","bad","cattivo"],[["יָפֶה","יפה"],"yafe","beautiful","bello"],[["חָדָשׁ","חדש"],"chadash","new","nuovo"],
+  [["יָשָׁן","ישן"],"yashan","old (things)","vecchio"],[["צָעִיר","צעיר"],"tza'ir","young","giovane"],[["אָרֹךְ","ארוך"],"aroch","long","lungo"],
+  [["קָצָר","קצר"],"katzar","short","corto"],[["גָּבוֹהַּ","גבוה"],"gavoha","tall / high","alto"],[["נָמוּךְ","נמוך"],"namuch","low / short","basso"],
+  [["מָלֵא","מלא"],"male","full","pieno"],[["רֵיק","ריק"],"reik","empty","vuoto"],[["חָזָק","חזק"],"chazak","strong","forte"],
+  [["מָהִיר","מהיר"],"mahir","fast","veloce"],[["אִטִּי","איטי"],"iti","slow","lento"],[["קַל","קל"],"kal","easy / light","facile"],
+  [["קָשֶׁה","קשה"],"kashe","hard / difficult","difficile"],[["חָשׁוּב","חשוב"],"chashuv","important","importante"],[["נָקִי","נקי"],"naki","clean","pulito"],
+  [["מָתוֹק","מתוק"],"matok","sweet","dolce"],[["פָּשׁוּט","פשוט"],"pashut","simple","semplice"],[["מוּכָן","מוכן"],"muchan","ready","pronto"]]},
+ {cat:"Work & business",lvl:"B1",words:[
+  [["עֲבוֹדָה","עבודה"],"avoda","work","lavoro"],[["עוֹבֵד","עובד"],"oved","worker","lavoratore"],[["מְנַהֵל","מנהל"],"menahel","manager","direttore"],
+  [["לָקוֹחַ","לקוח"],"lako'ach","client","cliente"],[["פְּגִישָׁה","פגישה"],"pgisha","meeting","riunione"],[["פְּרוֹיֶקְט","פרויקט"],"proyekt","project","progetto"],
+  [["חֶבְרָה","חברה"],"chevra","company","azienda"],[["עֵסֶק","עסק"],"esek","business","attività"],[["מַשְׂכֹּרֶת","משכורת"],"maskoret","salary","stipendio"],
+  [["חוֹזֶה","חוזה"],"choze","contract","contratto"],[["מִסְמָךְ","מסמך"],"mismach","document","documento"],[["רַעְיוֹן","רעיון"],"ra'ayon","idea","idea"],
+  [["מַטָּרָה","מטרה"],"matara","goal","obiettivo"],[["הַצְלָחָה","הצלחה"],"hatzlacha","success","successo"],[["בְּעָיָה","בעיה"],"be'aya","problem","problema"],
+  [["פִּתְרוֹן","פתרון"],"pitaron","solution","soluzione"],[["הַחְלָטָה","החלטה"],"hachlata","decision","decisione"],[["תּוֹכְנִית","תוכנית"],"tochnit","plan","piano"],
+  [["הִזְדַּמְּנוּת","הזדמנות"],"hizdamnut","opportunity","opportunità"],[["תַּשְׁלוּם","תשלום"],"tashlum","payment","pagamento"],[["חֶשְׁבּוֹנִית","חשבונית"],"cheshbonit","invoice","fattura"],
+  [["תַּקְצִיב","תקציב"],"taktziv","budget","budget"],[["אַחְרָיוּת","אחריות"],"achrayut","responsibility","responsabilità"]]},
+ {cat:"Feelings & emotions",lvl:"B1",words:[
+  [["רֶגֶשׁ","רגש"],"regesh","emotion","emozione"],[["שָׂמֵחַ","שמח"],"same'ach","happy","felice"],[["עָצוּב","עצוב"],"atzuv","sad","triste"],
+  [["כּוֹעֵס","כועס"],"ko'es","angry","arrabbiato"],[["מְפֻחָד","מפוחד"],"mefuchad","scared","spaventato"],[["רָגוּעַ","רגוע"],"ragu'a","calm","calmo"],
+  [["לָחוּץ","לחוץ"],"lachutz","stressed","stressato"],[["גֵּאֶה","גאה"],"ge'e","proud","orgoglioso"],[["אַהֲבָה","אהבה"],"ahava","love","amore"],
+  [["שִׂמְחָה","שמחה"],"simcha","joy","gioia"],[["פַּחַד","פחד"],"pachad","fear","paura"],[["תִּקְוָה","תקווה"],"tikva","hope","speranza"],
+  [["גַּעְגּוּעַ","געגוע"],"ga'agua","longing","nostalgia"],[["מְעַנְיֵן","מעניין"],"me'anyen","interesting","interessante"],[["מְשַׁעֲמֵם","משעמם"],"meshaamem","boring","noioso"],
+  [["נֶהְדָּר","נהדר"],"nehedar","wonderful","meraviglioso"]]},
+ {cat:"Abstract & B2",lvl:"B2",words:[
+  [["חֶבְרָה","חברה"],"chevra","society","società"],[["תַּרְבּוּת","תרבות"],"tarbut","culture","cultura"],[["זְהוּת","זהות"],"zehut","identity","identità"],
+  [["מַשְׁמָעוּת","משמעות"],"mashma'ut","meaning","significato"],[["נִיסָּיוֹן","ניסיון"],"nisayon","experience","esperienza"],[["הִזְדַּמְּנוּת","הזדמנות"],"hizdamnut","opportunity","opportunità"],
+  [["סִבָּה","סיבה"],"siba","reason","ragione"],[["תּוֹצָאָה","תוצאה"],"totza'a","result","risultato"],[["הֶבְדֵּל","הבדל"],"hevdel","difference","differenza"],
+  [["דֵּעָה","דעה"],"de'a","opinion","opinione"],[["מַחְשָׁבָה","מחשבה"],"machshava","thought","pensiero"],[["חֵרוּת","חירות"],"cherut","freedom","libertà"],
+  [["שִׁנּוּי","שינוי"],"shinuy","change","cambiamento"],[["יְכֹלֶת","יכולת"],"yecholet","ability","capacità"],[["צֹרֶךְ","צורך"],"tzorech","need","bisogno"],
+  [["דֻּגְמָה","דוגמה"],"dugma","example","esempio"]]},
+ {cat:"Question words",lvl:"A1",words:[
+  [["מַה","מה"],"ma","what","che / cosa"],[["מִי","מי"],"mi","who","chi"],[["אֵיפֹה","איפה"],"eifo","where","dove"],
+  [["מָתַי","מתי"],"matay","when","quando"],[["לָמָּה","למה"],"lama","why","perché"],[["אֵיךְ","איך"],"eich","how","come"],
+  [["כַּמָּה","כמה"],"kama","how much / many","quanto"],[["אֵיזֶה","איזה"],"eize","which","quale"],[["לְאָן","לאן"],"le'an","where to","dove (verso)"],
+  [["מֵאַיִן","מאין"],"me-ayin","where from","da dove"],[["כְּשֶׁ","כש"],"kshe-","when (conj)","quando"],[["כְּדֵי","כדי"],"kdei","in order to","per"]]}
+];
+
+/* ---- VERBS: bank across binyanim, A1 to B2; tap to expand full table ---- */
+const VERBS=[
+ {inf:["לִלְמֹד","ללמוד"],root:"ל־מ־ד",en:"to learn",binyan:"Pa'al",lvl:"A1",
+  present:[["m.sg",["לוֹמֵד","לומד"]],["f.sg",["לוֹמֶדֶת","לומדת"]],["m.pl",["לוֹמְדִים","לומדים"]],["f.pl",["לוֹמְדוֹת","לומדות"]]],
+  past:[["I",["לָמַדְתִּי","למדתי"]],["you m",["לָמַדְתָּ","למדת"]],["he",["לָמַד","למד"]],["she",["לָמְדָה","למדה"]],["we",["לָמַדְנוּ","למדנו"]],["they",["לָמְדוּ","למדו"]]],
+  future:[["I",["אֶלְמַד","אלמד"]],["he",["יִלְמַד","ילמד"]],["we",["נִלְמַד","נלמד"]],["they",["יִלְמְדוּ","ילמדו"]]],
+  note:"Regular Pa'al, your core verb. אני לומד עברית."},
+ {inf:["לֶאֱכֹל","לאכול"],root:"א־כ־ל",en:"to eat",binyan:"Pa'al",lvl:"A1",
+  present:[["m.sg",["אוֹכֵל","אוכל"]],["f.sg",["אוֹכֶלֶת","אוכלת"]],["m.pl",["אוֹכְלִים","אוכלים"]],["f.pl",["אוֹכְלוֹת","אוכלות"]]],
+  past:[["I",["אָכַלְתִּי","אכלתי"]],["you m",["אָכַלְתָּ","אכלת"]],["he",["אָכַל","אכל"]],["she",["אָכְלָה","אכלה"]],["we",["אָכַלְנוּ","אכלנו"]],["they",["אָכְלוּ","אכלו"]]],
+  future:[["I",["אֹכַל","אוכל"]],["he",["יֹאכַל","יאכל"]],["we",["נֹאכַל","נאכל"]],["they",["יֹאכְלוּ","יאכלו"]]],
+  note:"Guttural first letter shifts vowels. High frequency."},
+ {inf:["לִשְׁתּוֹת","לשתות"],root:"שׁ־ת־ה",en:"to drink",binyan:"Pa'al",lvl:"A1",
+  present:[["m.sg",["שׁוֹתֶה","שותה"]],["f.sg",["שׁוֹתָה","שותה"]],["m.pl",["שׁוֹתִים","שותים"]],["f.pl",["שׁוֹתוֹת","שותות"]]],
+  past:[["I",["שָׁתִיתִי","שתיתי"]],["you m",["שָׁתִיתָ","שתית"]],["he",["שָׁתָה","שתה"]],["she",["שָׁתְתָה","שתתה"]],["we",["שָׁתִינוּ","שתינו"]],["they",["שָׁתוּ","שתו"]]],
+  future:[["I",["אֶשְׁתֶּה","אשתה"]],["he",["יִשְׁתֶּה","ישתה"]],["we",["נִשְׁתֶּה","נשתה"]],["they",["יִשְׁתּוּ","ישתו"]]],
+  note:"Final-ה verb. Same family: רוצה, קונה, רואה."},
+ {inf:["לָלֶכֶת","ללכת"],root:"ה־ל־ך",en:"to go / walk",binyan:"Pa'al",lvl:"A1",
+  present:[["m.sg",["הוֹלֵךְ","הולך"]],["f.sg",["הוֹלֶכֶת","הולכת"]],["m.pl",["הוֹלְכִים","הולכים"]],["f.pl",["הוֹלְכוֹת","הולכות"]]],
+  past:[["I",["הָלַכְתִּי","הלכתי"]],["you m",["הָלַכְתָּ","הלכת"]],["he",["הָלַךְ","הלך"]],["she",["הָלְכָה","הלכה"]],["we",["הָלַכְנוּ","הלכנו"]],["they",["הָלְכוּ","הלכו"]]],
+  future:[["I",["אֵלֵךְ","אלך"]],["he",["יֵלֵךְ","ילך"]],["we",["נֵלֵךְ","נלך"]],["they",["יֵלְכוּ","ילכו"]]],
+  note:"Irregular future (drops the ה). Extremely common."},
+ {inf:["לִרְצוֹת","לרצות"],root:"ר־צ־ה",en:"to want",binyan:"Pa'al",lvl:"A1",
+  present:[["m.sg",["רוֹצֶה","רוצה"]],["f.sg",["רוֹצָה","רוצה"]],["m.pl",["רוֹצִים","רוצים"]],["f.pl",["רוֹצוֹת","רוצות"]]],
+  past:[["I",["רָצִיתִי","רציתי"]],["you m",["רָצִיתָ","רצית"]],["he",["רָצָה","רצה"]],["she",["רָצְתָה","רצתה"]],["we",["רָצִינוּ","רצינו"]],["they",["רָצוּ","רצו"]]],
+  future:[["I",["אֶרְצֶה","ארצה"]],["he",["יִרְצֶה","ירצה"]],["we",["נִרְצֶה","נרצה"]],["they",["יִרְצוּ","ירצו"]]],
+  note:"Use רוצה + noun or + infinitive: אני רוצה לאכול."},
+ {inf:["לִרְאוֹת","לראות"],root:"ר־א־ה",en:"to see",binyan:"Pa'al",lvl:"A1",
+  present:[["m.sg",["רוֹאֶה","רואה"]],["f.sg",["רוֹאָה","רואה"]],["m.pl",["רוֹאִים","רואים"]],["f.pl",["רוֹאוֹת","רואות"]]],
+  past:[["I",["רָאִיתִי","ראיתי"]],["you m",["רָאִיתָ","ראית"]],["he",["רָאָה","ראה"]],["she",["רָאֲתָה","ראתה"]],["we",["רָאִינוּ","ראינו"]],["they",["רָאוּ","ראו"]]],
+  future:[["I",["אֶרְאֶה","אראה"]],["he",["יִרְאֶה","יראה"]],["we",["נִרְאֶה","נראה"]],["they",["יִרְאוּ","יראו"]]],
+  note:"Final-ה with guttural. Very frequent."},
+ {inf:["לָגוּר","לגור"],root:"ג־ו־ר",en:"to live (reside)",binyan:"Pa'al (hollow)",lvl:"A1",
+  present:[["m.sg",["גָּר","גר"]],["f.sg",["גָּרָה","גרה"]],["m.pl",["גָּרִים","גרים"]],["f.pl",["גָּרוֹת","גרות"]]],
+  past:[["I",["גַּרְתִּי","גרתי"]],["you m",["גַּרְתָּ","גרת"]],["he",["גָּר","גר"]],["she",["גָּרָה","גרה"]],["we",["גַּרְנוּ","גרנו"]],["they",["גָּרוּ","גרו"]]],
+  future:[["I",["אָגוּר","אגור"]],["he",["יָגוּר","יגור"]],["we",["נָגוּר","נגור"]],["they",["יָגוּרוּ","יגורו"]]],
+  note:"Hollow root (vav middle). Family: בא, קם, שם, רץ."},
+ {inf:["לָבוֹא","לבוא"],root:"ב־ו־א",en:"to come",binyan:"Pa'al (hollow)",lvl:"A1",
+  present:[["m.sg",["בָּא","בא"]],["f.sg",["בָּאָה","באה"]],["m.pl",["בָּאִים","באים"]],["f.pl",["בָּאוֹת","באות"]]],
+  past:[["I",["בָּאתִי","באתי"]],["you m",["בָּאתָ","באת"]],["he",["בָּא","בא"]],["she",["בָּאָה","באה"]],["we",["בָּאנוּ","באנו"]],["they",["בָּאוּ","באו"]]],
+  future:[["I",["אָבוֹא","אבוא"]],["he",["יָבוֹא","יבוא"]],["we",["נָבוֹא","נבוא"]],["they",["יָבוֹאוּ","יבואו"]]],
+  note:"Present m.sg and past 'he' look identical (בא). Context decides."},
+ {inf:["לָקוּם","לקום"],root:"ק־ו־ם",en:"to get up / rise",binyan:"Pa'al (hollow)",lvl:"A2",
+  present:[["m.sg",["קָם","קם"]],["f.sg",["קָמָה","קמה"]],["m.pl",["קָמִים","קמים"]],["f.pl",["קָמוֹת","קמות"]]],
+  past:[["I",["קַמְתִּי","קמתי"]],["you m",["קַמְתָּ","קמת"]],["he",["קָם","קם"]],["she",["קָמָה","קמה"]],["we",["קַמְנוּ","קמנו"]],["they",["קָמוּ","קמו"]]],
+  future:[["I",["אָקוּם","אקום"]],["he",["יָקוּם","יקום"]],["we",["נָקוּם","נקום"]],["they",["יָקוּמוּ","יקומו"]]],
+  note:"Hollow. אני קם בשבע = I get up at seven."},
+ {inf:["לִכְתֹּב","לכתוב"],root:"כ־ת־ב",en:"to write",binyan:"Pa'al",lvl:"A1",
+  present:[["m.sg",["כּוֹתֵב","כותב"]],["f.sg",["כּוֹתֶבֶת","כותבת"]],["m.pl",["כּוֹתְבִים","כותבים"]],["f.pl",["כּוֹתְבוֹת","כותבות"]]],
+  past:[["I",["כָּתַבְתִּי","כתבתי"]],["you m",["כָּתַבְתָּ","כתבת"]],["he",["כָּתַב","כתב"]],["she",["כָּתְבָה","כתבה"]],["we",["כָּתַבְנוּ","כתבנו"]],["they",["כָּתְבוּ","כתבו"]]],
+  future:[["I",["אֶכְתֹּב","אכתוב"]],["he",["יִכְתֹּב","יכתוב"]],["we",["נִכְתֹּב","נכתוב"]],["they",["יִכְתְּבוּ","יכתבו"]]],
+  note:"The model Pa'al verb shown in grammar."},
+ {inf:["לִקְנוֹת","לקנות"],root:"ק־נ־ה",en:"to buy",binyan:"Pa'al",lvl:"A2",
+  present:[["m.sg",["קוֹנֶה","קונה"]],["f.sg",["קוֹנָה","קונה"]],["m.pl",["קוֹנִים","קונים"]],["f.pl",["קוֹנוֹת","קונות"]]],
+  past:[["I",["קָנִיתִי","קניתי"]],["you m",["קָנִיתָ","קנית"]],["he",["קָנָה","קנה"]],["she",["קָנְתָה","קנתה"]],["we",["קָנִינוּ","קנינו"]],["they",["קָנוּ","קנו"]]],
+  future:[["I",["אֶקְנֶה","אקנה"]],["he",["יִקְנֶה","יקנה"]],["we",["נִקְנֶה","נקנה"]],["they",["יִקְנוּ","יקנו"]]],
+  note:"Final-ה. אני קונה לחם בשוק."},
+ {inf:["לַעֲבֹד","לעבוד"],root:"ע־ב־ד",en:"to work",binyan:"Pa'al",lvl:"A2",
+  present:[["m.sg",["עוֹבֵד","עובד"]],["f.sg",["עוֹבֶדֶת","עובדת"]],["m.pl",["עוֹבְדִים","עובדים"]],["f.pl",["עוֹבְדוֹת","עובדות"]]],
+  past:[["I",["עָבַדְתִּי","עבדתי"]],["you m",["עָבַדְתָּ","עבדת"]],["he",["עָבַד","עבד"]],["she",["עָבְדָה","עבדה"]],["we",["עָבַדְנוּ","עבדנו"]],["they",["עָבְדוּ","עבדו"]]],
+  future:[["I",["אֶעֱבֹד","אעבוד"]],["he",["יַעֲבֹד","יעבוד"]],["we",["נַעֲבֹד","נעבוד"]],["they",["יַעַבְדוּ","יעבדו"]]],
+  note:"Guttural first letter (ע). קובי עובד עם אנשים."},
+ {inf:["לִנְסֹעַ","לנסוע"],root:"נ־ס־ע",en:"to travel / ride",binyan:"Pa'al",lvl:"A2",
+  present:[["m.sg",["נוֹסֵעַ","נוסע"]],["f.sg",["נוֹסַעַת","נוסעת"]],["m.pl",["נוֹסְעִים","נוסעים"]],["f.pl",["נוֹסְעוֹת","נוסעות"]]],
+  past:[["I",["נָסַעְתִּי","נסעתי"]],["you m",["נָסַעְתָּ","נסעת"]],["he",["נָסַע","נסע"]],["she",["נָסְעָה","נסעה"]],["we",["נָסַעְנוּ","נסענו"]],["they",["נָסְעוּ","נסעו"]]],
+  future:[["I",["אֶסַּע","אסע"]],["he",["יִסַּע","יסע"]],["we",["נִסַּע","ניסע"]],["they",["יִסְעוּ","יסעו"]]],
+  note:"First-letter נ assimilates in future. נוסעים לתל אביב."},
+ {inf:["לָתֵת","לתת"],root:"נ־ת־ן",en:"to give",binyan:"Pa'al",lvl:"A2",
+  present:[["m.sg",["נוֹתֵן","נותן"]],["f.sg",["נוֹתֶנֶת","נותנת"]],["m.pl",["נוֹתְנִים","נותנים"]],["f.pl",["נוֹתְנוֹת","נותנות"]]],
+  past:[["I",["נָתַתִּי","נתתי"]],["you m",["נָתַתָּ","נתת"]],["he",["נָתַן","נתן"]],["she",["נָתְנָה","נתנה"]],["we",["נָתַנּוּ","נתנו"]],["they",["נָתְנוּ","נתנו"]]],
+  future:[["I",["אֶתֵּן","אתן"]],["he",["יִתֵּן","ייתן"]],["we",["נִתֵּן","ניתן"]],["they",["יִתְּנוּ","ייתנו"]]],
+  note:"Irregular: both נ letters drop in places. Common with לי/לך."},
+ {inf:["לְדַבֵּר","לדבר"],root:"ד־ב־ר",en:"to speak",binyan:"Pi'el",lvl:"A1",
+  present:[["m.sg",["מְדַבֵּר","מדבר"]],["f.sg",["מְדַבֶּרֶת","מדברת"]],["m.pl",["מְדַבְּרִים","מדברים"]],["f.pl",["מְדַבְּרוֹת","מדברות"]]],
+  past:[["I",["דִּבַּרְתִּי","דיברתי"]],["you m",["דִּבַּרְתָּ","דיברת"]],["he",["דִּבֵּר","דיבר"]],["she",["דִּבְּרָה","דיברה"]],["we",["דִּבַּרְנוּ","דיברנו"]],["they",["דִּבְּרוּ","דיברו"]]],
+  future:[["I",["אֲדַבֵּר","אדבר"]],["he",["יְדַבֵּר","ידבר"]],["we",["נְדַבֵּר","נדבר"]],["they",["יְדַבְּרוּ","ידברו"]]],
+  note:"Pi'el: מְ prefix in present, doubled middle ב."},
+ {inf:["לְבַשֵּׁל","לבשל"],root:"ב־שׁ־ל",en:"to cook",binyan:"Pi'el",lvl:"A1",
+  present:[["m.sg",["מְבַשֵּׁל","מבשל"]],["f.sg",["מְבַשֶּׁלֶת","מבשלת"]],["m.pl",["מְבַשְּׁלִים","מבשלים"]],["f.pl",["מְבַשְּׁלוֹת","מבשלות"]]],
+  past:[["I",["בִּשַּׁלְתִּי","בישלתי"]],["you m",["בִּשַּׁלְתָּ","בישלת"]],["he",["בִּשֵּׁל","בישל"]],["she",["בִּשְּׁלָה","בישלה"]],["we",["בִּשַּׁלְנוּ","בישלנו"]],["they",["בִּשְּׁלוּ","בישלו"]]],
+  future:[["I",["אֲבַשֵּׁל","אבשל"]],["he",["יְבַשֵּׁל","יבשל"]],["we",["נְבַשֵּׁל","נבשל"]],["they",["יְבַשְּׁלוּ","יבשלו"]]],
+  note:"Vincenzo's verb. אני מבשל פסטה."},
+ {inf:["לְסַפֵּר","לספר"],root:"ס־פ־ר",en:"to tell / narrate",binyan:"Pi'el",lvl:"A2",
+  present:[["m.sg",["מְסַפֵּר","מספר"]],["f.sg",["מְסַפֶּרֶת","מספרת"]],["m.pl",["מְסַפְּרִים","מספרים"]],["f.pl",["מְסַפְּרוֹת","מספרות"]]],
+  past:[["I",["סִפַּרְתִּי","סיפרתי"]],["you m",["סִפַּרְתָּ","סיפרת"]],["he",["סִפֵּר","סיפר"]],["she",["סִפְּרָה","סיפרה"]],["we",["סִפַּרְנוּ","סיפרנו"]],["they",["סִפְּרוּ","סיפרו"]]],
+  future:[["I",["אֲסַפֵּר","אספר"]],["he",["יְסַפֵּר","יספר"]],["we",["נְסַפֵּר","נספר"]],["they",["יְסַפְּרוּ","יספרו"]]],
+  note:"Pi'el. תספר לי על ברלין = tell me about Berlin."},
+ {inf:["לְטַיֵּל","לטייל"],root:"ט־י־ל",en:"to tour / stroll",binyan:"Pi'el",lvl:"A2",
+  present:[["m.sg",["מְטַיֵּל","מטייל"]],["f.sg",["מְטַיֶּלֶת","מטיילת"]],["m.pl",["מְטַיְּלִים","מטיילים"]],["f.pl",["מְטַיְּלוֹת","מטיילות"]]],
+  past:[["I",["טִיַּלְתִּי","טיילתי"]],["you m",["טִיַּלְתָּ","טיילת"]],["he",["טִיֵּל","טייל"]],["she",["טִיְּלָה","טיילה"]],["we",["טִיַּלְנוּ","טיילנו"]],["they",["טִיְּלוּ","טיילו"]]],
+  future:[["I",["אֲטַיֵּל","אטייל"]],["he",["יְטַיֵּל","יטייל"]],["we",["נְטַיֵּל","נטייל"]],["they",["יְטַיְּלוּ","יטיילו"]]],
+  note:"Pi'el. מטיילים ברחובות של יפו."},
+ {inf:["לְהָבִין","להבין"],root:"ב־י־ן",en:"to understand",binyan:"Hif'il",lvl:"A2",
+  present:[["m.sg",["מֵבִין","מבין"]],["f.sg",["מְבִינָה","מבינה"]],["m.pl",["מְבִינִים","מבינים"]],["f.pl",["מְבִינוֹת","מבינות"]]],
+  past:[["I",["הֵבַנְתִּי","הבנתי"]],["you m",["הֵבַנְתָּ","הבנת"]],["he",["הֵבִין","הבין"]],["she",["הֵבִינָה","הבינה"]],["we",["הֵבַנּוּ","הבנו"]],["they",["הֵבִינוּ","הבינו"]]],
+  future:[["I",["אָבִין","אבין"]],["he",["יָבִין","יבין"]],["we",["נָבִין","נבין"]],["they",["יָבִינוּ","יבינו"]]],
+  note:"Irregular Hif'il, memorise it. אני לא מבין = I don't understand."},
+ {inf:["לְהַכִּיר","להכיר"],root:"נ־כ־ר",en:"to know (a person)",binyan:"Hif'il",lvl:"A2",
+  present:[["m.sg",["מַכִּיר","מכיר"]],["f.sg",["מַכִּירָה","מכירה"]],["m.pl",["מַכִּירִים","מכירים"]],["f.pl",["מַכִּירוֹת","מכירות"]]],
+  past:[["I",["הִכַּרְתִּי","הכרתי"]],["you m",["הִכַּרְתָּ","הכרת"]],["he",["הִכִּיר","הכיר"]],["she",["הִכִּירָה","הכירה"]],["we",["הִכַּרְנוּ","הכרנו"]],["they",["הִכִּירוּ","הכירו"]]],
+  future:[["I",["אַכִּיר","אכיר"]],["he",["יַכִּיר","יכיר"]],["we",["נַכִּיר","נכיר"]],["they",["יַכִּירוּ","יכירו"]]],
+  note:"conoscere. Pair with יודע = sapere (facts)."},
+ {inf:["לְהַתְחִיל","להתחיל"],root:"ת־ח־ל",en:"to begin",binyan:"Hif'il",lvl:"A2",
+  present:[["m.sg",["מַתְחִיל","מתחיל"]],["f.sg",["מַתְחִילָה","מתחילה"]],["m.pl",["מַתְחִילִים","מתחילים"]],["f.pl",["מַתְחִילוֹת","מתחילות"]]],
+  past:[["I",["הִתְחַלְתִּי","התחלתי"]],["you m",["הִתְחַלְתָּ","התחלת"]],["he",["הִתְחִיל","התחיל"]],["she",["הִתְחִילָה","התחילה"]],["we",["הִתְחַלְנוּ","התחלנו"]],["they",["הִתְחִילוּ","התחילו"]]],
+  future:[["I",["אַתְחִיל","אתחיל"]],["he",["יַתְחִיל","יתחיל"]],["we",["נַתְחִיל","נתחיל"]],["they",["יַתְחִילוּ","יתחילו"]]],
+  note:"Hif'il. מתחילים את השיעור."},
+ {inf:["לְהַרְגִּישׁ","להרגיש"],root:"ר־ג־שׁ",en:"to feel",binyan:"Hif'il",lvl:"B1",
+  present:[["m.sg",["מַרְגִּישׁ","מרגיש"]],["f.sg",["מַרְגִּישָׁה","מרגישה"]],["m.pl",["מַרְגִּישִׁים","מרגישים"]],["f.pl",["מַרְגִּישׁוֹת","מרגישות"]]],
+  past:[["I",["הִרְגַּשְׁתִּי","הרגשתי"]],["you m",["הִרְגַּשְׁתָּ","הרגשת"]],["he",["הִרְגִּישׁ","הרגיש"]],["she",["הִרְגִּישָׁה","הרגישה"]],["we",["הִרְגַּשְׁנוּ","הרגשנו"]],["they",["הִרְגִּישׁוּ","הרגישו"]]],
+  future:[["I",["אַרְגִּישׁ","ארגיש"]],["he",["יַרְגִּישׁ","ירגיש"]],["we",["נַרְגִּישׁ","נרגיש"]],["they",["יַרְגִּישׁוּ","ירגישו"]]],
+  note:"Hif'il. אני מרגיש טוב = I feel good."},
+ {inf:["לְהִתְלַבֵּשׁ","להתלבש"],root:"ל־ב־שׁ",en:"to get dressed",binyan:"Hitpa'el",lvl:"A2",
+  present:[["m.sg",["מִתְלַבֵּשׁ","מתלבש"]],["f.sg",["מִתְלַבֶּשֶׁת","מתלבשת"]],["m.pl",["מִתְלַבְּשִׁים","מתלבשים"]],["f.pl",["מִתְלַבְּשׁוֹת","מתלבשות"]]],
+  past:[["I",["הִתְלַבַּשְׁתִּי","התלבשתי"]],["you m",["הִתְלַבַּשְׁתָּ","התלבשת"]],["he",["הִתְלַבֵּשׁ","התלבש"]],["she",["הִתְלַבְּשָׁה","התלבשה"]],["we",["הִתְלַבַּשְׁנוּ","התלבשנו"]],["they",["הִתְלַבְּשׁוּ","התלבשו"]]],
+  future:[["I",["אֶתְלַבֵּשׁ","אתלבש"]],["he",["יִתְלַבֵּשׁ","יתלבש"]],["we",["נִתְלַבֵּשׁ","נתלבש"]],["they",["יִתְלַבְּשׁוּ","יתלבשו"]]],
+  note:"Hitpa'el reflexive (vestirsi). מִתְ prefix."},
+ {inf:["לְהִתְעוֹרֵר","להתעורר"],root:"ע־ו־ר",en:"to wake up",binyan:"Hitpa'el",lvl:"A2",
+  present:[["m.sg",["מִתְעוֹרֵר","מתעורר"]],["f.sg",["מִתְעוֹרֶרֶת","מתעוררת"]],["m.pl",["מִתְעוֹרְרִים","מתעוררים"]],["f.pl",["מִתְעוֹרְרוֹת","מתעוררות"]]],
+  past:[["I",["הִתְעוֹרַרְתִּי","התעוררתי"]],["you m",["הִתְעוֹרַרְתָּ","התעוררת"]],["he",["הִתְעוֹרֵר","התעורר"]],["she",["הִתְעוֹרְרָה","התעוררה"]],["we",["הִתְעוֹרַרְנוּ","התעוררנו"]],["they",["הִתְעוֹרְרוּ","התעוררו"]]],
+  future:[["I",["אֶתְעוֹרֵר","אתעורר"]],["he",["יִתְעוֹרֵר","יתעורר"]],["we",["נִתְעוֹרֵר","נתעורר"]],["they",["יִתְעוֹרְרוּ","יתעוררו"]]],
+  note:"Reflexive (svegliarsi). Daily routine verb."},
+ {inf:["לְהִתְגַּעְגֵּעַ","להתגעגע"],root:"ג־ע־ג־ע",en:"to miss / long for",binyan:"Hitpa'el",lvl:"A2",
+  present:[["m.sg",["מִתְגַּעְגֵּעַ","מתגעגע"]],["f.sg",["מִתְגַּעְגַּעַת","מתגעגעת"]],["m.pl",["מִתְגַּעְגְּעִים","מתגעגעים"]],["f.pl",["מִתְגַּעְגְּעוֹת","מתגעגעות"]]],
+  past:[["I",["הִתְגַּעְגַּעְתִּי","התגעגעתי"]],["you m",["הִתְגַּעְגַּעְתָּ","התגעגעת"]],["he",["הִתְגַּעְגֵּעַ","התגעגע"]],["she",["הִתְגַּעְגְּעָה","התגעגעה"]],["we",["הִתְגַּעְגַּעְנוּ","התגעגענו"]],["they",["הִתְגַּעְגְּעוּ","התגעגעו"]]],
+  future:[["I",["אֶתְגַּעְגֵּעַ","אתגעגע"]],["he",["יִתְגַּעְגֵּעַ","יתגעגע"]],["we",["נִתְגַּעְגֵּעַ","נתגעגע"]],["they",["יִתְגַּעְגְּעוּ","יתגעגעו"]]],
+  note:"Hitpa'el. אני מתגעגע לסיציליה."},
+ {inf:["לְהִתְחַתֵּן","להתחתן"],root:"ח־ת־ן",en:"to get married",binyan:"Hitpa'el",lvl:"B1",
+  present:[["m.sg",["מִתְחַתֵּן","מתחתן"]],["f.sg",["מִתְחַתֶּנֶת","מתחתנת"]],["m.pl",["מִתְחַתְּנִים","מתחתנים"]],["f.pl",["מִתְחַתְּנוֹת","מתחתנות"]]],
+  past:[["I",["הִתְחַתַּנְתִּי","התחתנתי"]],["you m",["הִתְחַתַּנְתָּ","התחתנת"]],["he",["הִתְחַתֵּן","התחתן"]],["she",["הִתְחַתְּנָה","התחתנה"]],["we",["הִתְחַתַּנּוּ","התחתנו"]],["they",["הִתְחַתְּנוּ","התחתנו"]]],
+  future:[["I",["אֶתְחַתֵּן","אתחתן"]],["he",["יִתְחַתֵּן","יתחתן"]],["we",["נִתְחַתֵּן","נתחתן"]],["they",["יִתְחַתְּנוּ","יתחתנו"]]],
+  note:"Hitpa'el. התחתנו בקופנהאגן = we got married in Copenhagen."},
+ {inf:["לְהִיכָּנֵס","להיכנס"],root:"כ־נ־ס",en:"to enter",binyan:"Nif'al",lvl:"B1",
+  present:[["m.sg",["נִכְנָס","נכנס"]],["f.sg",["נִכְנֶסֶת","נכנסת"]],["m.pl",["נִכְנָסִים","נכנסים"]],["f.pl",["נִכְנָסוֹת","נכנסות"]]],
+  past:[["I",["נִכְנַסְתִּי","נכנסתי"]],["you m",["נִכְנַסְתָּ","נכנסת"]],["he",["נִכְנַס","נכנס"]],["she",["נִכְנְסָה","נכנסה"]],["we",["נִכְנַסְנוּ","נכנסנו"]],["they",["נִכְנְסוּ","נכנסו"]]],
+  future:[["I",["אֶכָּנֵס","איכנס"]],["he",["יִכָּנֵס","ייכנס"]],["we",["נִכָּנֵס","ניכנס"]],["they",["יִכָּנְסוּ","ייכנסו"]]],
+  note:"Nif'al, נ prefix in present. Common despite the pattern."},
+ {inf:["לְהִישָּׁאֵר","להישאר"],root:"שׁ־א־ר",en:"to stay / remain",binyan:"Nif'al",lvl:"B1",
+  present:[["m.sg",["נִשְׁאָר","נשאר"]],["f.sg",["נִשְׁאֶרֶת","נשארת"]],["m.pl",["נִשְׁאָרִים","נשארים"]],["f.pl",["נִשְׁאָרוֹת","נשארות"]]],
+  past:[["I",["נִשְׁאַרְתִּי","נשארתי"]],["you m",["נִשְׁאַרְתָּ","נשארת"]],["he",["נִשְׁאַר","נשאר"]],["she",["נִשְׁאֲרָה","נשארה"]],["we",["נִשְׁאַרְנוּ","נשארנו"]],["they",["נִשְׁאֲרוּ","נשארו"]]],
+  future:[["I",["אֶשָּׁאֵר","אישאר"]],["he",["יִשָּׁאֵר","יישאר"]],["we",["נִשָּׁאֵר","נישאר"]],["they",["יִשָּׁאֲרוּ","יישארו"]]],
+  note:"Nif'al. נשארים בבית = we stay home."},
+ {inf:["לִשְׁמֹעַ","לשמוע"],root:"שׁ־מ־ע",en:"to hear",binyan:"Pa'al",lvl:"A2",
+  present:[["m.sg",["שׁוֹמֵעַ","שומע"]],["f.sg",["שׁוֹמַעַת","שומעת"]],["m.pl",["שׁוֹמְעִים","שומעים"]],["f.pl",["שׁוֹמְעוֹת","שומעות"]]],
+  past:[["I",["שָׁמַעְתִּי","שמעתי"]],["you m",["שָׁמַעְתָּ","שמעת"]],["he",["שָׁמַע","שמע"]],["she",["שָׁמְעָה","שמעה"]],["we",["שָׁמַעְנוּ","שמענו"]],["they",["שָׁמְעוּ","שמעו"]]],
+  future:[["I",["אֶשְׁמַע","אשמע"]],["he",["יִשְׁמַע","ישמע"]],["we",["נִשְׁמַע","נשמע"]],["they",["יִשְׁמְעוּ","ישמעו"]]],
+  note:"Guttural final ע adds a helper 'a'. מה נשמע? = what's up?"},
+ {inf:["לַעֲזֹר","לעזור"],root:"ע־ז־ר",en:"to help",binyan:"Pa'al",lvl:"A2",
+  present:[["m.sg",["עוֹזֵר","עוזר"]],["f.sg",["עוֹזֶרֶת","עוזרת"]],["m.pl",["עוֹזְרִים","עוזרים"]],["f.pl",["עוֹזְרוֹת","עוזרות"]]],
+  past:[["I",["עָזַרְתִּי","עזרתי"]],["you m",["עָזַרְתָּ","עזרת"]],["he",["עָזַר","עזר"]],["she",["עָזְרָה","עזרה"]],["we",["עָזַרְנוּ","עזרנו"]],["they",["עָזְרוּ","עזרו"]]],
+  future:[["I",["אֶעֱזֹר","אעזור"]],["he",["יַעֲזֹר","יעזור"]],["we",["נַעֲזֹר","נעזור"]],["they",["יַעַזְרוּ","יעזרו"]]],
+  note:"Guttural first letter. הוא עוזר לי = he helps me."},
+ {inf:["לִסְגֹּר","לסגור"],root:"ס־ג־ר",en:"to close",binyan:"Pa'al",lvl:"A2",
+  present:[["m.sg",["סוֹגֵר","סוגר"]],["f.sg",["סוֹגֶרֶת","סוגרת"]],["m.pl",["סוֹגְרִים","סוגרים"]],["f.pl",["סוֹגְרוֹת","סוגרות"]]],
+  past:[["I",["סָגַרְתִּי","סגרתי"]],["you m",["סָגַרְתָּ","סגרת"]],["he",["סָגַר","סגר"]],["she",["סָגְרָה","סגרה"]],["we",["סָגַרְנוּ","סגרנו"]],["they",["סָגְרוּ","סגרו"]]],
+  future:[["I",["אֶסְגֹּר","אסגור"]],["he",["יִסְגֹּר","יסגור"]],["we",["נִסְגֹּר","נסגור"]],["they",["יִסְגְּרוּ","יסגרו"]]],
+  note:"Regular Pa'al. Opposite: לפתוח (to open)."},
+ {inf:["לִפְתֹּחַ","לפתוח"],root:"פ־ת־ח",en:"to open",binyan:"Pa'al",lvl:"A2",
+  present:[["m.sg",["פּוֹתֵחַ","פותח"]],["f.sg",["פּוֹתַחַת","פותחת"]],["m.pl",["פּוֹתְחִים","פותחים"]],["f.pl",["פּוֹתְחוֹת","פותחות"]]],
+  past:[["I",["פָּתַחְתִּי","פתחתי"]],["you m",["פָּתַחְתָּ","פתחת"]],["he",["פָּתַח","פתח"]],["she",["פָּתְחָה","פתחה"]],["we",["פָּתַחְנוּ","פתחנו"]],["they",["פָּתְחוּ","פתחו"]]],
+  future:[["I",["אֶפְתַּח","אפתח"]],["he",["יִפְתַּח","יפתח"]],["we",["נִפְתַּח","נפתח"]],["they",["יִפְתְּחוּ","יפתחו"]]],
+  note:"Guttural final ח takes 'a'. אני פותח את החלון."},
+ {inf:["לָדַעַת","לדעת"],root:"י־ד־ע",en:"to know (facts)",binyan:"Pa'al",lvl:"A2",
+  present:[["m.sg",["יוֹדֵעַ","יודע"]],["f.sg",["יוֹדַעַת","יודעת"]],["m.pl",["יוֹדְעִים","יודעים"]],["f.pl",["יוֹדְעוֹת","יודעות"]]],
+  past:[["I",["יָדַעְתִּי","ידעתי"]],["you m",["יָדַעְתָּ","ידעת"]],["he",["יָדַע","ידע"]],["she",["יָדְעָה","ידעה"]],["we",["יָדַעְנוּ","ידענו"]],["they",["יָדְעוּ","ידעו"]]],
+  future:[["I",["אֵדַע","אדע"]],["he",["יֵדַע","ידע"]],["we",["נֵדַע","נדע"]],["they",["יֵדְעוּ","ידעו"]]],
+  note:"sapere (facts). Pair with להכיר = conoscere (people). אני יודע."},
+ {inf:["לֶאֱהֹב","לאהוב"],root:"א־ה־ב",en:"to love / like",binyan:"Pa'al",lvl:"A1",
+  present:[["m.sg",["אוֹהֵב","אוהב"]],["f.sg",["אוֹהֶבֶת","אוהבת"]],["m.pl",["אוֹהֲבִים","אוהבים"]],["f.pl",["אוֹהֲבוֹת","אוהבות"]]],
+  past:[["I",["אָהַבְתִּי","אהבתי"]],["you m",["אָהַבְתָּ","אהבת"]],["he",["אָהַב","אהב"]],["she",["אָהֲבָה","אהבה"]],["we",["אָהַבְנוּ","אהבנו"]],["they",["אָהֲבוּ","אהבו"]]],
+  future:[["I",["אֹהַב","אוהב"]],["he",["יֹאהַב","יאהב"]],["we",["נֹאהַב","נאהב"]],["they",["יֹאהֲבוּ","יאהבו"]]],
+  note:"Guttural first letter. אני אוהב אותך = I love you."},
+ {inf:["לָשֶׁבֶת","לשבת"],root:"י־שׁ־ב",en:"to sit / dwell",binyan:"Pa'al",lvl:"A2",
+  present:[["m.sg",["יוֹשֵׁב","יושב"]],["f.sg",["יוֹשֶׁבֶת","יושבת"]],["m.pl",["יוֹשְׁבִים","יושבים"]],["f.pl",["יוֹשְׁבוֹת","יושבות"]]],
+  past:[["I",["יָשַׁבְתִּי","ישבתי"]],["you m",["יָשַׁבְתָּ","ישבת"]],["he",["יָשַׁב","ישב"]],["she",["יָשְׁבָה","ישבה"]],["we",["יָשַׁבְנוּ","ישבנו"]],["they",["יָשְׁבוּ","ישבו"]]],
+  future:[["I",["אֵשֵׁב","אשב"]],["he",["יֵשֵׁב","ישב"]],["we",["נֵשֵׁב","נשב"]],["they",["יֵשְׁבוּ","ישבו"]]],
+  note:"First-letter י drops in future. נשב בגינה = let's sit in the garden."},
+ {inf:["לִקְרֹא","לקרוא"],root:"ק־ר־א",en:"to read / call",binyan:"Pa'al",lvl:"A2",
+  present:[["m.sg",["קוֹרֵא","קורא"]],["f.sg",["קוֹרֵאת","קוראת"]],["m.pl",["קוֹרְאִים","קוראים"]],["f.pl",["קוֹרְאוֹת","קוראות"]]],
+  past:[["I",["קָרָאתִי","קראתי"]],["you m",["קָרָאתָ","קראת"]],["he",["קָרָא","קרא"]],["she",["קָרְאָה","קראה"]],["we",["קָרָאנוּ","קראנו"]],["they",["קָרְאוּ","קראו"]]],
+  future:[["I",["אֶקְרָא","אקרא"]],["he",["יִקְרָא","יקרא"]],["we",["נִקְרָא","נקרא"]],["they",["יִקְרְאוּ","יקראו"]]],
+  note:"Final א. Also 'to call': איך קוראים לך? = what's your name?"},
+ {inf:["לַחְשֹׁב","לחשוב"],root:"ח־שׁ־ב",en:"to think",binyan:"Pa'al",lvl:"B1",
+  present:[["m.sg",["חוֹשֵׁב","חושב"]],["f.sg",["חוֹשֶׁבֶת","חושבת"]],["m.pl",["חוֹשְׁבִים","חושבים"]],["f.pl",["חוֹשְׁבוֹת","חושבות"]]],
+  past:[["I",["חָשַׁבְתִּי","חשבתי"]],["you m",["חָשַׁבְתָּ","חשבת"]],["he",["חָשַׁב","חשב"]],["she",["חָשְׁבָה","חשבה"]],["we",["חָשַׁבְנוּ","חשבנו"]],["they",["חָשְׁבוּ","חשבו"]]],
+  future:[["I",["אַחְשֹׁב","אחשוב"]],["he",["יַחְשֹׁב","יחשוב"]],["we",["נַחְשֹׁב","נחשוב"]],["they",["יַחְשְׁבוּ","יחשבו"]]],
+  note:"אני חושב ש... = I think that... (with subordinate ש)."},
+ {inf:["לָשִׂים","לשים"],root:"שׂ־י־ם",en:"to put",binyan:"Pa'al (hollow)",lvl:"A2",
+  present:[["m.sg",["שָׂם","שם"]],["f.sg",["שָׂמָה","שמה"]],["m.pl",["שָׂמִים","שמים"]],["f.pl",["שָׂמוֹת","שמות"]]],
+  past:[["I",["שַׂמְתִּי","שמתי"]],["you m",["שַׂמְתָּ","שמת"]],["he",["שָׂם","שם"]],["she",["שָׂמָה","שמה"]],["we",["שַׂמְנוּ","שמנו"]],["they",["שָׂמוּ","שמו"]]],
+  future:[["I",["אָשִׂים","אשים"]],["he",["יָשִׂים","ישים"]],["we",["נָשִׂים","נשים"]],["they",["יָשִׂימוּ","ישימו"]]],
+  note:"Hollow root. שמתי את זה על השולחן = I put it on the table."},
+ {inf:["לָרוּץ","לרוץ"],root:"ר־ו־ץ",en:"to run",binyan:"Pa'al (hollow)",lvl:"B1",
+  present:[["m.sg",["רָץ","רץ"]],["f.sg",["רָצָה","רצה"]],["m.pl",["רָצִים","רצים"]],["f.pl",["רָצוֹת","רצות"]]],
+  past:[["I",["רַצְתִּי","רצתי"]],["you m",["רַצְתָּ","רצת"]],["he",["רָץ","רץ"]],["she",["רָצָה","רצה"]],["we",["רַצְנוּ","רצנו"]],["they",["רָצוּ","רצו"]]],
+  future:[["I",["אָרוּץ","ארוץ"]],["he",["יָרוּץ","ירוץ"]],["we",["נָרוּץ","נרוץ"]],["they",["יָרוּצוּ","ירוצו"]]],
+  note:"Hollow. Note רָצָה (she runs) vs רָצָה from לרצות (wanted): context."},
+ {inf:["לְלַמֵּד","ללמד"],root:"ל־מ־ד",en:"to teach",binyan:"Pi'el",lvl:"B1",
+  present:[["m.sg",["מְלַמֵּד","מלמד"]],["f.sg",["מְלַמֶּדֶת","מלמדת"]],["m.pl",["מְלַמְּדִים","מלמדים"]],["f.pl",["מְלַמְּדוֹת","מלמדות"]]],
+  past:[["I",["לִמַּדְתִּי","לימדתי"]],["you m",["לִמַּדְתָּ","לימדת"]],["he",["לִמֵּד","לימד"]],["she",["לִמְּדָה","לימדה"]],["we",["לִמַּדְנוּ","לימדנו"]],["they",["לִמְּדוּ","לימדו"]]],
+  future:[["I",["אֲלַמֵּד","אלמד"]],["he",["יְלַמֵּד","ילמד"]],["we",["נְלַמֵּד","נלמד"]],["they",["יְלַמְּדוּ","ילמדו"]]],
+  note:"Pi'el = teach (cause to learn). Same root as ללמוד (learn), different binyan."},
+ {inf:["לְנַקּוֹת","לנקות"],root:"נ־ק־ה",en:"to clean",binyan:"Pi'el",lvl:"A2",
+  present:[["m.sg",["מְנַקֶּה","מנקה"]],["f.sg",["מְנַקָּה","מנקה"]],["m.pl",["מְנַקִּים","מנקים"]],["f.pl",["מְנַקּוֹת","מנקות"]]],
+  past:[["I",["נִקִּיתִי","ניקיתי"]],["you m",["נִקִּיתָ","ניקית"]],["he",["נִקָּה","ניקה"]],["she",["נִקְּתָה","ניקתה"]],["we",["נִקִּינוּ","ניקינו"]],["they",["נִקּוּ","ניקו"]]],
+  future:[["I",["אֲנַקֶּה","אנקה"]],["he",["יְנַקֶּה","ינקה"]],["we",["נְנַקֶּה","ננקה"]],["they",["יְנַקּוּ","ינקו"]]],
+  note:"Pi'el, final-ה. מנקה את הבית = cleaning the house."},
+ {inf:["לְחַכּוֹת","לחכות"],root:"ח־כ־ה",en:"to wait",binyan:"Pi'el",lvl:"A2",
+  present:[["m.sg",["מְחַכֶּה","מחכה"]],["f.sg",["מְחַכָּה","מחכה"]],["m.pl",["מְחַכִּים","מחכים"]],["f.pl",["מְחַכּוֹת","מחכות"]]],
+  past:[["I",["חִכִּיתִי","חיכיתי"]],["you m",["חִכִּיתָ","חיכית"]],["he",["חִכָּה","חיכה"]],["she",["חִכְּתָה","חיכתה"]],["we",["חִכִּינוּ","חיכינו"]],["they",["חִכּוּ","חיכו"]]],
+  future:[["I",["אֲחַכֶּה","אחכה"]],["he",["יְחַכֶּה","יחכה"]],["we",["נְחַכֶּה","נחכה"]],["they",["יְחַכּוּ","יחכו"]]],
+  note:"Pi'el, final-ה. מחכה לך = waiting for you."},
+ {inf:["לְהַזְמִין","להזמין"],root:"ז־מ־ן",en:"to invite / order",binyan:"Hif'il",lvl:"B1",
+  present:[["m.sg",["מַזְמִין","מזמין"]],["f.sg",["מַזְמִינָה","מזמינה"]],["m.pl",["מַזְמִינִים","מזמינים"]],["f.pl",["מַזְמִינוֹת","מזמינות"]]],
+  past:[["I",["הִזְמַנְתִּי","הזמנתי"]],["you m",["הִזְמַנְתָּ","הזמנת"]],["he",["הִזְמִין","הזמין"]],["she",["הִזְמִינָה","הזמינה"]],["we",["הִזְמַנּוּ","הזמנו"]],["they",["הִזְמִינוּ","הזמינו"]]],
+  future:[["I",["אַזְמִין","אזמין"]],["he",["יַזְמִין","יזמין"]],["we",["נַזְמִין","נזמין"]],["they",["יַזְמִינוּ","יזמינו"]]],
+  note:"Hif'il. Order food or invite people: הזמנתי שולחן = I booked a table."},
+ {inf:["לְהַגִּיעַ","להגיע"],root:"נ־ג־ע",en:"to arrive",binyan:"Hif'il",lvl:"B1",
+  present:[["m.sg",["מַגִּיעַ","מגיע"]],["f.sg",["מַגִּיעָה","מגיעה"]],["m.pl",["מַגִּיעִים","מגיעים"]],["f.pl",["מַגִּיעוֹת","מגיעות"]]],
+  past:[["I",["הִגַּעְתִּי","הגעתי"]],["you m",["הִגַּעְתָּ","הגעת"]],["he",["הִגִּיעַ","הגיע"]],["she",["הִגִּיעָה","הגיעה"]],["we",["הִגַּעְנוּ","הגענו"]],["they",["הִגִּיעוּ","הגיעו"]]],
+  future:[["I",["אַגִּיעַ","אגיע"]],["he",["יַגִּיעַ","יגיע"]],["we",["נַגִּיעַ","נגיע"]],["they",["יַגִּיעוּ","יגיעו"]]],
+  note:"Hif'il. מתי אתה מגיע? = when do you arrive?"},
+ {inf:["לְהַרְאוֹת","להראות"],root:"ר־א־ה",en:"to show",binyan:"Hif'il",lvl:"B1",
+  present:[["m.sg",["מַרְאֶה","מראה"]],["f.sg",["מַרְאָה","מראה"]],["m.pl",["מַרְאִים","מראים"]],["f.pl",["מַרְאוֹת","מראות"]]],
+  past:[["I",["הֶרְאֵיתִי","הראיתי"]],["you m",["הֶרְאֵיתָ","הראית"]],["he",["הֶרְאָה","הראה"]],["she",["הֶרְאֲתָה","הראתה"]],["we",["הֶרְאֵינוּ","הראינו"]],["they",["הֶרְאוּ","הראו"]]],
+  future:[["I",["אַרְאֶה","אראה"]],["he",["יַרְאֶה","יראה"]],["we",["נַרְאֶה","נראה"]],["they",["יַרְאוּ","יראו"]]],
+  note:"Hif'il of ר־א־ה (causative of 'see'). אראה לך = I'll show you."},
+ {inf:["לְהִתְקַלֵּחַ","להתקלח"],root:"ק־ל־ח",en:"to shower",binyan:"Hitpa'el",lvl:"A2",
+  present:[["m.sg",["מִתְקַלֵּחַ","מתקלח"]],["f.sg",["מִתְקַלַּחַת","מתקלחת"]],["m.pl",["מִתְקַלְּחִים","מתקלחים"]],["f.pl",["מִתְקַלְּחוֹת","מתקלחות"]]],
+  past:[["I",["הִתְקַלַּחְתִּי","התקלחתי"]],["you m",["הִתְקַלַּחְתָּ","התקלחת"]],["he",["הִתְקַלֵּחַ","התקלח"]],["she",["הִתְקַלְּחָה","התקלחה"]],["we",["הִתְקַלַּחְנוּ","התקלחנו"]],["they",["הִתְקַלְּחוּ","התקלחו"]]],
+  future:[["I",["אֶתְקַלֵּחַ","אתקלח"]],["he",["יִתְקַלֵּחַ","יתקלח"]],["we",["נִתְקַלֵּחַ","נתקלח"]],["they",["יִתְקַלְּחוּ","יתקלחו"]]],
+  note:"Hitpa'el reflexive (lavarsi). Daily routine."},
+ {inf:["לְהִשְׁתַּמֵּשׁ","להשתמש"],root:"שׁ־מ־שׁ",en:"to use",binyan:"Hitpa'el",lvl:"B1",
+  present:[["m.sg",["מִשְׁתַּמֵּשׁ","משתמש"]],["f.sg",["מִשְׁתַּמֶּשֶׁת","משתמשת"]],["m.pl",["מִשְׁתַּמְּשִׁים","משתמשים"]],["f.pl",["מִשְׁתַּמְּשׁוֹת","משתמשות"]]],
+  past:[["I",["הִשְׁתַּמַּשְׁתִּי","השתמשתי"]],["you m",["הִשְׁתַּמַּשְׁתָּ","השתמשת"]],["he",["הִשְׁתַּמֵּשׁ","השתמש"]],["she",["הִשְׁתַּמְּשָׁה","השתמשה"]],["we",["הִשְׁתַּמַּשְׁנוּ","השתמשנו"]],["they",["הִשְׁתַּמְּשׁוּ","השתמשו"]]],
+  future:[["I",["אֶשְׁתַּמֵּשׁ","אשתמש"]],["he",["יִשְׁתַּמֵּשׁ","ישתמש"]],["we",["נִשְׁתַּמֵּשׁ","נשתמש"]],["they",["יִשְׁתַּמְּשׁוּ","ישתמשו"]]],
+  note:"Hitpa'el. Root starts שׁ so the ת moves: השתמש not התשמש. נשתמש בעץ = we'll use wood."},
+ {inf:["לְהֵרָאוֹת","להיראות"],root:"ר־א־ה",en:"to look / seem",binyan:"Nif'al",lvl:"B1",
+  present:[["m.sg",["נִרְאֶה","נראה"]],["f.sg",["נִרְאֵית","נראית"]],["m.pl",["נִרְאִים","נראים"]],["f.pl",["נִרְאוֹת","נראות"]]],
+  past:[["I",["נִרְאֵיתִי","נראיתי"]],["you m",["נִרְאֵיתָ","נראית"]],["he",["נִרְאָה","נראה"]],["she",["נִרְאֲתָה","נראתה"]],["we",["נִרְאֵינוּ","נראינו"]],["they",["נִרְאוּ","נראו"]]],
+  future:[["I",["אֵרָאֶה","איראה"]],["he",["יֵרָאֶה","ייראה"]],["we",["נֵרָאֶה","ניראה"]],["they",["יֵרָאוּ","ייראו"]]],
+  note:"Nif'al. אתה נראה טוב = you look good. זה נראה לי = it seems to me."},
+];
+
+/* ---- STORIES: leveled, longer as level rises, each with a quiz ---- */
+const STORIES=[
+ {id:"s1",t:["בֹּקֶר בְּבֶּרְלִין","בוקר בברלין"],en:"Morning in Berlin",lvl:"A1",
+  s:[[["בֹּקֶר טוֹב.","בוקר טוב."],"boker tov.","Good morning."],
+     [["אֲנִי וִינְצֶנְצוֹ.","אני וינצנצו."],"ani Vincenzo.","I am Vincenzo."],
+     [["אֲנִי גָּר בְּבֶּרְלִין.","אני גר בברלין."],"ani gar be-Berlin.","I live in Berlin."],
+     [["אֲנִי שׁוֹתֶה קָפֶה בַּבֹּקֶר.","אני שותה קפה בבוקר."],"ani shote kafe ba-boker.","I drink coffee in the morning."],
+     [["קוֹבִּי שׁוֹתֶה תֵּה.","קובי שותה תה."],"Kobi shote te.","Kobi drinks tea."],
+     [["אֲנַחְנוּ אוֹהֲבִים אֶת הַבֹּקֶר.","אנחנו אוהבים את הבוקר."],"anachnu ohavim et ha-boker.","We love the morning."]],
+  quiz:[{q:"What does Vincenzo drink in the morning?",opts:["Tea","Coffee","Water"],a:1},{q:"Where does he live?",opts:["Rosolini","Tel Aviv","Berlin"],a:2}]},
+ {id:"s2",t:["הַמִּשְׁפָּחָה שֶׁלִּי","המשפחה שלי"],en:"My Family",lvl:"A1",
+  s:[[["יֵשׁ לִי מִשְׁפָּחָה גְּדוֹלָה.","יש לי משפחה גדולה."],"yesh li mishpacha gdola.","I have a big family."],
+     [["אַבָּא שֶׁלִּי סַלְבָטוֹרֶה.","אבא שלי סלבטורה."],"aba sheli Salvatore.","My father is Salvatore."],
+     [["אִמָּא שֶׁלִּי אַנְגֶ'לָה.","אמא שלי אנג'לה."],"ima sheli Angela.","My mother is Angela."],
+     [["הֵם גָּרִים בְּסִיצִילְיָה.","הם גרים בסיציליה."],"hem garim be-Sitzilya.","They live in Sicily."],
+     [["יֵשׁ לִי אָחוֹת, טֵרֵזָה.","יש לי אחות, טרזה."],"yesh li achot, Teresa.","I have a sister, Teresa."],
+     [["אֲנִי אוֹהֵב אֶת הַמִּשְׁפָּחָה שֶׁלִּי.","אני אוהב את המשפחה שלי."],"ani ohev et ha-mishpacha sheli.","I love my family."]],
+  quiz:[{q:"Where do his parents live?",opts:["Berlin","Sicily","Tel Aviv"],a:1},{q:"What is his sister's name?",opts:["Angela","Teresa","Marta"],a:1}]},
+ {id:"s3",t:["אַנְגֶ'לָה מִתְקַשֶּׁרֶת","אנג'לה מתקשרת"],en:"Angela Calls from Rosolini",lvl:"A1",
+  s:[[["הַטֶּלֶפוֹן מְצַלְצֵל בָּעֶרֶב.","הטלפון מצלצל בערב."],"ha-telefon metzaltzel ba-erev.","The phone rings in the evening."],
+     [["זֹאת אִמָּא שֶׁלִּי, אַנְגֶ'לָה.","זאת אמא שלי, אנג'לה."],"zot ima sheli, Angela.","It is my mother, Angela."],
+     [["הִיא מִתְקַשֶּׁרֶת מֵרוֹזוֹלִינִי.","היא מתקשרת מרוזוליני."],"hi mitkasheret me-Rosolini.","She calls from Rosolini."],
+     [["אֲנִי אוֹמֵר שֶׁאֲנִי מְבַשֵּׁל פַּסְטָה.","אני אומר שאני מבשל פסטה."],"ani omer she-ani mevashel pasta.","I tell her I cook pasta."],
+     [["אֲנִי מִתְגַּעְגֵּעַ אֵלֶיהָ.","אני מתגעגע אליה."],"ani mitga'age'a eleha.","I miss her."]],
+  quiz:[{q:"Who is calling?",opts:["Kobi","Angela","Miki"],a:1},{q:"What is Vincenzo cooking?",opts:["Fish","Pasta","Soup"],a:1}]},
+ {id:"s4",t:["אֲרוּחַת שַׁבָּת","ארוחת שבת"],en:"Shabbat Dinner",lvl:"A2",
+  s:[[["בַּיּוֹם שִׁישִׁי אֲנַחְנוּ עוֹשִׂים אֲרוּחָה מְיֻחֶדֶת.","ביום שישי אנחנו עושים ארוחה מיוחדת."],"ba-yom shishi anachnu osim arucha meyuchedet.","On Friday we make a special meal."],
+     [["קוֹבִּי קוֹנֶה חַלָּה טְרִיָּה.","קובי קונה חלה טרייה."],"Kobi kone chala triya.","Kobi buys fresh challah."],
+     [["אֲנִי מֵכִין סָלָט וְדָגִים.","אני מכין סלט ודגים."],"ani mechin salat ve-dagim.","I prepare salad and fish."],
+     [["עַל הַשֻּׁלְחָן יֵשׁ יַיִן אָדֹם.","על השולחן יש יין אדום."],"al ha-shulchan yesh yayin adom.","On the table there is red wine."],
+     [["לִפְעָמִים בָּאִים אוֹרְחִים.","לפעמים באים אורחים."],"lif'amim ba'im orchim.","Sometimes guests come."],
+     [["זֶה הָעֶרֶב הָאָהוּב עָלַי.","זה הערב האהוב עליי."],"ze ha-erev ha-ahuv alai.","This is my favourite evening."]],
+  quiz:[{q:"What does Kobi buy?",opts:["Wine","Challah","Fish"],a:1},{q:"What colour is the wine?",opts:["White","Red","Rosé"],a:1}]},
+ {id:"s5",t:["סוֹף שָׁבוּעַ בְּאַבַּאיְטָה","סוף שבוע באבאיטה"],en:"A Weekend at ABAITA",lvl:"A2",
+  s:[[["בְּסוֹף הַשָּׁבוּעַ אֲנַחְנוּ נוֹסְעִים לְאַבַּאיְטָה.","בסוף השבוע אנחנו נוסעים לאבאיטה."],"be-sof ha-shavua anachnu nos'im le-ABAITA.","On the weekend we travel to ABAITA."],
+     [["אַבַּאיְטָה הוּא בַּיִת קָטָן בַּטֶּבַע.","אבאיטה הוא בית קטן בטבע."],"ABAITA hu bayit katan ba-teva.","ABAITA is a small house in nature."],
+     [["יֵשׁ שָׁם גִּינָה וְסָאוּנָה.","יש שם גינה וסאונה."],"yesh sham gina ve-sauna.","There is a garden and a sauna."],
+     [["בָּעֶרֶב אֲנַחְנוּ מַדְלִיקִים אֶת הַתַּנּוּר.","בערב אנחנו מדליקים את התנור."],"ba-erev anachnu madlikim et ha-tanur.","In the evening we light the stove."],
+     [["אוֹרְחִים בָּאִים עִם הַכְּלָבִים שֶׁלָּהֶם.","אורחים באים עם הכלבים שלהם."],"orchim ba'im im ha-klavim shelahem.","Guests come with their dogs."],
+     [["בְּאַבַּאיְטָה הַזְּמַן עוֹבֵר לְאַט.","באבאיטה הזמן עובר לאט."],"be-ABAITA ha-zman over le'at.","At ABAITA time passes slowly."]],
+  quiz:[{q:"What two features does ABAITA have?",opts:["Pool and gym","Garden and sauna","Bar and cinema"],a:1},{q:"What do guests bring?",opts:["Their dogs","Their children","Wine"],a:0}]},
+ {id:"s6",t:["יוֹם גָּשׁוּם בְּבֶּרְלִין","יום גשום בברלין"],en:"A Rainy Day in Berlin",lvl:"A2",
+  s:[[["הַיּוֹם יוֹרֵד גֶּשֶׁם בְּבֶּרְלִין.","היום יורד גשם בברלין."],"hayom yored geshem be-Berlin.","Today it is raining in Berlin."],
+     [["קַר וְאָפֹר בַּחוּץ.","קר ואפור בחוץ."],"kar ve-afor ba-chutz.","It is cold and grey outside."],
+     [["אֲנַחְנוּ נִשְׁאָרִים בַּבַּיִת.","אנחנו נשארים בבית."],"anachnu nish'arim ba-bayit.","We stay at home."],
+     [["אֲנִי קוֹרֵא סֵפֶר עַל הַסַּפָּה.","אני קורא ספר על הספה."],"ani kore sefer al ha-sapa.","I read a book on the sofa."],
+     [["קוֹבִּי מֵכִין קָפֶה חַם.","קובי מכין קפה חם."],"Kobi mechin kafe cham.","Kobi makes hot coffee."],
+     [["אֲנִי אוֹהֵב יָמִים כָּאֵלֶּה.","אני אוהב ימים כאלה."],"ani ohev yamim ka'ele.","I love days like these."]],
+  quiz:[{q:"What is the weather?",opts:["Sunny","Rainy","Snowy"],a:1},{q:"Where do they stay?",opts:["At a café","At home","At ABAITA"],a:1}]},
+ {id:"s7",t:["בַּשּׁוּק בְּתֵל אָבִיב","בשוק בתל אביב"],en:"At the Market in Tel Aviv",lvl:"A2",
+  s:[[["אֲנַחְנוּ הוֹלְכִים לַשּׁוּק בְּתֵל אָבִיב.","אנחנו הולכים לשוק בתל אביב."],"anachnu holchim la-shuk be-Tel Aviv.","We go to the market in Tel Aviv."],
+     [["בַּשּׁוּק יֵשׁ הַרְבֵּה אֹכֶל.","בשוק יש הרבה אוכל."],"ba-shuk yesh harbe ochel.","At the market there is a lot of food."],
+     [["אֲנִי קוֹנֶה עַגְבָנִיּוֹת וְלֶחֶם.","אני קונה עגבניות ולחם."],"ani kone agvaniyot ve-lechem.","I buy tomatoes and bread."],
+     [["קוֹבִּי קוֹנֶה חוּמּוּס.","קובי קונה חומוס."],"Kobi kone chumus.","Kobi buys hummus."],
+     [["הַשּׁוּק גָּדוֹל וְרוֹעֵשׁ.","השוק גדול ורועש."],"ha-shuk gadol ve-ro'esh.","The market is big and noisy."],
+     [["זֶה לֹא יָקָר.","זה לא יקר."],"ze lo yakar.","It is not expensive."]],
+  quiz:[{q:"What does Vincenzo buy?",opts:["Tomatoes and bread","Hummus","Wine"],a:0},{q:"How is the market?",opts:["Quiet and small","Big and noisy","Empty"],a:1}]},
+ {id:"s8",t:["הַחֲתֻנָּה בְּקוֹפֶּנְהָאגֶן","החתונה בקופנהאגן"],en:"The Wedding in Copenhagen",lvl:"A2",
+  s:[[["בְּתִשְׁעָה בְּסֶפְּטֶמְבֶּר הִתְחַתַּנּוּ.","בתשעה בספטמבר התחתנו."],"be-tish'a be-September hitchatanu.","On the ninth of September we got married."],
+     [["הַחֲתֻנָּה הָיְתָה בְּקוֹפֶּנְהָאגֶן.","החתונה הייתה בקופנהאגן."],"ha-chatuna hayta be-Copenhagen.","The wedding was in Copenhagen."],
+     [["הַמִּשְׁפָּחָה מֵאִיטַלְיָה הִגִּיעָה בְּמָטוֹס.","המשפחה מאיטליה הגיעה במטוס."],"ha-mishpacha me-italya higi'a be-matos.","The family from Italy arrived by plane."],
+     [["אַנְגֶ'לָה בָּכְתָה מֵרֹב שִׂמְחָה.","אנג'לה בכתה מרוב שמחה."],"Angela bachta me-rov simcha.","Angela cried from joy."],
+     [["מִיקִי נָאַם נְאוּם יָפֶה.","מיקי נאם נאום יפה."],"Miki na'am ne'um yafe.","Miki gave a beautiful speech."],
+     [["רָקַדְנוּ עַד מְאֻחָר בַּלַּיְלָה.","רקדנו עד מאוחר בלילה."],"rakadnu ad me'uchar ba-layla.","We danced until late at night."],
+     [["זֶה הָיָה הַיּוֹם הֲכִי מְאֻשָּׁר בַּחַיִּים שֶׁלָּנוּ.","זה היה היום הכי מאושר בחיים שלנו."],"ze haya ha-yom hachi me'ushar ba-chayim shelanu.","It was the happiest day of our lives."]],
+  quiz:[{q:"Where was the wedding?",opts:["Tel Aviv","Copenhagen","Rosolini"],a:1},{q:"Who gave a speech?",opts:["Salvatore","Miki","Kobi"],a:1}]},
+ {id:"s9",t:["הָעֲבוֹדָה שֶׁל קוֹבִּי","העבודה של קובי"],en:"Kobi's Work",lvl:"B1",
+  s:[[["קוֹבִּי עוֹבֵד עִם אֲנָשִׁים.","קובי עובד עם אנשים."],"Kobi oved im anashim.","Kobi works with people."],
+     [["הוּא יוֹעֵץ תַּדְמִית וְגַם סַפָּר.","הוא יועץ תדמית וגם ספר."],"hu yo'etz tadmit ve-gam sapar.","He is an image consultant and also a hairdresser."],
+     [["הוּא מֵבִין בְּצֶבַע, בְּסִגְנוֹן וּבְעִצּוּב.","הוא מבין בצבע, בסגנון ובעיצוב."],"hu mevin be-tzeva, be-signon u-ve-itzuv.","He understands colour, style and design."],
+     [["לָקוֹחוֹת בָּאִים אֵלָיו מִכָּל בֶּרְלִין.","לקוחות באים אליו מכל ברלין."],"lekochot ba'im elav mi-kol Berlin.","Clients come to him from all over Berlin."],
+     [["גַּם אֲנִי עוֹבֵד בְּעִצּוּב, אֲבָל בְּעִצּוּב פְּנִים.","גם אני עובד בעיצוב, אבל בעיצוב פנים."],"gam ani oved be-itzuv, aval be-itzuv pnim.","I also work in design, but in interior design."],
+     [["בָּעֶרֶב אֲנַחְנוּ מְדַבְּרִים עַל הָרַעְיוֹנוֹת שֶׁלָּנוּ.","בערב אנחנו מדברים על הרעיונות שלנו."],"ba-erev anachnu medabrim al ha-ra'ayonot shelanu.","In the evening we talk about our ideas."],
+     [["אֲנַחְנוּ לוֹמְדִים אֶחָד מֵהַשֵּׁנִי.","אנחנו לומדים אחד מהשני."],"anachnu lomdim echad me-ha-sheni.","We learn from each other."]],
+  quiz:[{q:"What is one of Kobi's jobs?",opts:["Doctor","Hairdresser","Teacher"],a:1},{q:"What field is Vincenzo in?",opts:["Interior design","Cooking","Medicine"],a:0}]},
+ {id:"s10",t:["לִלְמֹד שָׂפָה חֲדָשָׁה","ללמוד שפה חדשה"],en:"Learning a New Language",lvl:"B1",
+  s:[[["כְּשֶׁהִתְחַלְתִּי לִלְמֹד עִבְרִית, חָשַׁבְתִּי שֶׁזֶּה בִּלְתִּי אֶפְשָׁרִי.","כשהתחלתי ללמוד עברית, חשבתי שזה בלתי אפשרי."],"kshe-hitchalti lilmod ivrit, chashavti she-ze bilti efshari.","When I started learning Hebrew, I thought it was impossible."],
+     [["הָאוֹתִיּוֹת נִרְאוּ לִי כְּמוֹ צִיּוּרִים.","האותיות נראו לי כמו ציורים."],"ha-otiyot nir'u li kmo tziyurim.","The letters looked to me like drawings."],
+     [["בְּאִיטַלְקִית קוֹרְאִים מִשְּׂמֹאל לְיָמִין, וְכָאן הַכֹּל הָפוּךְ.","באיטלקית קוראים משמאל לימין, וכאן הכול הפוך."],"be-italkit korim mi-smol le-yamin, ve-kan ha-kol hafuch.","In Italian you read left to right, and here everything is reversed."],
+     [["אֲבָל גִּלִּיתִי שֶׁהַתְּנוּעוֹת דּוֹמוֹת לְאִיטַלְקִית.","אבל גיליתי שהתנועות דומות לאיטלקית."],"aval giliti she-ha-tnu'ot domot le-italkit.","But I discovered the vowels are similar to Italian."],
+     [["הַיּוֹם אֲנִי כְּבָר מֵבִין מִשְׁפָּטִים פְּשׁוּטִים.","היום אני כבר מבין משפטים פשוטים."],"hayom ani kvar mevin mishpatim pshutim.","Today I already understand simple sentences."],
+     [["כָּל פַּעַם שֶׁאֲנִי מֵבִין, אֲנִי מַרְגִּישׁ קָרוֹב יוֹתֵר לְקוֹבִּי.","כל פעם שאני מבין, אני מרגיש קרוב יותר לקובי."],"kol pa'am she-ani mevin, ani margish karov yoter le-Kobi.","Each time I understand, I feel closer to Kobi."]],
+  quiz:[{q:"What did the letters look like to him?",opts:["Numbers","Drawings","Music"],a:1},{q:"What is similar to Italian?",opts:["The vowels","The verbs","The alphabet"],a:0}]},
+ {id:"s11",t:["גַּעְגּוּעַ לְסִיצִילְיָה","געגוע לסיציליה"],en:"Longing for Sicily",lvl:"B1",
+  s:[[["יֵשׁ יָמִים שֶׁבָּהֶם אֲנִי מִתְגַּעְגֵּעַ לְרוֹזוֹלִינִי.","יש ימים שבהם אני מתגעגע לרוזוליני."],"yesh yamim she-bahem ani mitga'age'a le-Rosolini.","There are days when I long for Rosolini."],
+     [["אֲנִי זוֹכֵר אֶת הָאוֹר שֶׁל סִיצִילְיָה.","אני זוכר את האור של סיציליה."],"ani zocher et ha-or shel Sitzilya.","I remember the light of Sicily."],
+     [["אֲנִי זוֹכֵר אֶת הָרֵיחַ שֶׁל הַיָּם.","אני זוכר את הריח של הים."],"ani zocher et ha-re'ach shel ha-yam.","I remember the smell of the sea."],
+     [["אֲבָל בָּחַרְתִּי לִחְיוֹת כָּאן, עִם הָאִישׁ שֶׁאֲנִי אוֹהֵב.","אבל בחרתי לחיות כאן, עם האיש שאני אוהב."],"aval bacharti lichyot kan, im ha-ish she-ani ohev.","But I chose to live here, with the man I love."],
+     [["וּכְשֶׁאֲנִי מְבַשֵּׁל אֹכֶל סִיצִילְיָאנִי, סִיצִילְיָה אִתִּי.","וכשאני מבשל אוכל סיציליאני, סיציליה איתי."],"u-chshe-ani mevashel ochel sitzilyani, Sitzilya iti.","And when I cook Sicilian food, Sicily is with me."],
+     [["אֲנִי יָכוֹל לִהְיוֹת בִּשְׁנֵי מְקוֹמוֹת בְּאוֹתוֹ זְמַן.","אני יכול להיות בשני מקומות באותו זמן."],"ani yachol lihyot bi-shnei mekomot be-oto zman.","I can be in two places at the same time."]],
+  quiz:[{q:"What does he remember about Sicily?",opts:["The cold","The light and the smell of the sea","The traffic"],a:1},{q:"How does he bring Sicily to Berlin?",opts:["By cooking Sicilian food","By phone","By flying"],a:0}]},
+ {id:"s12",t:["הָאוֹרְחִים שֶׁל אַבַּאיְטָה","האורחים של אבאיטה"],en:"The Guests of ABAITA",lvl:"B2",
+  s:[[["אַבַּאיְטָה אֵינוֹ רַק בַּיִת פְּרָטִי שֶׁלָּנוּ.","אבאיטה אינו רק בית פרטי שלנו."],"ABAITA eino rak bayit prati shelanu.","ABAITA is not only our private house."],
+     [["אֲנַחְנוּ פּוֹתְחִים אוֹתוֹ גַּם לְאוֹרְחִים.","אנחנו פותחים אותו גם לאורחים."],"anachnu potchim oto gam le-orchim.","We open it also to guests."],
+     [["אֲנָשִׁים מַגִּיעִים מִבֶּרְלִין כְּדֵי לָנוּחַ.","אנשים מגיעים מברלין כדי לנוח."],"anashim magi'im mi-Berlin kdei lanu'ach.","People arrive from Berlin in order to rest."],
+     [["רֻבָּם בָּאִים עִם כְּלָבִים, כִּי הַמָּקוֹם אוֹהֵב כְּלָבִים.","רובם באים עם כלבים, כי המקום אוהב כלבים."],"rubam ba'im im klavim, ki ha-makom ohev klavim.","Most of them come with dogs, because the place is dog-friendly."],
+     [["אֲנַחְנוּ מַסְבִּירִים לָהֶם אֵיךְ לְהַדְלִיק אֶת הַתַּנּוּר.","אנחנו מסבירים להם איך להדליק את התנור."],"anachnu masbirim lahem eich lehadlik et ha-tanur.","We explain to them how to light the stove."],
+     [["מַשֶּׁהוּ בַּשֶּׁקֶט שֶׁל בְּרַנְדֶּנְבּוּרְג עוֹשֶׂה טוֹב לָאֲנָשִׁים.","משהו בשקט של ברנדנבורג עושה טוב לאנשים."],"mashehu ba-sheket shel Brandenburg ose tov la-anashim.","Something in the quiet of Brandenburg does people good."],
+     [["הֵם מַגִּיעִים עֲיֵפִים וְעוֹזְבִים רְגוּעִים.","הם מגיעים עייפים ועוזבים רגועים."],"hem magi'im ayefim ve-ozvim regu'im.","They arrive tired and leave calm."],
+     [["בִּשְׁבִילֵנוּ זֶה לֹא רַק עֵסֶק, זֶה דֶּרֶךְ לְאָרֵחַ.","בשבילנו זה לא רק עסק, זו דרך לארח."],"bishvilenu ze lo rak esek, ze derech le'are'ach.","For us it is not only a business, it is a way to host."],
+     [["וְאֵין דָּבָר אִיטַלְקִי יוֹתֵר מֵאֲשֶׁר לְאָרֵחַ.","ואין דבר איטלקי יותר מאשר לארח."],"ve-ein davar italki yoter me-asher le'are'ach.","And there is nothing more Italian than to host."]],
+  quiz:[{q:"Why do most guests come with dogs?",opts:["The place is dog-friendly","Dogs are required","To guard the house"],a:0},{q:"How do guests leave?",opts:["Tired","Calm","Hungry"],a:1}]},
+ {id:"s13",t:["הַשָּׁכֵן הֶחָדָשׁ","השכן החדש"],en:"The New Neighbour",lvl:"A2",
+  s:[[["יֵשׁ שָׁכֵן חָדָשׁ בַּבִּנְיָן.","יש שכן חדש בבניין."],"yesh shachen chadash ba-binyan.","There is a new neighbour in the building."],
+     [["קוֹרְאִים לוֹ תּוֹמָס וְהוּא מִגֶּרְמַנְיָה.","קוראים לו תומס והוא מגרמניה."],"korim lo Thomas ve-hu mi-germanya.","His name is Thomas and he is from Germany."],
+     [["הוּא אוֹהֵב אֹכֶל אִיטַלְקִי.","הוא אוהב אוכל איטלקי."],"hu ohev ochel italki.","He loves Italian food."],
+     [["אֶתְמוֹל הִזְמַנְתִּי אוֹתוֹ לַאֲרוּחַת עֶרֶב.","אתמול הזמנתי אותו לארוחת ערב."],"etmol hizmanti oto la-aruchat erev.","Yesterday I invited him to dinner."],
+     [["בִּשַּׁלְתִּי פַּסְטָה וְהוּא הֵבִיא יַיִן.","בישלתי פסטה והוא הביא יין."],"bishalti pasta ve-hu hevi yayin.","I cooked pasta and he brought wine."],
+     [["עַכְשָׁיו יֵשׁ לָנוּ חָבֵר חָדָשׁ.","עכשיו יש לנו חבר חדש."],"achshav yesh lanu chaver chadash.","Now we have a new friend."]],
+  quiz:[{q:"Where is Thomas from?",opts:["Italy","Germany","Israel"],a:1},{q:"What did Vincenzo cook?",opts:["Fish","Pasta","Soup"],a:1}]},
+ {id:"s14",t:["הַפְּגִישָׁה עִם הַלָּקוֹחַ","הפגישה עם הלקוח"],en:"The Client Meeting",lvl:"B1",
+  s:[[["הַבֹּקֶר הָיְתָה לִי פְּגִישָׁה חֲשׁוּבָה.","הבוקר הייתה לי פגישה חשובה."],"ha-boker hayta li pgisha chashuva.","This morning I had an important meeting."],
+     [["לָקוֹחַ חָדָשׁ רוֹצֶה לְעַצֵּב מֵחָדָשׁ אֶת הַסָּלוֹן.","לקוח חדש רוצה לעצב מחדש את הסלון."],"lako'ach chadash rotze le'atzev me-chadash et ha-salon.","A new client wants to redesign the living room."],
+     [["הוּא שָׁאַל אוֹתִי אֵיזֶה סִגְנוֹן אֲנִי מַמְלִיץ.","הוא שאל אותי איזה סגנון אני ממליץ."],"hu sha'al oti eize signon ani mamlitz.","He asked me which style I recommend."],
+     [["אָמַרְתִּי שֶׁאֲנִי אוֹהֵב עֵץ, אֶבֶן וְאוֹר טִבְעִי.","אמרתי שאני אוהב עץ, אבן ואור טבעי."],"amarti she-ani ohev etz, even ve-or tiv'i.","I said I love wood, stone and natural light."],
+     [["הִסְבַּרְתִּי לוֹ אֶת הָרַעְיוֹן וְהוּא הִתְלַהֵב.","הסברתי לו את הרעיון והוא התלהב."],"hisbarti lo et ha-ra'ayon ve-hu hitlahev.","I explained the idea to him and he got excited."],
+     [["מָחָר אֶשְׁלַח לוֹ תּוֹכְנִית.","מחר אשלח לו תוכנית."],"machar eshlach lo tochnit.","Tomorrow I will send him a plan."],
+     [["אֲנִי אוֹהֵב אֶת הָעֲבוֹדָה שֶׁלִּי.","אני אוהב את העבודה שלי."],"ani ohev et ha-avoda sheli.","I love my work."]],
+  quiz:[{q:"What does the client want to redesign?",opts:["The kitchen","The living room","The garden"],a:1},{q:"What materials does Vincenzo love?",opts:["Glass and metal","Wood, stone and natural light","Plastic"],a:1}]},
+ {id:"s15",t:["שְׁנֵי בָּתִּים, לֵב אֶחָד","שני בתים, לב אחד"],en:"Two Homes, One Heart",lvl:"B2",
+  s:[[["לִפְעָמִים שׁוֹאֲלִים אוֹתִי אֵיפֹה הַבַּיִת שֶׁלִּי.","לפעמים שואלים אותי איפה הבית שלי."],"lif'amim sho'alim oti eifo ha-bayit sheli.","Sometimes people ask me where my home is."],
+     [["זוֹ שְׁאֵלָה לֹא פְּשׁוּטָה בִּשְׁבִילִי.","זו שאלה לא פשוטה בשבילי."],"zo she'ela lo pshuta bishvili.","It is not a simple question for me."],
+     [["נוֹלַדְתִּי בְּסִיצִילְיָה, בְּעִיר קְטַנָּה בְּשֵׁם רוֹזוֹלִינִי.","נולדתי בסיציליה, בעיר קטנה בשם רוזוליני."],"noladti be-Sitzilya, be-ir ktana be-shem Rosolini.","I was born in Sicily, in a small town called Rosolini."],
+     [["שָׁם נִשְׁאֲרָה הַמִּשְׁפָּחָה שֶׁלִּי, וְשָׁם נִשְׁאַר חֵלֶק מִמֶּנִּי.","שם נשארה המשפחה שלי, ושם נשאר חלק ממני."],"sham nish'ara ha-mishpacha sheli, ve-sham nish'ar chelek mimeni.","My family stayed there, and a part of me stayed there too."],
+     [["אֲבָל אֶת הַחַיִּים שֶׁלִּי בָּנִיתִי בְּבֶּרְלִין, עִם קוֹבִּי.","אבל את החיים שלי בניתי בברלין, עם קובי."],"aval et ha-chayim sheli baniti be-Berlin, im Kobi.","But I built my life in Berlin, with Kobi."],
+     [["כְּשֶׁאֲנִי מְבַשֵּׁל אֹכֶל סִיצִילְיָאנִי בַּמִּטְבָּח שֶׁלָּנוּ, שְׁנֵי הָעוֹלָמוֹת נִפְגָּשִׁים.","כשאני מבשל אוכל סיציליאני במטבח שלנו, שני העולמות נפגשים."],"kshe-ani mevashel ochel sitzilyani ba-mitbach shelanu, shnei ha-olamot nifgashim.","When I cook Sicilian food in our kitchen, the two worlds meet."],
+     [["לָמַדְתִּי שֶׁבַּיִת אֵינוֹ מָקוֹם אֶחָד.","למדתי שבית אינו מקום אחד."],"lamadti she-bayit eino makom echad.","I have learned that home is not one place."],
+     [["בַּיִת הוּא הָאֲנָשִׁים שֶׁאַתָּה אוֹהֵב, בְּכָל מָקוֹם שֶׁהֵם נִמְצָאִים.","בית הוא האנשים שאתה אוהב, בכל מקום שהם נמצאים."],"bayit hu ha-anashim she-ata ohev, be-chol makom she-hem nimtza'im.","Home is the people you love, wherever they are."]],
+  quiz:[{q:"Where was Vincenzo born?",opts:["Berlin","Rosolini, Sicily","Tel Aviv"],a:1},{q:"What has he learned about home?",opts:["It is one fixed place","It is the people you love, wherever they are","It is only Berlin"],a:1}]},
+];
+
+/* ---- PRACTICE: typed exercises by chapter ---- */
+const PRACTICE=[
+ {ch:3,t:"Present Tense",lvl:"A1",items:[
+  {q:"Type in Hebrew: I learn Hebrew.",a:["אני לומד עברית","ani lomed ivrit"],hint:"present m.sg of ללמוד"},
+  {q:"Fill the verb (drink): אני ___ קפה",a:["שותה","shote"],hint:"present m.sg of לשתות"},
+  {q:"Type: we live in Berlin",a:["אנחנו גרים בברלין","anachnu garim beberlin","anachnu garim be-berlin"],hint:"plural of לגור"},
+  {q:"Fill (speak): קובי ___ עברית",a:["מדבר","medaber"],hint:"Pi'el present m.sg"}]},
+ {ch:4,t:"Nouns & Gender",lvl:"A1",items:[
+  {q:"Is דירה masculine or feminine?",a:["feminine","f","נקבה"],hint:"ends in ־ה"},
+  {q:"Make plural: ספר (book)",a:["ספרים","sfarim"],hint:"masculine ־ים"},
+  {q:"Make plural: דירה",a:["דירות","dirot"],hint:"feminine ־ות"}]},
+ {ch:5,t:"Article & את",lvl:"A1",items:[
+  {q:"Make definite: בית",a:["הבית","habayit"],hint:"add the prefix ה"},
+  {q:"Add the object marker: אני אוהב ___ קובי",a:["את"],hint:"definite object"},
+  {q:"Does this need את? אני שותה קפה (yes/no)",a:["no","לא"],hint:"is the object definite?"}]},
+ {ch:6,t:"Adjectives",lvl:"A1",items:[
+  {q:"Type: a big house",a:["בית גדול","bayit gadol"],hint:"adjective after noun, masculine"},
+  {q:"Make it feminine: דירה (big)",a:["דירה גדולה","dira gdola"],hint:"add ־ה"},
+  {q:"Type: the big house (both definite)",a:["הבית הגדול","habayit hagadol"],hint:"ה on both words"}]},
+ {ch:8,t:"Past Tense",lvl:"A2",items:[
+  {q:"Change to past: אני אוכל פסטה",a:["אני אכלתי פסטה","achalti pasta","אכלתי פסטה"],hint:"past 'I'"},
+  {q:"Type: we got married in Copenhagen",a:["התחתנו בקופנהאגן","hitchatanu becopenhagen","hitchatanu be-copenhagen"],hint:"Hitpa'el past 'we'"},
+  {q:"Past 'he' of לכתוב (write)",a:["כתב","katav"],hint:"three root letters, no prefix"}]},
+ {ch:9,t:"Future Tense",lvl:"A2",items:[
+  {q:"Type: tomorrow I will learn",a:["מחר אלמד","machar elmad"],hint:"future prefix א"},
+  {q:"Future 'we' of לנסוע (travel)",a:["ניסע","נסע","nisa"],hint:"prefix נ, נ assimilates"}]},
+ {ch:11,t:"Possession",lvl:"A2",items:[
+  {q:"Type: I have a big family",a:["יש לי משפחה גדולה","yesh li mishpacha gdola"],hint:"yesh li + noun + adjective"},
+  {q:"Type: I don't have a dog",a:["אין לי כלב","ein li kelev"],hint:"ein li"},
+  {q:"Build smichut: Shabbat meal",a:["ארוחת שבת","aruchat shabat"],hint:"meal-of Shabbat"}]},
+ {ch:16,t:"Hitpa'el",lvl:"B1",items:[
+  {q:"Type: I wake up at seven",a:["אני מתעורר בשבע","ani mit'orer besheva","ani mitorer beseva"],hint:"reflexive present"},
+  {q:"Type: I miss Sicily",a:["אני מתגעגע לסיציליה","ani mitga'age'a lesitzilya"],hint:"מתגעגע ל"},
+  {q:"Present m.sg of להתלבש (get dressed)",a:["מתלבש","mitlabesh"],hint:"מִתְ prefix"}]},
+ {ch:21,t:"Subordinate clauses",lvl:"B2",items:[
+  {q:"Type: I think that it is beautiful",a:["אני חושב שזה יפה","ani choshev sheze yafe"],hint:"ש attaches to the next word"},
+  {q:"Type: the man who lives here",a:["האיש שגר כאן","haish shegar kan"],hint:"ש = who"}]},
+ {ch:7,t:"Numbers & Time",lvl:"A1",items:[
+  {q:"Type in Hebrew: what time is it?",a:["מה השעה","ma hashaa","ma hasha'a"],hint:"ma + the hour"},
+  {q:"How do you say 'three' (feminine, for counting)?",a:["שלוש","shalosh"],hint:"counting form"},
+  {q:"Type: it's three o'clock",a:["השעה שלוש","hashaa shalosh","hasha'a shalosh"],hint:"the-hour three"}]},
+ {ch:10,t:"Pronouns & to be",lvl:"A2",items:[
+  {q:"Type: Kobi is my husband (no word for 'is')",a:["קובי הבעל שלי","kobi habaal sheli","קובי הוא הבעל שלי"],hint:"no present 'to be' needed"},
+  {q:"Type: I am Italian",a:["אני איטלקי","ani italki"],hint:"just pronoun + adjective"},
+  {q:"Past of 'to be' meaning 'I had a dog'",a:["היה לי כלב","haya li kelev"],hint:"there-was to-me a dog"}]},
+ {ch:12,t:"Questions",lvl:"A2",items:[
+  {q:"Type the question word: where?",a:["איפה","eifo"],hint:""},
+  {q:"Type: how much does it cost?",a:["כמה זה עולה","kama ze ole"],hint:"how-much this costs"},
+  {q:"Ask someone's name (the natural way)",a:["איך קוראים לך","eich korim lecha"],hint:"how do they call you"}]},
+ {ch:13,t:"Binyanim overview",lvl:"A2",items:[
+  {q:"Which binyan is the simple, basic active pattern?",a:["paal","pa'al","פעל"],hint:"the first one"},
+  {q:"Which binyan is reflexive, with מִתְ prefix?",a:["hitpael","hitpa'el","התפעל"],hint:"-si verbs"},
+  {q:"Present-tense Pi'el starts with which letter prefix?",a:["מ","mem","m"],hint:"medaber, mevashel"}]},
+ {ch:14,t:"Pi'el in depth",lvl:"A2",items:[
+  {q:"Type: I cook pasta",a:["אני מבשל פסטה","ani mevashel pasta"],hint:"Pi'el present m.sg"},
+  {q:"Present m.sg of לספר (to tell)",a:["מספר","mesaper"],hint:"מ prefix"},
+  {q:"Past 'I' of לדבר (to speak)",a:["דיברתי","dibarti"],hint:"Pi'el past"}]},
+ {ch:15,t:"Hif'il in depth",lvl:"B1",items:[
+  {q:"Type: I understand a little Hebrew",a:["אני מבין קצת עברית","ani mevin ktzat ivrit"],hint:"Hif'il present"},
+  {q:"Which verb is 'to know a person' (conoscere)?",a:["להכיר","lehakir","מכיר"],hint:"Hif'il, not יודע"},
+  {q:"Present m.sg of להתחיל (to begin)",a:["מתחיל","matchil"],hint:"מ + long i"}]},
+ {ch:17,t:"Nif'al in depth",lvl:"B1",items:[
+  {q:"Type: Kobi was born in Tel Aviv",a:["קובי נולד בתל אביב","kobi nolad betel aviv"],hint:"Nif'al נולד"},
+  {q:"Present m.sg of 'to enter' (Nif'al)",a:["נכנס","nichnas"],hint:"נ prefix"},
+  {q:"Type: we stay home",a:["אנחנו נשארים בבית","anachnu nisharim babayit","נשארים בבית"],hint:"Nif'al plural"}]},
+ {ch:18,t:"Prepositions + suffixes",lvl:"B1",items:[
+  {q:"Type: he helps me",a:["הוא עוזר לי","hu ozer li"],hint:"עוזר + ל+me"},
+  {q:"How do you say 'with me' (one word)?",a:["איתי","iti"],hint:"עם fused"},
+  {q:"How do you say 'our' / 'ours'?",a:["שלנו","shelanu"],hint:"של + us"}]},
+ {ch:22,t:"Comparatives",lvl:"B2",items:[
+  {q:"Type: Berlin is bigger than Rosolini",a:["ברלין גדולה יותר מרוזוליני","berlin gdola yoter merosolini"],hint:"גדולה יותר מ"},
+  {q:"How do you say 'the most beautiful'?",a:["הכי יפה","hachi yafe"],hint:"הכי + adjective"}]},
+ {ch:23,t:"Conditional",lvl:"B2",items:[
+  {q:"Type: I would like to travel",a:["הייתי רוצה לנסוע","hayiti rotze linsoa"],hint:"היה + present"},
+  {q:"Type: if I had time, I would come",a:["אם היה לי זמן הייתי בא","im haya li zman hayiti ba"],hint:"im + past, then haya + present"}]},
+];
+
+/* ---- CONVERSA: scenarios + free chat ---- */
+const CONVERSA=[
+ {id:"free",t:"Free conversation",lvl:"any",free:true,
+  char:"You are a friendly, patient Hebrew conversation partner and tutor for Vincenzo (Italian, lives in Berlin, married to Kobi, around A1-A2, male). Chat naturally in simple modern Hebrew about daily life. Keep replies short (1-2 sentences). If he makes a clear mistake, model the correct version briefly and warmly, then continue. Adjust difficulty to how he writes. You may add a tiny English gloss in brackets only for a genuinely new word.",
+  open:["שָׁלוֹם וִינְצֶנְצוֹ! עַל מָה תִּרְצֶה לְדַבֵּר הַיּוֹם?"],
+  chips:["מָה שְׁלוֹמְךָ?","סַפֵּר לִי מַשֶּׁהוּ","בּוֹא נְדַבֵּר עַל אֹכֶל"]},
+ {id:"c1",t:"Morning with Kobi",lvl:"A1",char:"You are Kobi, Vincenzo's Israeli husband, at home in Berlin in the morning. Warm, simple present-tense Hebrew, short sentences, gently corrects.",
+  open:["בֹּקֶר טוֹב, מוֹתֶק.","אַתָּה רוֹצֶה קָפֶה?"],chips:["כֵּן, בְּבַקָּשָׁה","אֲנִי רוֹצֶה קָפֶה","יָשַׁנְתִּי טוֹב"]},
+ {id:"c2",t:"Angela Calls",lvl:"A1",char:"You are Angela, Vincenzo's mother, calling from Rosolini, Sicily. Warm, a little worried, asks about food and Kobi. Simple Hebrew.",
+  open:["וִינְצֶנְצוֹ, מַה שְׁלוֹמְךָ?","אַתָּה אוֹכֵל מַסְפִּיק?"],chips:["הַכֹּל טוֹב, אִמָּא","אֲנִי מְבַשֵּׁל הַרְבֵּה","אֲנִי מִתְגַּעְגֵּעַ אֵלַיִךְ"]},
+ {id:"c3",t:"HaCarmel Market",lvl:"A1",char:"You are a loud friendly vegetable vendor at Shuk HaCarmel, Tel Aviv. Fast but slows for a learner. Numbers, prices in shekels, food words.",
+  open:["בּוֹא, בּוֹא! עַגְבָנִיּוֹת טְרִיּוֹת!","מָה אַתָּה רוֹצֶה?"],chips:["אֲנִי רוֹצֶה קִילוֹ עַגְבָנִיּוֹת","כַּמָּה זֶה עוֹלֶה?","זֶה יָקָר"]},
+ {id:"c4",t:"Berlin Café",lvl:"A2",char:"You are an Israeli friend living in Berlin, meeting for coffee. Casual, some slang, asks follow-ups.",
+  open:["אָח שֶׁלִּי, מָה הַמַּצָּב?","מָה עָשִׂיתָ בְּסוֹף הַשָּׁבוּעַ?"],chips:["הָיִינוּ בְּאַבַּאיְטָה","הָעֲבוֹדָה טוֹבָה","סַבָּבָּה, וְאַתָּה?"]},
+ {id:"c5",t:"The Neighbour Thomas",lvl:"A2",char:"You are Thomas, a polite German neighbour in Vincenzo's Berlin building who knows a little Hebrew and loves Italian food.",
+  open:["בֹּקֶר טוֹב, שָׁכֵן!","אַתָּה מְבַשֵּׁל אִיטַלְקִי?"],chips:["אֲנִי מִסִּיצִילְיָה","כֵּן, אֲנִי מְבַשֵּׁל פַּסְטָה","נָכוֹן, קַר הַיּוֹם"]},
+ {id:"c6",t:"Tel Aviv Hotel",lvl:"A2",char:"You are a hotel receptionist in Tel Aviv. Professional, friendly. Handle check-in: name, nights, breakfast, beach directions.",
+  open:["שָׁלוֹם, בְּרוּכִים הַבָּאִים.","כַּמָּה לֵילוֹת תִּשָּׁאֲרוּ?"],chips:["הַהַזְמָנָה עַל הַשֵּׁם קוֹבִּי","שְׁלוֹשָׁה לֵילוֹת","אֵיפֹה הַחוֹף?"]},
+ {id:"c7",t:"Ben Gurion Security",lvl:"A2",char:"You are a polite, procedural security agent at Ben Gurion airport. Standard questions one at a time, low-stress.",
+  open:["שָׁלוֹם, אֶת הַדַּרְכּוֹן בְּבַקָּשָׁה.","מֵאַיִן אַתָּה מַגִּיעַ?"],chips:["אֲנִי מַגִּיעַ מִתֵּל אָבִיב","בִּקַּרְתִּי אֶת הַמִּשְׁפָּחָה","אֲנִי טָס לְבֶּרְלִין"]},
+ {id:"c8",t:"Miki at the Airport",lvl:"A2",char:"You are Miki, Kobi's brother, picking them up at Ben Gurion. Warm, funny, praises his Hebrew.",
+  open:["הִנֵּה הֵם! בְּרוּכִים הַבָּאִים!","אֵיךְ הָיְתָה הַטִּיסָה?"],chips:["הַטִּיסָה הָיְתָה טוֹבָה","תּוֹדָה, אֲנִי לוֹמֵד הַרְבֵּה","כֵּן, אֲנַחְנוּ רְעֵבִים"]},
+ {id:"c9",t:"Meeting a Client",lvl:"B1",char:"You are a client meeting Vincenzo, an interior designer, in Berlin, to redesign a living room. Discuss style, colours, materials, budget. Clear professional Hebrew.",
+  open:["נָעִים מְאוֹד.","אֵיזֶה סִגְנוֹן אַתָּה מַמְלִיץ?"],chips:["אֲנִי מַמְלִיץ עַל סִגְנוֹן נָקִי","נִשְׁתַּמֵּשׁ בְּעֵץ וּבְאֶבֶן","אֶשְׁלַח לְךָ תּוֹכְנִית"]},
+ {id:"c10",t:"Ordering Dinner",lvl:"A1",char:"You are a friendly patient waiter in a Tel Aviv restaurant. Present the menu, recommend fish, take the order, bring the bill.",
+  open:["עֶרֶב טוֹב, שְׁנַיִם?","מָה תִּרְצוּ לִשְׁתּוֹת?"],chips:["אֲנִי רוֹצֶה דָּג וְסָלָט","יַיִן אָדֹם, בְּבַקָּשָׁה","אֶפְשָׁר אֶת הַחֶשְׁבּוֹן?"]},
+ {id:"c11",t:"The Shabbat Table",lvl:"B1",char:"You are Kobi's mother hosting Friday-night dinner in Tel Aviv. Warm, keeps offering food, asks about Berlin and Sicily.",
+  open:["שַׁבָּת שָׁלוֹם, בּוֹאוּ לֶאֱכֹל!","קַח עוֹד חַלָּה."],chips:["תּוֹדָה, הַכֹּל טָעִים","הַמִּשְׁפָּחָה שֶׁלִּי בְּסֵדֶר","בֶּרְלִין עִיר יָפָה"]},
+ {id:"c12",t:"A Guest at ABAITA",lvl:"A2",char:"You are a guest arriving at ABAITA in Brandenburg with a dog. Ask about parking, the sauna, the wood stove. Vincenzo hosts and answers.",
+  open:["שָׁלוֹם, הִגַּעְנוּ! אֵיזֶה מָקוֹם יָפֶה.","אֵיךְ מַדְלִיקִים אֶת הַתַּנּוּר?"],chips:["אֶפְשָׁר לַחֲנוֹת לְיַד הַגִּינָה","הַכֶּלֶב בָּרוּךְ הַבָּא","אַרְאֶה לְךָ אֶת הַסָּאוּנָה"]},
+ {id:"c13",t:"Directions in Jaffa",lvl:"A2",char:"You are a friendly local in Jaffa helping a visitor find the port and a fish restaurant. Simple directions, patient.",
+  open:["אַתָּה מְחַפֵּשׂ מַשֶּׁהוּ?","הַנָּמֵל? זֶה יָשָׁר וְאָז יָמִינָה."],chips:["אֲנִי מְחַפֵּשׂ אֶת הַנָּמֵל","יָשָׁר וְיָמִינָה, נָכוֹן?","תּוֹדָה רַבָּה!"]},
+ {id:"c14",t:"Planning a Trip",lvl:"B1",char:"You are Kobi, planning the next Tel Aviv trip with Vincenzo: dates, flights, seeing Miki, Jaffa and the beach. Natural B1 Hebrew, future tense, joint decisions.",
+  open:["מָתַי נִסַּע לְתֵל אָבִיב הַפַּעַם?","שָׁבוּעַ מַסְפִּיק?"],chips:["נִסַּע בַּקַּיִץ","כֵּן, בָּא לִי יוֹם בְּיָפוֹ","שָׁבוּעַ מַסְפִּיק"]}
+];
+
+/* ===================================================================
+   LEXICON INDEX  (all vocab as flat, addressable items)
+=================================================================== */
+const LEX=[];
+function buildLex(){
+  LEX.length=0;
+  VOCAB.forEach(c=>c.words.forEach((w,i)=>LEX.push({key:'v|'+c.cat+'|'+i,v:w[0][0],p:w[0][1],tl:w[1],en:w[2],it:w[3],cat:c.cat,lvl:c.lvl})));
+  (S.customVocab||[]).forEach((w,i)=>LEX.push({key:'cv|'+i,v:w.v,p:w.p||'',tl:w.tl,en:w.en,it:w.it||'',cat:'My words',lvl:''}));
+}
+function catItems(name){return LEX.filter(it=>it.cat===name);}
+
+/* ===================================================================
+   MASTERY MODEL   states: 0 seen · 1 weak · 2 familiar · 3 mastered
+=================================================================== */
+function mState(k){const m=S.mastery[k];return m?m.s:-1;}
+function mSeen(k){if(!S.mastery[k])S.mastery[k]={s:0,n:0,c:0,due:Date.now()};}
+function mAnswer(k,ok){let m=S.mastery[k]||{s:0,n:0,c:0,due:Date.now()};m.n++;
+  if(ok){m.c++;m.s=m.c>=4?3:m.c>=2?2:Math.max(m.s,1);m.due=Date.now()+(m.s===3?7:m.s===2?2:1)*864e5;}
+  else{m.c=0;m.s=1;m.due=Date.now()+6e5;}
+  S.mastery[k]=m;}
+function masteryCounts(){const c={enc:0,weak:0,fam:0,mas:0};for(const k in S.mastery){const s=S.mastery[k].s;if(s===0)c.enc++;else if(s===1)c.weak++;else if(s===2)c.fam++;else if(s>=3)c.mas++;}return c;}
+function mpill(k){const s=mState(k);if(s<0)return '<span class="mpill new">new</span>';return['<span class="mpill enc">seen</span>','<span class="mpill weak">weak</span>','<span class="mpill fam">familiar</span>','<span class="mpill mas">mastered</span>'][s];}
+function weakPool(limit){const now=Date.now();const arr=[];
+  LEX.forEach(it=>{const m=S.mastery[it.key];if(!m)return;if(m.s<=1)arr.push({it,pri:0});else if(m.due<=now)arr.push({it,pri:1});});
+  arr.sort((a,b)=>a.pri-b.pri);return arr.slice(0,limit||20).map(x=>x.it);}
+function learnedPool(){return LEX.filter(it=>S.mastery[it.key]);}
+
+/* ===================================================================
+   COURSE  (guided, unlocking lessons; each blends the methods)
+=================================================================== */
+const COURSE=[
+ {id:1,title:"Alphabet & first words",lvl:"A1",vocab:"Greetings & basics",grammar:1,story:"s1"},
+ {id:2,title:"Vowel marks & questions",lvl:"A1",vocab:"Question words",grammar:2,story:null},
+ {id:3,title:"Present tense & family",lvl:"A1",vocab:"Family & people",grammar:3,story:"s2"},
+ {id:4,title:"Nouns, gender & the home",lvl:"A1",vocab:"Home & interior design",grammar:4,story:null},
+ {id:5,title:"The, את & food",lvl:"A1",vocab:"Food & drink",grammar:5,story:"s7"},
+ {id:6,title:"Adjectives & colours",lvl:"A2",vocab:"Colours & clothing",grammar:6,story:null},
+ {id:7,title:"Numbers & time",lvl:"A2",vocab:"Numbers",grammar:7,story:null},
+ {id:8,title:"Past tense & the calendar",lvl:"A2",vocab:"Time & calendar",grammar:8,story:"s8"},
+ {id:9,title:"Future tense & travel",lvl:"A2",vocab:"Travel & places",grammar:9,story:"s5"},
+ {id:10,title:"Pronouns & to be",lvl:"A2",vocab:"Pronouns & function",grammar:10,story:"s3"},
+ {id:11,title:"Possession & work",lvl:"A2",vocab:"Work & business",grammar:11,story:"s4"},
+ {id:12,title:"Questions & Berlin life",lvl:"A2",vocab:"Berlin daily life",grammar:12,story:"s6"},
+ {id:13,title:"Binyanim & everyday words",lvl:"A2",vocab:"Common adjectives",grammar:13,story:null},
+ {id:14,title:"Pi'el & feelings",lvl:"B1",vocab:"Feelings & emotions",grammar:14,story:"s9"},
+ {id:15,title:"Hif'il, Hitpa'el & the body",lvl:"B1",vocab:"Body & health",grammar:15,story:"s10"},
+ {id:16,title:"Toward B2",lvl:"B2",vocab:"Abstract & B2",grammar:21,story:"s12"}
+];
+function lessonDone(id){return !!S.course.done[id];}
+function lessonUnlocked(id){return id===1||lessonDone(id-1);}
+function currentLesson(){for(const l of COURSE)if(!lessonDone(l.id))return l;return COURSE[COURSE.length-1];}
+function completeLesson(id){S.course.done[id]=true;const nx=COURSE.find(l=>!lessonDone(l.id));S.course.lesson=nx?nx.id:id;touchDay();addXP(15);save();}
+function lessonStages(l){
+  const st=[{type:'vocab'},{type:'grammar'}];
+  if(l.story)st.push({type:'story'});
+  st.push({type:'drill'});
+  return st;
+}
+
+/* ===================================================================
+   DRILL ENGINE  (feedback-bearing, updates mastery)
+=================================================================== */
+let drill=null;
+function startVocabDrill(items,opts){opts=opts||{};
+  items=items.filter(Boolean);
+  if(!items.length){toast('Nothing to practise here yet');return;}
+  drill={typed:false,items:shuffle(items).slice(0,opts.max||Math.min(items.length,12)),i:0,score:0,wrong:[],answered:null,done:opts.onDone,title:opts.title||'Practice',back:opts.back||'practice'};
+  go('drill');}
+function startGrammarDrill(chItems,opts){opts=opts||{};
+  drill={typed:true,items:shuffle(chItems).slice(0,opts.max||chItems.length),i:0,score:0,wrong:[],answered:null,done:opts.onDone,title:opts.title||'Practice',back:opts.back||'practice'};
+  go('drill');}
+function startVerbDrill(verbs,opts){opts=opts||{};
+  verbs=(verbs||VERBS).filter(Boolean);
+  const tenses=[["present","Present"],["past","Past"],["future","Future"]];
+  const items=[];
+  verbs.forEach(v=>{
+    tenses.forEach(t=>{const rows=v[t[0]];if(!rows)return;
+      rows.forEach(r=>{
+        items.push({q:v.en+" \u00b7 "+t[1]+", "+r[0]+"  ("+v.inf[1]+")",a:[r[1][0],r[1][1]],hint:v.binyan+" \u00b7 root "+v.root});
+      });});
+  });
+  if(!items.length){toast("No verbs to drill");return;}
+  drill={typed:true,items:shuffle(items).slice(0,opts.max||12),i:0,score:0,wrong:[],answered:null,done:opts.onDone,title:opts.title||"Verb conjugation",back:opts.back||"practice"};
+  go("drill");}
+function distractors(it,n){const pool=(drill.items.length>=4?drill.items:LEX).filter(x=>x.en!==it.en);const out=[];const used={};
+  while(out.length<n&&pool.length){const c=pool[Math.floor(Math.random()*pool.length)];if(!used[c.en]){used[c.en]=1;out.push(c);}if(Object.keys(used).length>=pool.length)break;}
+  return out;}
+function vDrill(){
+  const d=drill;if(!d)return '<p>No drill.</p>';
+  if(d.i>=d.items.length)return drillDone();
+  const pct=Math.round(d.i/d.items.length*100);
+  const head=`<div class="dprog"><button class="back" data-drill-exit="1" style="margin:0">← exit</button><div class="track"><i style="width:${pct}%"></i></div><div class="num">${d.i+1} / ${d.items.length}</div></div><div class="steplabel">${d.title}</div>`;
+  if(d.typed)return head+drillTyped(d);
+  return head+drillVocab(d);
+}
+function drillVocab(d){
+  const it=d.items[d.i];const type=d.i%4;const a=d.answered;
+  if(type===1){ // typed meaning
+    const fb=a?`<div class="banner ${a.ok?'ok':'bad'}"><span><span class="lbl">${a.ok?'נכון · correct':'לא בדיוק · not quite'}</span><br>${H(it.v,it.p)} = ${it.en} (${it.tl})</span><button class="btn sm" data-drill-next="1">Continue</button></div>`:'';
+    return `<div class="qprompt"><div class="big">${H(it.v,it.p)}</div><button class="spk" data-speak="${encodeURIComponent(it.v)}" style="margin:8px auto 0">♪</button><div class="sub">type the English meaning</div></div>
+      <input class="inp" id="dType" placeholder="meaning…" ${a?'disabled':''}>
+      <div class="row" style="margin-top:10px">${a?'':'<button class="btn" data-drill-check="1">check</button><button class="btn ghost sm" data-drill-skip="1">skip</button>'}</div>${fb}`;
+  }
+  // MCQ
+  const en2he=(type===3);
+  const opts=shuffle([it,...distractors(it,3)]);
+  const promptHTML = en2he
+    ? `<div class="qprompt"><div class="en">${it.en}</div><div class="sub">choose the Hebrew word</div></div>`
+    : (type===2
+      ? `<div class="qprompt"><button class="spk" data-speak="${encodeURIComponent(it.v)}" style="margin:0 auto;width:46px;height:46px;font-size:20px">♪</button><div class="sub">listen, then choose the meaning</div></div>`
+      : `<div class="qprompt"><div class="big">${H(it.v,it.p)}</div><button class="spk" data-speak="${encodeURIComponent(it.v)}" style="margin:8px auto 0">♪</button><div class="sub">choose the meaning</div></div>`);
+  const optsHTML=opts.map(o=>{
+    const label=en2he?H(o.v,o.p):o.en;
+    let cls='opt'+(en2he?' heb':'');
+    if(a){if(o.en===it.en)cls+=' ok';else if(o.en===a.chosen&&!a.ok)cls+=' bad';}
+    return `<button class="${cls}" ${a?'disabled':''} data-drill-pick="${encodeURIComponent(o.en)}">${label}</button>`;
+  }).join('');
+  const fb=a?`<div class="banner ${a.ok?'ok':'bad'}"><span><span class="lbl">${a.ok?'נכון · correct':'לא בדיוק · not quite'}</span><br>${H(it.v,it.p)} = ${it.en}</span><button class="btn sm" data-drill-next="1">Continue</button></div>`:'';
+  return promptHTML+`<div class="opts">${optsHTML}</div>${fb}`;
+}
+function drillTyped(d){
+  const it=d.items[d.i];const a=d.answered;
+  const fb=a?`<div class="banner ${a.ok?'ok':'bad'}"><span><span class="lbl">${a.ok?'נכון · correct':'לא בדיוק · not quite'}</span><br>${it.a[0]}</span><button class="btn sm" data-drill-next="1">Continue</button></div>`:'';
+  return `<div class="qprompt"><div class="sub" style="font-size:15px;color:var(--paper)">${it.q}</div></div>
+    <input class="inp" id="dType" placeholder="type your answer…" ${a?'disabled':''}>
+    <div class="row" style="margin-top:10px">${a?'':'<button class="btn" data-drill-check="1">check</button> <button class="btn ghost sm" data-drill-hint="1">hint</button> <span class="muted" id="dHint" style="font-size:12.5px"></span>'}</div>${fb}`;
+}
+function drillDone(){
+  const d=drill;const total=d.items.length;
+  return `<div class="steplabel">${d.title}</div>
+   <div class="card" style="text-align:center"><h2 style="margin-top:0">${d.score} / ${total}</h2>
+   <p class="muted">${d.score===total?'Perfect.':d.score>=total*0.6?'Good work. The ones you missed are now marked weak and will come back.':'Keep going. These are now in your weak spots for review.'}</p>
+   <div class="row" style="justify-content:center;margin-top:14px;gap:8px"><button class="btn sm" data-drill-again="1">Again</button><button class="btn ghost sm" data-drill-finish="1">Done</button></div></div>`;
+}
+
+/* ===================================================================
+   NAV & ROUTER
+=================================================================== */
+const TABS=[
+ ["dash","Today","◆"],["course","Course","❡"],["grammar","Grammar","✎"],["binyanim","Binyanim","⬡"],
+ ["vocab","Vocab","✦"],["verbs","Verbs","⟳"],["stories","Stories","❧"],["practice","Practice","✓"],
+ ["conversa","Conversa","❝"],["write","Write","✒"],["pron","Sounds","♪"],["settings","Settings","⚙"]
+];
+let route={section:'dash',item:null,sub:null};
+let lsStage=0;
+function go(section,item,sub){route={section,item:item||null,sub:sub||null};buildNav();render();window.scrollTo(0,0);}
+function buildNav(){
+  document.getElementById('nav').innerHTML=TABS.map(t=>`<button data-v="${t[0]}" class="${t[0]===route.section?'on':''}"><span class="ic">${t[2]}</span>${t[1]}</button>`).join('');
+  document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>go(b.dataset.v));
+  const mob=[["dash","Today","◆"],["course","Course","❡"],["practice","Practice","✓"],["vocab","Vocab","✦"],["conversa","Talk","❝"],["settings","More","⚙"]];
+  document.getElementById('mobnav').innerHTML=mob.map(t=>`<button data-v="${t[0]}" class="${t[0]===route.section?'on':''}"><span class="ic">${t[2]}</span>${t[1]}</button>`).join('');
+  document.querySelectorAll('#mobnav button').forEach(b=>b.onclick=()=>go(b.dataset.v));
+}
+function render(){const m=document.getElementById('main');
+  const f={dash:vDash,course:vCourse,grammar:vGrammar,binyanim:vBinyanim,vocab:vVocab,verbs:vVerbs,stories:vStories,practice:vPractice,drill:vDrill,conversa:vConversa,write:vWrite,pron:vPron,settings:vSettings}[route.section]||vDash;
+  m.innerHTML=f();bind();}
+
+/* small helpers */
+function lvlBadge(l){if(!l)return '';const k=l.toLowerCase().replace('.','').slice(0,2);return `<span class="lvl ${k}">${l}</span>`;}
+function speakBtn(v){return `<button class="spk" data-speak="${encodeURIComponent(v)}">♪</button>`;}
+function nikToggle(){return `<label class="switch" title="vowel marks"><input type="checkbox" id="nikTop" ${S.nikud?'checked':''}><span class="track"></span></label>
+  <span class="info">i<span class="tip">Nikud are the vowel marks. Beginners keep them on. Real modern Hebrew has none, so turn them off to read the bare word. Spelling shifts slightly (extra ו/י): we show the true unvowelled form.</span></span>`;}
+function stageHTML(s,i){let body='';
+  if(s.p)body=`<p>${s.p}</p>`;
+  if(s.tbl)body=`<table><tbody>${s.tbl.map(r=>`<tr>${r.map(c=>Array.isArray(c)?`<td>${hebClick(c[0],c[1])}</td>`:/[\u0590-\u05FF]/.test(c)?`<td>${hebClick(c)}</td>`:`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  if(s.ex)body=s.ex.map(e=>`<div class="row" style="gap:10px;margin-bottom:6px">${speakBtn(e[0][0])}${hebClick(e[0][0],e[0][1])} <span class="tl">${e[1]}</span> <span class="muted">· ${e[2]}</span></div>`).join('');
+  return `<div class="stage"><div class="n">${i+1}</div><div style="flex:1"><h3>${s.h}</h3>${body}</div></div>`;}
+function rateRow(id){const v=S.grammar[id]||0;return `<div class="row spread" style="margin-top:12px"><div class="rate" data-rate="${id}"><span class="muted" style="font-size:12px;margin-inline-end:4px">How confident?</span>${[1,2,3,4,5].map(n=>`<b class="${v>=n?'on':''}" data-n="${n}">${n}</b>`).join('')}</div></div>`;}
+
+/* ===================================================================
+   DASHBOARD  (knowledge map + continue + sequenced today)
+=================================================================== */
+function vDash(){
+  const hour=new Date().getHours();const g=hour<12?["בֹּקֶר טוֹב","בוקר טוב"]:hour<18?["צָהֳרַיִים טוֹבִים","צהריים טובים"]:["עֶרֶב טוֹב","ערב טוב"];
+  const c=masteryCounts();const tot=c.enc+c.weak+c.fam+c.mas||1;
+  const l=currentLesson();const weak=weakPool(10);
+  const doneToday=S.dailyDone[new Date().toDateString()];
+  return `<div class="topbar"><div><h1>${H(g[0],g[1])}, Vincenzo</h1><div class="lead">${hebClick("לְאַט לְאַט זֶה בָּא","לאט לאט זה בא")} · slowly it comes.</div></div><span class="pill">streak ${S.streak||0} · ${S.xp||0} XP</span></div>
+   <h2>Your knowledge map</h2>
+   <div class="km">
+     <div class="b mas"><b>${c.mas}</b><span>mastered</span></div>
+     <div class="b fam"><b>${c.fam}</b><span>familiar</span></div>
+     <div class="b weak"><b>${c.weak}</b><span>weak</span></div>
+     <div class="b enc"><b>${c.enc}</b><span>seen</span></div>
+   </div>
+   <div class="mbar"><i class="" style="width:${c.mas/tot*100}%;background:#6fae86"></i><i style="width:${c.fam/tot*100}%;background:#7fa8c9"></i><i style="width:${c.weak/tot*100}%;background:#cf8a7c"></i><i style="width:${c.enc/tot*100}%;background:#5a6b7a"></i></div>
+   <p class="muted" style="font-size:12.5px;margin-top:8px">Out of ${LEX.length} words in the app. Words move up as you practise, and weak ones come back to you.</p>
+
+   <h2>Continue where you left off</h2>
+   <div class="card"><div class="row spread"><div><span class="tag">Lesson ${l.id} of ${COURSE.length}</span><h3 style="margin-top:7px">${l.title}</h3><p class="muted" style="font-size:13px">${lvlBadge(l.lvl)} a full lesson: words, grammar, a story, then practice.</p></div></div>
+     <button class="btn full" style="margin-top:12px" data-open-lesson="${l.id}">${lessonDone(l.id)?'Review lesson':'Continue lesson'}</button></div>
+
+   <h2>Today's session</h2>
+   <div class="card">
+     <p class="muted" style="margin-bottom:12px">Built for you, in order. ${doneToday?'<span class="ans-ok">Done today ✓</span>':''}</p>
+     <div class="stage"><div class="n">1</div><div style="flex:1"><h3>Warm-up review</h3><p class="muted" style="font-size:13px">${weak.length?weak.length+' word(s) need another look.':'Nothing due. Learn new words in your lesson to build a review queue.'}</p>${weak.length?'<button class="btn sm ghost" style="margin-top:8px" data-warmup="1">Review weak spots</button>':''}</div></div>
+     <div class="stage"><div class="n">2</div><div style="flex:1"><h3>Today's lesson</h3><p class="muted" style="font-size:13px">${l.title}</p><button class="btn sm ghost" style="margin-top:8px" data-open-lesson="${l.id}">Open lesson ${l.id}</button></div></div>
+     <div class="stage"><div class="n">3</div><div style="flex:1"><h3>Read something</h3><p class="muted" style="font-size:13px">A short story at your level.</p><button class="btn sm ghost" style="margin-top:8px" data-go2="stories">Open stories</button></div></div>
+     <button class="btn full" style="margin-top:14px" id="finishDay">Mark today done (+10 XP)</button>
+   </div>
+   <div class="note">Tap any Hebrew word, anywhere, to hear it and see its meaning. Toggle the vowel marks at the top of each learning screen.</div>`;
+}
+
+/* ===================================================================
+   COURSE  (list + stepped lesson)
+=================================================================== */
+function vCourse(){
+  if(route.item){return lessonView(+route.item);}
+  return `<h1>Course</h1><div class="lead">The guided path. Each lesson teaches words, then grammar, then a story that uses them, then practice. Finish one to unlock the next.</div>
+   ${COURSE.map(l=>{const done=lessonDone(l.id);const open=lessonUnlocked(l.id);
+     return `<div class="item ${done?'done':''} ${open?'':'lock'}" ${open?`data-open-lesson="${l.id}"`:''}><div class="meta"><div class="t">${l.id}. ${l.title} ${done?'<span class="ans-ok" style="font-size:12px">✓</span>':''}</div><div class="muted" style="font-size:12.5px">words · grammar · story · practice</div></div><div class="row">${lvlBadge(l.lvl)}<span class="chev">${open?'›':'🔒'}</span></div></div>`;}).join('')}`;
+}
+function lessonView(id){
+  const l=COURSE.find(x=>x.id===id);if(!l)return vCourse();
+  if(!lessonUnlocked(id))return `<button class="back" data-back="course">← course</button><div class="note">Finish lesson ${id-1} first to unlock this one.</div>`;
+  const stages=lessonStages(l);const st=Math.min(lsStage,stages.length-1);const stage=stages[st];
+  const head=`<button class="back" data-back="course">← course</button>
+   <div class="topbar"><div><h1>${l.title}</h1><div class="lead">${lvlBadge(l.lvl)} lesson ${l.id} of ${COURSE.length}</div></div>${nikToggle()}</div>
+   <div class="stepper">${stages.map((s,i)=>`<div class="st ${i<st?'done':''} ${i===st?'on':''}"></div>`).join('')}</div>`;
+  let body='';
+  if(stage.type==='vocab'){
+    const items=catItems(l.vocab);items.forEach(it=>mSeen(it.key));
+    body=`<div class="steplabel">Step ${st+1} · Learn these words</div>
+     <p class="muted" style="margin-bottom:12px">Tap a card to hear it. You'll be tested on these at the end.</p>
+     <div class="wcards">${items.map(it=>`<div class="wcard" data-speak="${encodeURIComponent(it.v)}"><div class="h">${H(it.v,it.p)}</div><div class="t">${it.tl}</div><div class="e">${it.en}</div></div>`).join('')}</div>`;
+  } else if(stage.type==='grammar'){
+    const gr=GRAMMAR.find(x=>x.id===l.grammar);
+    body=`<div class="steplabel">Step ${st+1} · The grammar</div><div class="sec">${gr.stages.map((s,i)=>stageHTML(s,i)).join('')}${rateRow(gr.id)}</div>`;
+  } else if(stage.type==='story'){
+    const story=STORIES.find(s=>s.id===l.story);S.stories[story.id]=true;
+    body=`<div class="steplabel">Step ${st+1} · Read it in context</div>
+     <div class="row" style="margin-bottom:10px"><button class="btn sm" data-readall="${story.id}">▶ read aloud</button><button class="btn sm ghost" data-stopread="1">■ stop</button></div>
+     <div class="card">${story.s.map(x=>`<div class="s-sent">${hebClick(x[0][0],x[0][1])}<span class="tl">${x[1]}</span><span class="en">${x[2]}</span></div>`).join('')}</div>`;
+  } else if(stage.type==='drill'){
+    body=`<div class="steplabel">Step ${st+1} · Practice what you learned</div>
+     <div class="card" style="text-align:center"><p>Ready? A short drill on this lesson's words and grammar, with instant feedback.</p>
+     <button class="btn" style="margin-top:12px" data-lesson-drill="${l.id}">Start practice</button></div>`;
+  }
+  const nav=`<div class="row spread" style="margin-top:16px">${st>0?'<button class="btn ghost sm" data-ls-prev="1">← back</button>':'<span></span>'}${stage.type!=='drill'?'<button class="btn sm" data-ls-next="1">next step →</button>':''}</div>`;
+  return head+body+nav;
+}
+
+/* ===================================================================
+   GRAMMAR  (list + detail + attached practice)
+=================================================================== */
+function vGrammar(){
+  if(route.item){const c=GRAMMAR.find(x=>''+x.id===''+route.item);if(!c)return grammarList();
+    const pr=PRACTICE.find(p=>p.ch===c.id);const lesson=COURSE.find(l=>l.grammar===c.id);
+    return `<button class="back" data-back="grammar">← all topics</button>
+     <div class="topbar"><div><h1>${c.t}</h1><div class="lead">${lvlBadge(c.lvl)} · chapter ${c.id} of ${GRAMMAR.length}</div></div>${nikToggle()}</div>
+     <div class="sec">${c.stages.map((s,i)=>stageHTML(s,i)).join('')}${rateRow(c.id)}</div>
+     <div class="card" style="text-align:center"><h3>Practice this topic</h3><p class="muted" style="font-size:13px">${pr?'Typed exercises on '+c.t.toLowerCase()+'.':(lesson?'Drill the words from the matching lesson.':'Try the matching practice set.')}</p>
+       <button class="btn" style="margin-top:10px" data-practice-topic="${c.id}">Start practice</button></div>
+     <div class="row" style="gap:8px;margin-top:12px">${c.id>1?`<button class="btn ghost sm" data-go2="grammar|${c.id-1}">← previous</button>`:''}${c.id<GRAMMAR.length?`<button class="btn sm" data-go2="grammar|${c.id+1}">next topic →</button>`:''}</div>`;
+  }
+  return grammarList();
+}
+function grammarList(){const groups={A1:[],A2:[],B1:[],B2:[]};GRAMMAR.forEach(c=>groups[c.lvl].push(c));
+  return `<div class="topbar"><div><h1>Grammar</h1><div class="lead">${GRAMMAR.length} topics, A1 to B2. Pick one to open it as its own page, then practise it.</div></div>${nikToggle()}</div>
+   ${Object.keys(groups).filter(k=>groups[k].length).map(k=>`<h2>${k}</h2>${groups[k].map(c=>{const done=(S.grammar[c.id]||0)>=4;
+     return `<div class="item ${done?'done':''}" data-grammar="${c.id}"><div class="meta"><div class="t">${c.id}. ${c.t}</div><div class="muted" style="font-size:12.5px">${c.sum}</div></div><span class="chev">›</span></div>`;}).join('')}`).join('')}`;
+}
+
+/* ===================================================================
+   BINYANIM
+=================================================================== */
+function vBinyanim(){
+  if(route.item){const b=BINYANIM.find(x=>x.id===route.item);if(!b)return binyanimList();
+    return `<button class="back" data-back="binyanim">← all binyanim</button>
+     <div class="topbar"><div><h1>${H(b.name)} · ${b.tl}</h1><div class="lead">${b.voice}</div></div>${nikToggle()}</div>
+     <div class="sec"><h4>What it is</h4><p>${b.desc}</p></div>
+     <div class="sec"><h4>Examples</h4>${b.ex.map(e=>`<div class="row" style="gap:10px;margin-bottom:6px">${speakBtn(e[0])}${hebClick(e[0])} <span class="tl">${e[1]}</span> <span class="muted">· ${e[2]}</span></div>`).join('')}</div>
+     <div class="sec"><h4>Good to know</h4><p>${b.note}</p></div>`;}
+  return binyanimList();
+}
+function binyanimList(){
+  return `<div class="topbar"><div><h1>Binyanim · בִּנְיָנִים</h1><div class="lead">The 7 verb patterns, the backbone of every Hebrew verb. Tap one to study it.</div></div>${nikToggle()}</div>
+   <div class="note" style="margin-top:0;margin-bottom:14px">A Hebrew verb is a 3-letter root poured into one of these 7 moulds. The mould sets the voice: active, passive, reflexive, causative.</div>
+   ${BINYANIM.map(b=>`<div class="item" data-binyan="${b.id}"><div class="meta"><div class="t">${hebClick(b.name)} · ${b.tl}</div><div class="muted" style="font-size:12.5px">${b.voice}</div></div><span class="chev">›</span></div>`).join('')}`;
+}
+
+/* ===================================================================
+   VOCAB  (categories with mastery + practise + add)
+=================================================================== */
+function vVocab(){
+  if(route.item){if(route.item==='__add__')return vocabAdd();return vocabCategory(route.item);}
+  const custom=S.customVocab.length;
+  return `<div class="topbar"><div><h1>Vocabulary</h1><div class="lead">${VOCAB.length} categories. Words gain mastery as you practise them.</div></div>${nikToggle()}</div>
+   <div class="row" style="margin-bottom:14px"><button class="btn sm" data-vocab-add="1">+ Add a word</button></div>
+   ${VOCAB.map(c=>{const items=catItems(c.cat);const mas=items.filter(it=>mState(it.key)>=2).length;
+     return `<div class="item" data-cat="${encodeURIComponent(c.cat)}"><div class="meta"><div class="t">${c.cat}</div><div class="muted" style="font-size:12.5px">${c.words.length} words · ${mas} familiar+</div></div><div class="row">${lvlBadge(c.lvl)}<span class="chev">›</span></div></div>`;}).join('')}
+   ${custom?`<div class="item" data-cat="${encodeURIComponent('My words')}"><div class="meta"><div class="t">My words</div><div class="muted" style="font-size:12.5px">${custom} added</div></div><span class="chev">›</span></div>`:''}`;
+}
+function vocabCategory(encName){const name=decodeURIComponent(encName);const items=catItems(name);if(!items.length)return vVocab();
+  return `<button class="back" data-back="vocab">← all categories</button>
+   <div class="topbar"><div><h1>${name}</h1><div class="lead">${items.length} words</div></div>${nikToggle()}</div>
+   <div class="row" style="margin-bottom:12px"><button class="btn sm" data-practice-cat="${encName}">Practise this set</button></div>
+   ${items.map(it=>`<div class="item" style="cursor:default"><div class="row" style="gap:12px">${speakBtn(it.v)}<div class="meta"><div>${hebClick(it.v,it.p)}</div><div class="tl">${it.tl}</div></div></div>
+     <div class="row" style="gap:10px"><div class="meta" style="text-align:end"><span class="en">${it.en}</span><span class="faint" style="font-size:12px">${it.it||''}</span></div>${mpill(it.key)}</div></div>`).join('')}`;
+}
+function vocabAdd(){
+  return `<button class="back" data-back="vocab">← categories</button>
+   <h1>Add a word</h1><div class="lead">If Kobi spots something missing, add it here. Saved to your own set and included in practice.</div>
+   <div class="card" style="margin-top:14px">
+     <label>Hebrew (with nikud if you like)</label><input class="inp heb" id="awV" placeholder="מִלָּה">
+     <label>Hebrew unvowelled (optional, how it's really written)</label><input class="inp heb" id="awP" placeholder="מילה">
+     <label>Transliteration</label><input class="inp" id="awTl" placeholder="mila">
+     <label>English</label><input class="inp" id="awEn" placeholder="word">
+     <label>Italian (optional)</label><input class="inp" id="awIt" placeholder="parola">
+     <button class="btn full" style="margin-top:14px" id="awSave">Save word</button>
+   </div>`;
+}
+
+/* ===================================================================
+   VERBS  (list + full table + drill)
+=================================================================== */
+function vVerbs(){
+  if(route.item){const v=VERBS.find(x=>x.inf[0]===route.item);if(!v)return verbsList();
+    return `<button class="back" data-back="verbs">← all verbs</button>
+     <div class="topbar"><div><h1>${hebClick(v.inf[0],v.inf[1])}</h1><div class="lead">${v.en} · ${v.binyan} · ${lvlBadge(v.lvl)}</div></div>${nikToggle()}</div>
+     <div class="row" style="gap:10px;margin-bottom:12px">${speakBtn(v.inf[0])}<span class="muted">root</span> ${hebClick(v.root)} <button class="btn sm" data-verb-drill="${encodeURIComponent(v.inf[0])}">drill this verb</button></div>
+     <div class="sec"><h4>Present</h4><table><tbody>${v.present.map(r=>`<tr><td class="muted" style="font-size:12px">${r[0]}</td><td>${hebClick(r[1][0],r[1][1])}</td><td>${speakBtn(r[1][0])}</td></tr>`).join('')}</tbody></table></div>
+     <div class="sec"><h4>Past</h4><table><tbody>${v.past.map(r=>`<tr><td class="muted" style="font-size:12px">${r[0]}</td><td>${hebClick(r[1][0],r[1][1])}</td><td>${speakBtn(r[1][0])}</td></tr>`).join('')}</tbody></table></div>
+     <div class="sec"><h4>Future</h4><table><tbody>${v.future.map(r=>`<tr><td class="muted" style="font-size:12px">${r[0]}</td><td>${hebClick(r[1][0],r[1][1])}</td><td>${speakBtn(r[1][0])}</td></tr>`).join('')}</tbody></table></div>
+     <div class="sec"><h4>Note</h4><p>${v.note}</p></div>`;}
+  return verbsList();
+}
+function verbsList(){const groups={};VERBS.forEach(v=>{(groups[v.binyan]=groups[v.binyan]||[]).push(v)});
+  return `<div class="topbar"><div><h1>Verbs</h1><div class="lead">${VERBS.length} verbs, grouped by binyan. Tap one for its full conjugation.</div></div>${nikToggle()}</div>
+   ${Object.keys(groups).map(bn=>`<h2>${bn}</h2>${groups[bn].map(v=>`<div class="item" data-verb="${encodeURIComponent(v.inf[0])}"><div class="row" style="gap:12px">${speakBtn(v.inf[0])}<div class="meta"><div>${hebClick(v.inf[0],v.inf[1])}</div><div class="muted" style="font-size:12.5px">${v.en}</div></div></div><div class="row">${lvlBadge(v.lvl)}<span class="chev">›</span></div></div>`).join('')}`).join('')}`;
+}
+
+/* ===================================================================
+   STORIES  (list + detail + quiz)
+=================================================================== */
+function vStories(){
+  if(route.item){const st=STORIES.find(s=>s.id===route.item);if(!st)return storiesList();
+    if(route.sub==='quiz')return storyQuiz(st);
+    return `<button class="back" data-back="stories">← all stories</button>
+     <div class="topbar"><div><h1>${hebClick(st.t[0],st.t[1])}</h1><div class="lead">${st.en} · ${lvlBadge(st.lvl)}</div></div>${nikToggle()}</div>
+     <div class="card"><div class="row" style="margin-bottom:10px"><button class="btn sm" data-readall="${st.id}">▶ read aloud</button><button class="btn sm ghost" data-stopread="1">■ stop</button></div>
+       ${st.s.map(x=>`<div class="s-sent">${hebClick(x[0][0],x[0][1])}<span class="tl">${x[1]}</span><span class="en">${x[2]}</span><button class="spk" style="margin-top:4px" data-speak="${encodeURIComponent(x[0][0])}">♪ hear this line</button></div>`).join('')}</div>
+     <button class="btn full" style="margin-top:14px" data-go2="stories|${st.id}|quiz">Comprehension quiz →</button>`;}
+  return storiesList();
+}
+function storiesList(){const groups={A1:[],A2:[],B1:[],B2:[]};STORIES.forEach(s=>groups[s.lvl].push(s));
+  return `<div class="topbar"><div><h1>Stories</h1><div class="lead">Grounded in your life, longer as the level rises. Each has audio, tappable words, and a quiz.</div></div>${nikToggle()}</div>
+   ${Object.keys(groups).filter(k=>groups[k].length).map(k=>`<h2>${k}</h2>${groups[k].map(s=>{const done=S.stories[s.id];
+     return `<div class="item ${done?'done':''}" data-story="${s.id}"><div class="meta"><div>${hebClick(s.t[0],s.t[1])}</div><div class="muted" style="font-size:12.5px">${s.en} · ${s.s.length} lines</div></div><span class="chev">›</span></div>`;}).join('')}`).join('')}`;
+}
+function storyQuiz(st){
+  return `<button class="back" data-back="stories">← stories</button>
+   <h1>Quiz: ${st.en}</h1><div class="lead">Check what you understood.</div>
+   <div class="card" style="margin-top:14px">${st.quiz.map((q,qi)=>`<div style="margin-bottom:18px"><h3>${qi+1}. ${q.q}</h3>
+     <div class="row" style="gap:8px;margin-top:8px">${q.opts.map((o,oi)=>`<button class="btn ghost sm" data-quiz="${st.id}|${qi}|${oi}">${o}</button>`).join('')}</div>
+     <div class="feedback" id="qf-${qi}"></div></div>`).join('')}</div>`;
+}
+
+/* ===================================================================
+   PRACTICE  (mode picker -> drills)
+=================================================================== */
+function vPractice(){
+  const c=masteryCounts();const weak=weakPool(99).length;
+  return `<h1>Practice</h1><div class="lead">Every drill gives instant feedback and updates your mastery. Wrong answers come back as weak spots.</div>
+   <div class="modepick" style="margin-top:16px">
+     <div class="m" data-mode="weak"><h3>Weak spots</h3><p>Drill only the words you're struggling with or are due for review.</p><div class="cnt">${weak} due</div></div>
+     <div class="m" data-mode="mixed"><h3>Mixed review</h3><p>A random drill across everything you've met so far.</p><div class="cnt">${learnedPool().length} learned</div></div>
+     <div class="m" data-mode="flash"><h3>Flashcards</h3><p>See the Hebrew, recall the meaning, rate yourself.</p><div class="cnt">self-paced</div></div>
+     <div class="m" data-mode="cat"><h3>By category</h3><p>Pick a word set and drill it.</p><div class="cnt">${VOCAB.length} sets</div></div>
+     <div class="m" data-mode="grammar"><h3>Grammar exercises</h3><p>Typed exercises by chapter, checked for you.</p><div class="cnt">${PRACTICE.length} chapters</div></div>
+     <div class="m" data-mode="verbs"><h3>Conjugation drill</h3><p>Type the right verb form for a given tense and person.</p><div class="cnt">${VERBS.length} verbs</div></div>
+   </div>
+   ${route.sub==='cat'?practiceCatPicker():''}
+   ${route.sub==='grammar'?practiceGrammarPicker():''}
+   ${route.sub==='flash'?'<div id="flashHost" style="margin-top:18px"></div>':''}`;
+}
+function practiceCatPicker(){return `<h2>Choose a set</h2>${VOCAB.map(c=>`<div class="item" data-practice-cat="${encodeURIComponent(c.cat)}"><div class="meta"><div class="t">${c.cat}</div></div><div class="row">${lvlBadge(c.lvl)}<span class="chev">›</span></div></div>`).join('')}`;}
+function practiceGrammarPicker(){return `<h2>Choose a chapter</h2>${PRACTICE.map(p=>`<div class="item" data-practice-ch="${p.ch}"><div class="meta"><div class="t">Ch ${p.ch} · ${p.t}</div><div class="muted" style="font-size:12.5px">${p.items.length} items</div></div><div class="row">${lvlBadge(p.lvl)}<span class="chev">›</span></div></div>`).join('')}`;}
+
+/* flashcards (lightweight, self-rated) */
+let flash=null;
+function startFlash(){const pool=learnedPool().length?learnedPool():LEX.slice(0,20);flash={list:shuffle(pool),i:0,show:false};renderFlash();}
+function renderFlash(){const host=document.getElementById('flashHost');if(!host)return;
+  if(flash.i>=flash.list.length){host.innerHTML='<div class="card" style="text-align:center"><h3>Done.</h3><button class="btn sm" id="flashAgain" style="margin-top:10px">Again</button></div>';document.getElementById('flashAgain').onclick=startFlash;return;}
+  const it=flash.list[flash.i];
+  host.innerHTML=`<div class="dprog"><div class="track"><i style="width:${Math.round(flash.i/flash.list.length*100)}%"></i></div><div class="num">${flash.i+1} / ${flash.list.length}</div></div>
+   <div class="flash" id="flashCard"><div class="h">${H(it.v,it.p)}</div>${flash.show?`<div class="tl">${it.tl}</div><div class="en" style="font-size:17px">${it.en}</div>`:'<div class="muted">tap to reveal</div>'}</div>
+   ${flash.show?`<div class="row" style="margin-top:12px;gap:8px;justify-content:center"><button class="btn ghost sm" data-flash-rate="0">didn't know</button><button class="btn ghost sm" data-flash-rate="1">hazy</button><button class="btn sm" data-flash-rate="2">got it</button></div>`:''}`;
+  document.getElementById('flashCard').onclick=()=>{flash.show=true;renderFlash();bindFlash();};
+  bindFlash();
+}
+function bindFlash(){document.querySelectorAll('[data-flash-rate]').forEach(b=>b.onclick=()=>{const r=+b.dataset.flashRate;const it=flash.list[flash.i];mAnswer(it.key,r===2);if(r===1){const m=S.mastery[it.key];if(m){m.s=1;m.due=Date.now()+6e5;}}save();flash.i++;flash.show=false;renderFlash();});}
+
+/* ===================================================================
+   CONVERSA
+=================================================================== */
+let chat=[];let busy=false;
+function vConversa(){
+  if(route.item){const sc=CONVERSA.find(c=>c.id===route.item);if(!sc)return conversaList();
+    const hasKey=!!(S.cfg&&S.cfg.anthropicKey);
+    return `<button class="back" data-back="conversa">← conversations</button>
+     <div class="topbar"><div><h1>${sc.t}</h1><div class="lead">${sc.free?'open chat':sc.lvl+' · roleplay'}</div></div>${nikToggle()}</div>
+     <div class="card"><div class="chat" id="chat"></div>
+       <div class="row" style="margin-top:12px;gap:8px"><input class="inp heb" id="cIn" placeholder="הָקֵשׁ כָּאן..." style="flex:1"><button class="btn" id="cSend">שְׁלַח</button></div>
+       <div class="chips">${sc.chips.map(c=>`<button data-chip="${encodeURIComponent(c)}">${H(c)}</button>`).join('')}</div>
+       ${hasKey?'':'<div class="note">Live AI replies need your Anthropic API key (Settings). Without it you can still read the opening lines and rehearse with the chips.</div>'}
+     </div>`;}
+  return conversaList();
+}
+function conversaList(){const free=CONVERSA.find(c=>c.free);const rest=CONVERSA.filter(c=>!c.free);
+  return `<h1>Conversa</h1><div class="lead">Free chat with a tutor, or step into a scene with someone from your life. Powered by your Anthropic key.</div>
+   <div class="card" style="margin:14px 0;cursor:pointer" data-conv="free"><div class="row spread"><div><h3>${free.t}</h3><p class="muted" style="font-size:13px">Open-ended conversation. The tutor adapts to you.</p></div><span class="chev">›</span></div></div>
+   <h2>Scenarios</h2>
+   ${rest.map(c=>`<div class="item" data-conv="${c.id}"><div class="meta"><div class="t">${c.t}</div><div class="muted" style="font-size:12.5px">${H(c.open[0])}</div></div><div class="row">${lvlBadge(c.lvl)}<span class="chev">›</span></div></div>`).join('')}`;
+}
+
+/* ===================================================================
+   WRITE
+=================================================================== */
+function vWrite(){
+  const prompts=["Describe your morning in Berlin.","Write Angela a few lines about your week.","List what you cooked and ate this week.","Plan the next trip to Tel Aviv.","Describe a room you would design for Kobi."];
+  const entries=S.writeEntries||[];
+  return `<div class="topbar"><div><h1>Write</h1><div class="lead">Build sentences yourself. Hear them, save them, get gentle feedback.</div></div>${nikToggle()}</div>
+   <div class="card"><h4>A prompt to try</h4><p id="wPrompt">${prompts[new Date().getDate()%prompts.length]}</p>
+     <label>Your text (Hebrew)</label><textarea class="heb" id="wBox" placeholder="כְּתֹב כָּאן...">${(S.writeDraft||'').replace(/</g,'&lt;')}</textarea>
+     <div class="row" style="margin-top:10px;gap:8px"><button class="btn sm" id="wSpeak">▶ read aloud</button><button class="btn sm ghost" id="wSave">save entry</button><button class="btn sm ghost" id="wFeedback">get AI feedback</button></div>
+     <div class="feedback" id="wFb" style="margin-top:10px"></div></div>
+   ${entries.length?`<h2>Your entries</h2>${entries.slice().reverse().map(e=>`<div class="card" style="margin-bottom:10px"><div class="faint" style="font-size:12px">${e.date}</div><div style="margin-top:4px">${hebClick(e.text)}</div></div>`).join('')}`:''}
+   <div class="note">After you save, ask for feedback (needs your Anthropic key) and it gently corrects you in plain English.</div>`;
+}
+
+/* ===================================================================
+   SOUNDS / PRONUNCIATION
+=================================================================== */
+function vPron(){
+  if(route.item==='nikud'){
+    return `<button class="back" data-back="pron">← sounds</button>
+     <div class="topbar"><div><h1>Vowel marks (nikud)</h1><div class="lead">Tap each to hear it on the letter ב.</div></div>${nikToggle()}</div>
+     <div class="grid g3">${NIKUD.map(n=>`<div class="cell" data-speak="${encodeURIComponent(n.sign)}"><span class="kbd">${n.sign}</span><small>${n.name} · ${n.sound}</small></div>`).join('')}</div>
+     <h2>Why two marks for one sound?</h2><div class="card">${NIKUD.map(n=>`<div style="margin-bottom:8px"><b class="heb" style="font-size:20px">${n.sign}</b> <span class="tl">${n.name}</span> <span class="muted">${n.note}</span></div>`).join('')}</div>`;}
+  return `<div class="topbar"><div><h1>Sounds</h1><div class="lead">The alphabet and the vowels. Tap anything to hear it. Set voice and speed in Settings.</div></div></div>
+   ${hasHeVoice()?'':'<div class="note" style="margin-top:0">No Hebrew voice found on this device. iPhone: Settings → Accessibility → Spoken Content → Voices → add Hebrew. Mac: System Settings → Accessibility → Spoken Content → manage voices. Then reopen the app.</div>'}
+   <h2>Letters</h2><div class="grid g4">${ALEFBET.map(l=>`<div class="cell" data-speak="${encodeURIComponent(l[0])}"><span class="kbd">${l[0]}${l[3]?'<span style="font-size:20px;color:var(--faint)"> '+l[3]+'</span>':''}</span><small>${l[1]} · ${l[2]}</small></div>`).join('')}</div>
+   <h2>Vowels</h2><div class="row"><button class="btn sm" data-go2="pron|nikud">Open the nikud lesson →</button></div>
+   <div class="grid g3" style="margin-top:12px">${NIKUD.slice(0,6).map(n=>`<div class="cell" data-speak="${encodeURIComponent(n.sign)}"><span class="kbd">${n.sign}</span><small>${n.name} · ${n.sound}</small></div>`).join('')}</div>
+   <div class="note">Your edge: the vowels a-e-i-o-u sound almost exactly like Italian. The work is in ח, the soft כ, and the French-style ר.</div>`;
+}
+
+/* ===================================================================
+   SETTINGS
+=================================================================== */
+function vSettings(){const c=S.cfg||{};const vlist=voices.filter(v=>v.lang&&v.lang.toLowerCase().startsWith('he'));
+  return `<h1>Settings</h1><div class="lead">Private to you. Saved on this device and synced across your Mac and iPhone.</div>
+   <div class="card" style="margin-top:14px"><h3>Reading</h3>
+     <div class="row spread" style="margin-top:10px"><span>Show vowel marks (nikud) by default <span class="info">i<span class="tip">Modern Hebrew normally has no vowel marks. Keep them on while learning, turn them off to read like real texts.</span></span></span>
+       <label class="switch"><input type="checkbox" id="setNik" ${S.nikud?'checked':''}><span class="track"></span></label></div></div>
+   <div class="card" style="margin-top:14px"><h3>Audio</h3>
+     <label>Voice ${vlist.length?'':'(no Hebrew voice found on this device)'}</label>
+     <select id="setVoice">${vlist.length?vlist.map(v=>`<option value="${v.voiceURI}" ${S.voiceURI===v.voiceURI?'selected':''}>${v.name}</option>`).join(''):'<option>System default</option>'}</select>
+     <label>Speaking speed: <span id="rateVal">${(S.rate||0.9).toFixed(2)}x</span></label>
+     <input class="range" type="range" id="setRate" min="0.5" max="1.2" step="0.05" value="${S.rate||0.9}">
+     <button class="btn sm ghost" id="testVoice" style="margin-top:10px">▶ test: שלום, מה שלומך?</button></div>
+   <div class="card" style="margin-top:14px"><h3>Conversa AI key</h3>
+     <p class="muted" style="font-size:13px">Your own Anthropic key powers the live chat and writing feedback. It stays on your device.</p>
+     <label>Anthropic API key</label><input class="inp" id="setKey" type="password" placeholder="sk-ant-..." value="${c.anthropicKey||''}">
+     <button class="btn sm" id="saveKey" style="margin-top:10px">Save key</button> <span class="muted" id="keyMsg" style="font-size:12.5px"></span></div>
+   <div class="card" style="margin-top:14px"><h3>Sync <span class="info">i<span class="tip">Keeps your streak, learned words and progress identical on Mac and iPhone, and safe if a browser clears its cache. Pre-connected to your private "ivrit" Supabase project.</span></span></h3>
+     <p class="muted" style="font-size:13px">Pre-connected to your private Supabase project "ivrit". Nothing to enter. Status: <span id="syncTxt2">…</span></p>
+     <button class="btn sm ghost" id="pullCloud">pull latest from cloud</button></div>
+   <div class="card" style="margin-top:14px"><h3>Backup</h3>
+     <p class="muted" style="font-size:13px">Download a snapshot (ivrit-backup-YYYY-MM-DD.json) for the shared Drive back-ups folder. Restore any time.</p>
+     <div class="row" style="margin-top:10px"><button class="btn sm" id="doBackup">download backup</button>
+       <label class="btn ghost sm" style="cursor:pointer">restore<input type="file" id="doRestore" accept="application/json" style="display:none"></label></div></div>
+   <div class="card" style="margin-top:14px"><h3>Reset progress</h3><p class="muted" style="font-size:13px">Clears mastery, course progress and streak. Cannot be undone.</p><button class="btn ghost sm" id="resetProg" style="margin-top:8px">Reset my progress</button></div>`;
+}
+
+/* ===================================================================
+   BIND
+=================================================================== */
+function bind(){
+  document.querySelectorAll('.w').forEach(el=>el.onclick=e=>{e.stopPropagation();wordPopover(decodeURIComponent(el.dataset.word),e);});
+  document.querySelectorAll('[data-speak]').forEach(b=>b.onclick=e=>{e.stopPropagation();speak(decodeURIComponent(b.dataset.speak));});
+  document.querySelectorAll('[data-go2]').forEach(b=>b.onclick=()=>{const[s,i,sub]=b.dataset.go2.split('|');go(s,i,sub);});
+  document.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>go(b.dataset.back));
+  const nt=document.getElementById('nikTop');if(nt)nt.onchange=()=>{S.nikud=nt.checked;save();render();};
+  document.querySelectorAll('[data-rate]').forEach(r=>r.querySelectorAll('b').forEach(b=>b.onclick=()=>{S.grammar[r.dataset.rate]=+b.dataset.n;touchDay();addXP(2);save();render();}));
+
+  // dashboard
+  document.querySelectorAll('[data-open-lesson]').forEach(b=>b.onclick=()=>{lsStage=0;go('course',b.dataset.openLesson);});
+  const fd=document.getElementById('finishDay');if(fd)fd.onclick=()=>{S.dailyDone[new Date().toDateString()]=true;touchDay();addXP(10);save();toast('Nice. +10 XP');render();};
+  const wu=document.querySelector('[data-warmup]');if(wu)wu.onclick=()=>startVocabDrill(weakPool(10),{title:'Warm-up review',back:'dash'});
+
+  // course lesson stepping
+  const lp=document.querySelector('[data-ls-prev]');if(lp)lp.onclick=()=>{lsStage=Math.max(0,lsStage-1);render();};
+  const ln=document.querySelector('[data-ls-next]');if(ln)ln.onclick=()=>{lsStage++;save();render();};
+  const ld=document.querySelector('[data-lesson-drill]');if(ld)ld.onclick=()=>{const l=COURSE.find(x=>x.id===+ld.dataset.lessonDrill);
+    let items=catItems(l.vocab).slice();const pr=PRACTICE.find(p=>p.ch===l.grammar);
+    const onDone=()=>{completeLesson(l.id);toast('Lesson '+l.id+' complete. +15 XP');go('course');};
+    if(pr){startGrammarDrill(pr.items,{title:'Lesson '+l.id+' grammar',back:'course',onDone:()=>{startVocabDrill(items,{title:'Lesson '+l.id+' words',back:'course',onDone});}});}
+    else{startVocabDrill(items,{title:'Lesson '+l.id+' practice',back:'course',onDone});}};
+
+  // grammar
+  document.querySelectorAll('[data-grammar]').forEach(b=>b.onclick=()=>go('grammar',b.dataset.grammar));
+  const pt=document.querySelector('[data-practice-topic]');if(pt)pt.onclick=()=>{const id=+pt.dataset.practiceTopic;const pr=PRACTICE.find(p=>p.ch===id);
+    if(pr){startGrammarDrill(pr.items,{title:pr.t,back:'grammar'});}
+    else{const l=COURSE.find(x=>x.grammar===id);const items=l?catItems(l.vocab):LEX.slice(0,10);startVocabDrill(items,{title:'Practice',back:'grammar'});}};
+
+  // binyanim
+  document.querySelectorAll('[data-binyan]').forEach(b=>b.onclick=()=>go('binyanim',b.dataset.binyan));
+
+  // vocab
+  document.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>go('vocab',b.dataset.cat));
+  document.querySelectorAll('[data-vocab-add]').forEach(b=>b.onclick=()=>go('vocab','__add__'));
+  document.querySelectorAll('[data-practice-cat]').forEach(b=>b.onclick=()=>{const name=decodeURIComponent(b.dataset.practiceCat);startVocabDrill(catItems(name),{title:name,back:'vocab'});});
+  const aw=document.getElementById('awSave');if(aw)aw.onclick=()=>{const v=val('awV');if(!v){toast('Type the Hebrew word');return;}S.customVocab.push({v,p:val('awP'),tl:val('awTl'),en:val('awEn'),it:val('awIt')});buildLex();save();toast('Word saved');go('vocab',encodeURIComponent('My words'));};
+
+  // verbs
+  document.querySelectorAll('[data-verb]').forEach(b=>b.onclick=()=>go('verbs',decodeURIComponent(b.dataset.verb)));
+  document.querySelectorAll('[data-verb-drill]').forEach(b=>b.onclick=()=>{const v=VERBS.find(x=>x.inf[0]===decodeURIComponent(b.dataset.verbDrill));startVerbDrill([v],{title:v.en+' · conjugation',max:12,back:'verbs'});});
+
+  // stories
+  document.querySelectorAll('[data-story]').forEach(b=>b.onclick=()=>{S.stories[b.dataset.story]=true;touchDay();save();go('stories',b.dataset.story);});
+  const ra=document.querySelector('[data-readall]');if(ra)ra.onclick=()=>{const st=STORIES.find(s=>s.id===ra.dataset.readall);speakSeq(st.s.map(x=>x[0][0]));};
+  const sr=document.querySelector('[data-stopread]');if(sr)sr.onclick=()=>{queue=[];if('speechSynthesis'in window)speechSynthesis.cancel();};
+  document.querySelectorAll('[data-quiz]').forEach(b=>b.onclick=()=>{const[sid,qi,oi]=b.dataset.quiz.split('|');const st=STORIES.find(s=>s.id===sid);const q=st.quiz[+qi];const fb=document.getElementById('qf-'+qi);
+    if(+oi===q.a){fb.innerHTML='<span class="ans-ok">Correct ✓</span>';addXP(2);save();}else{fb.innerHTML='<span class="ans-bad">Not quite. Answer: '+q.opts[q.a]+'</span>';}});
+
+  // practice modes
+  document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{const mode=b.dataset.mode;
+    if(mode==='weak'){const w=weakPool(15);if(!w.length){toast('No weak spots yet. Learn some words first.');return;}startVocabDrill(w,{title:'Weak spots',back:'practice'});}
+    else if(mode==='mixed'){const p=learnedPool();if(!p.length){toast('Learn some words first.');return;}startVocabDrill(p,{title:'Mixed review',max:12,back:'practice'});}
+    else if(mode==='flash'){go('practice',null,'flash');setTimeout(startFlash,30);}
+    else if(mode==='cat'){go('practice',null,'cat');}
+    else if(mode==='grammar'){go('practice',null,'grammar');}
+    else if(mode==='verbs'){startVerbDrill(VERBS,{title:'Conjugation drill',max:12,back:'practice'});}});
+  document.querySelectorAll('[data-practice-ch]').forEach(b=>b.onclick=()=>{const pr=PRACTICE.find(p=>p.ch===+b.dataset.practiceCh);startGrammarDrill(pr.items,{title:'Ch '+pr.ch+' · '+pr.t,back:'practice'});});
+  if(route.section==='practice'&&route.sub==='flash')setTimeout(startFlash,20);
+
+  // drill engine
+  bindDrill();
+
+  // conversa
+  document.querySelectorAll('[data-conv]').forEach(b=>b.onclick=()=>{go('conversa',b.dataset.conv);setTimeout(primeChat,30);});
+  const cs=document.getElementById('cSend');if(cs){cs.onclick=sendChat;primeChat();}
+  const cin=document.getElementById('cIn');if(cin)cin.onkeydown=e=>{if(e.key==='Enter')sendChat();};
+  document.querySelectorAll('[data-chip]').forEach(b=>b.onclick=()=>{const i=document.getElementById('cIn');if(i){i.value=decodeURIComponent(b.dataset.chip);i.focus();}});
+
+  // write
+  const wb=document.getElementById('wBox');
+  if(wb){document.getElementById('wSpeak').onclick=()=>speak(wb.value);
+    document.getElementById('wSave').onclick=()=>{if(!wb.value.trim())return;S.writeEntries.push({date:new Date().toLocaleString(),text:wb.value});S.writeDraft='';save();toast('Entry saved');render();};
+    wb.oninput=()=>{S.writeDraft=wb.value;};
+    document.getElementById('wFeedback').onclick=()=>writeFeedback(wb.value);}
+
+  // settings
+  const sn=document.getElementById('setNik');if(sn)sn.onchange=()=>{S.nikud=sn.checked;save();};
+  const sv=document.getElementById('setVoice');if(sv)sv.onchange=()=>{S.voiceURI=sv.value;save();};
+  const srng=document.getElementById('setRate');if(srng)srng.oninput=()=>{S.rate=+srng.value;document.getElementById('rateVal').textContent=(+srng.value).toFixed(2)+'x';save();};
+  const tv=document.getElementById('testVoice');if(tv)tv.onclick=()=>speak('שלום, מה שלומך?');
+  const sk=document.getElementById('saveKey');if(sk)sk.onclick=()=>{S.cfg.anthropicKey=val('setKey');save();document.getElementById('keyMsg').innerHTML='<span class="ans-ok">Saved ✓</span>';toast('API key saved');};
+  const pc=document.getElementById('pullCloud');if(pc)pc.onclick=()=>{syncDown();toast('Pulling from cloud…');};
+  const db=document.getElementById('doBackup');if(db)db.onclick=backupJSON;
+  const dr=document.getElementById('doRestore');if(dr)dr.onchange=e=>{if(e.target.files[0])importJSON(e.target.files[0]);};
+  const st2=document.getElementById('syncTxt2');if(st2)st2.textContent=document.getElementById('syncTxt').textContent;
+  const rp=document.getElementById('resetProg');if(rp)rp.onclick=()=>{if(confirm('Reset all progress?')){S.mastery={};S.grammar={};S.course={done:{},lesson:1};S.streak=0;S.xp=0;S.stories={};save();toast('Progress reset');go('dash');}};
+}
+function val(id){const el=document.getElementById(id);return el?el.value.trim():'';}
+function norm(s){return stripN(s).toLowerCase().replace(/[\u2013\u2014'"`.,!?]/g,'').replace(/\s+/g,' ').trim();}
+
+/* drill bind */
+function bindDrill(){
+  if(route.section!=='drill'||!drill)return;
+  const d=drill;
+  document.querySelectorAll('[data-drill-exit]').forEach(b=>b.onclick=()=>{const back=d.back||'practice';drill=null;go(back);});
+  document.querySelectorAll('[data-drill-pick]').forEach(b=>b.onclick=()=>{if(d.answered)return;const chosen=decodeURIComponent(b.dataset.drillPick);const it=d.items[d.i];const ok=chosen===it.en;mAnswer(it.key,ok);if(ok)d.score++;else d.wrong.push(it);d.answered={chosen,ok};save();render();});
+  const ck=document.querySelector('[data-drill-check]');if(ck)ck.onclick=drillCheck;
+  const ti=document.getElementById('dType');if(ti)ti.onkeydown=e=>{if(e.key==='Enter')drillCheck();};
+  const sk=document.querySelector('[data-drill-skip]');if(sk)sk.onclick=()=>{const it=d.items[d.i];mAnswer(it.key,false);d.wrong.push(it);d.answered={chosen:'',ok:false};save();render();};
+  const hb=document.querySelector('[data-drill-hint]');if(hb)hb.onclick=()=>{const it=d.items[d.i];const h=document.getElementById('dHint');if(h)h.textContent=it.hint||'';};
+  const nx=document.querySelector('[data-drill-next]');if(nx)nx.onclick=()=>{d.i++;d.answered=null;render();};
+  const ag=document.querySelector('[data-drill-again]');if(ag)ag.onclick=()=>{d.i=0;d.score=0;d.wrong=[];d.answered=null;d.items=shuffle(d.items);render();};
+  const fn=document.querySelector('[data-drill-finish]');if(fn)fn.onclick=()=>{const cb=d.done;const back=d.back||'practice';drill=null;if(cb)cb();else go(back);};
+}
+function drillCheck(){const d=drill;const ti=document.getElementById('dType');if(!ti)return;const got=norm(ti.value);
+  if(d.typed){const it=d.items[d.i];const ok=it.a.some(a=>norm(a)===got||norm(a).replace(/-/g,'')===got.replace(/-/g,''));if(ok)d.score++;else d.wrong.push(it);d.answered={ok};render();}
+  else{const it=d.items[d.i];const ok=(norm(it.en).includes(got)&&got.length>1)||norm(it.tl)===got;mAnswer(it.key,ok);if(ok)d.score++;else d.wrong.push(it);d.answered={chosen:'',ok};save();render();}
+}
+
+/* ===================================================================
+   WORD POPOVER + LEX LOOKUP
+=================================================================== */
+function lexLookup(word){const bare=stripN(word);
+  for(const it of LEX){if(stripN(it.v)===bare||(it.p&&it.p===bare))return {tl:it.tl,en:it.en};}
+  for(const v of VERBS){if(stripN(v.inf[0])===bare)return {tl:'',en:v.en,extra:v.binyan+' · '+v.root};
+    for(const grp of[[v.present,'present'],[v.past,'past'],[v.future,'future']]){for(const r of grp[0]){if(stripN(r[1][0])===bare)return {tl:'',en:v.en+' ('+grp[1]+', '+r[0]+')',extra:v.binyan+' · '+v.root};}}}
+  return null;}
+function wordPopover(word,e){const pop=document.getElementById('pop');const info=lexLookup(word);
+  pop.innerHTML=`<div class="row spread"><span class="hw">${word}</span><button class="spk" id="popSpk">♪</button></div>${info?`<div class="tl" style="margin-top:6px">${info.tl||''}</div><div class="en">${info.en}</div>${info.extra?`<div class="faint" style="font-size:11.5px;margin-top:3px">${info.extra}</div>`:''}`:'<div class="muted" style="margin-top:6px;font-size:12.5px">Tap to hear it.</div>'}`;
+  const x=Math.min(e.clientX,window.innerWidth-280);const y=Math.min(e.clientY+14,window.innerHeight-120);
+  pop.style.left=x+'px';pop.style.top=y+'px';pop.classList.add('show');
+  document.getElementById('popSpk').onclick=()=>speak(word);
+  setTimeout(()=>document.addEventListener('click',hidePop,{once:true}),10);
+  function hidePop(){pop.classList.remove('show');}
+}
+
+/* ===================================================================
+   AI: conversa + writing feedback
+=================================================================== */
+function primeChat(){if(route.section!=='conversa'||!route.item)return;const sc=CONVERSA.find(c=>c.id===route.item);if(!sc)return;
+  if(!chat.length||chat.__id!==sc.id){chat=[{role:'assistant',content:sc.open[0]}];chat.__id=sc.id;}renderChat();}
+function renderChat(){const c=document.getElementById('chat');if(!c)return;
+  c.innerHTML=chat.map(m=>`<div class="msg ${m.role==='assistant'?'ai':'me'}">${hebClick(m.display||m.content)}</div>`).join('')+(busy?'<div class="typing">…</div>':'');
+  c.querySelectorAll('.w').forEach(el=>el.onclick=ev=>{ev.stopPropagation();wordPopover(decodeURIComponent(el.dataset.word),ev);});
+  c.scrollTop=c.scrollHeight;}
+async function sendChat(){const inp=document.getElementById('cIn');const text=inp.value.trim();if(!text||busy)return;
+  inp.value='';chat.push({role:'user',content:text});touchDay();addXP(2);save();renderChat();
+  const sc=CONVERSA.find(c=>c.id===route.item);const key=S.cfg&&S.cfg.anthropicKey;
+  if(!key){chat.push({role:'assistant',content:'(הוֹסֵף מַפְתֵּחַ בְּהַגְדָּרוֹת)',display:'Add your Anthropic key in Settings for live replies.'});renderChat();return;}
+  busy=true;renderChat();
+  const sys=`${sc.char} You are speaking with Vincenzo. Reply ONLY in modern spoken Hebrew${sc.free?'':' at '+sc.lvl+' level'}, short and natural (1-2 sentences). Address him with masculine forms. If he makes a clear mistake, model the correct form briefly. Do not translate unless asked.`;
+  try{const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,system:sys,messages:chat.filter(m=>m.role==='user'||m.role==='assistant').map(m=>({role:m.role,content:m.content}))})});
+    const d=await r.json();busy=false;const txt=(d.content&&d.content.filter(x=>x.type==='text').map(x=>x.text).join(' '))||'(...)';
+    chat.push({role:'assistant',content:txt});renderChat();}catch(e){busy=false;chat.push({role:'assistant',content:'(שְׁגִיאָה)',display:'Connection error. Check your key and network.'});renderChat();}}
+async function writeFeedback(text){const fb=document.getElementById('wFb');const key=S.cfg&&S.cfg.anthropicKey;
+  if(!text.trim()){fb.textContent='Write something first.';return;}
+  if(!key){fb.innerHTML='<span class="muted">Add your Anthropic key in Settings to get feedback.</span>';return;}
+  fb.textContent='Reading your text…';
+  try{const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,
+      system:"You are a warm Hebrew tutor for an Italian beginner (A1-A2, male). The user writes Hebrew. Reply in English. Give: (1) a corrected version of their Hebrew, (2) 2-3 short bullet notes on the main fixes in plain language, (3) one encouraging line. Keep it brief.",
+      messages:[{role:'user',content:text}]})});
+    const d=await r.json();const txt=(d.content&&d.content.filter(x=>x.type==='text').map(x=>x.text).join(' '))||'(no response)';
+    fb.innerHTML=txt.replace(/\n/g,'<br>');}catch(e){fb.textContent='Connection error. Check your key.';}}
+
+/* ===================================================================
+   BOOT
+=================================================================== */
+buildLex();buildNav();render();setSync(false);syncDown();
+setTimeout(()=>{loadVoices();if(route.section==='settings'||route.section==='pron')render();},600);
+</script>
+</body>
+</html>
