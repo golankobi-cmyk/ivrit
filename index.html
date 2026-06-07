@@ -5341,7 +5341,7 @@ if(typeof window!=='undefined'){window.__ivritResolverCoverage=__ivritResolverCo
    lessons are untouched: every pilot branch returns null and falls
    back to the existing renderer. Verified IDs only (no invented refs).
 =================================================================== */
-var PILOT_LESSONS=[1,2,3,4,5,6,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30];
+var PILOT_LESSONS=[1,2,3,4,5,6,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36];
 /* Authored overlay: ONLY the word-level teaching selection the prose
    cannot give unambiguously, as verified indices into VOCAB categories.
    Everything else (phrases, grammar, story, practice, writing, output)
@@ -5381,7 +5381,18 @@ var PILOT_VOCAB_PICK={
   27:[{cat:"Home & interior design",idx:[0,6]},{cat:"Nature & outdoors",idx:[0,1,19]},{cat:"Pronouns & function",idx:[8,9]}],
   28:[{cat:"Home & interior design",idx:[0,1]},{cat:"Daily objects",idx:[1,2,3]},{cat:"Family & people",idx:[20,21]}],
   29:[{cat:"Numbers",idx:[1,2,3,4,5,6,7,8,9,10,11,14]}],
-  30:[{cat:"Home & interior design",idx:[0,2,3,4,5]},{cat:"Furniture & household",idx:[11,12]},{cat:"Daily objects",idx:[0,4]}]
+  30:[{cat:"Home & interior design",idx:[0,2,3,4,5]},{cat:"Furniture & household",idx:[11,12]},{cat:"Daily objects",idx:[0,4]}],
+  /* Chapter A1f (lessons 31-36): food and drink, want/need, the cafe, the market, likes and
+     preferences, and consolidation. Verified indices into live VOCAB categories only. A2
+     categories (Israeli food, Restaurant & ordering, Common adjectives) gate to exposure under
+     an A1 lesson, never block. The B1 emotion categories are deliberately NOT used; L35 likes
+     are carried by the leehov verb (taught earlier) plus A1/A2 adjectives. */
+  31:[{cat:"Food & drink",idx:[1,2,4,5,9,10,21,23,26,28,29]},{cat:"Israeli food",idx:[2]},{cat:"Drinks & beverages",idx:[6]}],
+  32:[{cat:"Drinks & beverages",idx:[0,1,2]},{cat:"Food & drink",idx:[23,30]},{cat:"Restaurant & ordering",idx:[0,2,7]}],
+  33:[{cat:"Drinks & beverages",idx:[1,5,9]},{cat:"Food & drink",idx:[30,35]},{cat:"Restaurant & ordering",idx:[1,16]}],
+  34:[{cat:"Fruits & vegetables",idx:[0,8,9,10,11]},{cat:"Food & drink",idx:[2,38]},{cat:"Israeli food",idx:[4,15]}],
+  35:[{cat:"Food & drink",idx:[0,30,31]},{cat:"Restaurant & ordering",idx:[11,15]},{cat:"Common adjectives",idx:[2,3,4]}],
+  36:[{cat:"Food & drink",idx:[2,23,28,38]},{cat:"Restaurant & ordering",idx:[0,2]},{cat:"Israeli food",idx:[0,2]},{cat:"Fruits & vegetables",idx:[0,8]}]
 };
 /* Authored verb overlay: verified indices into VERBS only. A1c introduces לראות (to see)
    and לאהוב (to love/like) with את; both are A1 and gate to allow. Used by the level-scoped
