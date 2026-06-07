@@ -649,7 +649,7 @@ function speakLiteral(t){if(!('speechSynthesis'in window))return;speechSynthesis
 var GTTS_KEY_LS='ivrit_gtts_key';
 var GTTS_DEFAULT_VOICE='he-IL-Wavenet-A';
 function gttsKey(){ try{ if(S&&S.cfg&&S.cfg.gttsKey) return S.cfg.gttsKey; }catch(e){} try{ var k=localStorage.getItem(GTTS_KEY_LS); return k||''; }catch(e){ return ''; } }
-function setGttsKey(k){ try{ if(!S.cfg)S.cfg={}; S.cfg.gttsKey=k||''; }catch(e){} try{ if(typeof save==='function')save(); }catch(e){} }
+function setGttsKey(k){ try{ if(!S.cfg)S.cfg={}; S.cfg.gttsKey=k||''; }catch(e){} try{ if(k)localStorage.setItem(GTTS_KEY_LS,k); else localStorage.removeItem(GTTS_KEY_LS); }catch(e){} try{ if(typeof save==='function')save(); }catch(e){} }
 function gttsVoice(){return (S&&S.ttsVoice)||GTTS_DEFAULT_VOICE;}
 function audioEngine(){ if(S&&S.audioEngine==='device')return 'device'; return gttsKey()?'google':'device'; }
 var _ADB=null;
@@ -794,7 +794,7 @@ async function syncUp(){if(!SUPA_URL||!SUPA_KEY){setSync(false);return;}
     body:JSON.stringify([{user_id:USER_ID,state:S,updated_at:new Date(S.updated).toISOString()}])});setSync(r.ok);}catch(e){setSync(false)}}
 async function syncDown(){if(!SUPA_URL||!SUPA_KEY){setSync(false);return;}
   try{const r=await fetch(SUPA_URL+'/rest/v1/progress?user_id=eq.'+USER_ID+'&select=state,updated_at',{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
-    if(r.ok){const rows=await r.json();if(rows&&rows[0]&&rows[0].state&&(rows[0].state.updated||0)>(S.updated||0)){S=deepMerge(structuredClone(defaultState),rows[0].state);migrateProgress(S,rows[0].state);/* gate: a pre-V2 remote blob is migrated, never trusted over a V2 state */localStorage.setItem(LS,JSON.stringify(S));render();}setSync(true);}else setSync(false);}catch(e){setSync(false)}}
+    if(r.ok){const rows=await r.json();if(rows&&rows[0]&&rows[0].state&&(rows[0].state.updated||0)>(S.updated||0)){S=deepMerge(structuredClone(defaultState),rows[0].state);migrateProgress(S,rows[0].state);try{if(S&&S.cfg&&!S.cfg.gttsKey){var _lk=localStorage.getItem(GTTS_KEY_LS);if(_lk)S.cfg.gttsKey=_lk;}}catch(e){}/* gate: a pre-V2 remote blob is migrated, never trusted over a V2 state */localStorage.setItem(LS,JSON.stringify(S));render();}setSync(true);}else setSync(false);}catch(e){setSync(false)}}
 function setSync(ok){const d=document.getElementById('syncDot'),t=document.getElementById('syncTxt');if(!d)return;d.className='dot'+(ok?' ok':'');t.textContent=ok?'synced across devices':'offline (saved on device)';}
 
 /* ---------- Backup ---------- */
@@ -7741,15 +7741,17 @@ function vSettings(){const c=S.cfg||{};const vlist=voices.filter(v=>v.lang&&v.la
 
 function getEdit(type,id,field){return (S.edits&&S.edits[type+'|'+id+'|'+field])||null;}
 function setEdit(type,id,field,val){if(!S.edits)S.edits={};S.edits[type+'|'+id+'|'+field]=val;save();}
-function applyEdit(key,newVal){if(!S.edits)S.edits={};S.edits[key]=newVal;save();showToast('Correction saved');}
+function applyEdit(key,newVal){if(!S.edits)S.edits={};S.edits[key]=newVal;save();try{toast('Correction saved');}catch(e){}}
 function showEditOverlay(key,currentVal,opts){
   var overlay=document.getElementById('editpop');var box=document.getElementById('editbox');
   if(!overlay||!box)return;
   opts=opts||{};var isRTL=opts.rtl!==false;var label=opts.label||'Hebrew text';
+  var shownVal=currentVal;
+  try{ if(isRTL && !S.nikud && !/nikud/i.test(label)) shownVal=stripN(currentVal); }catch(e){}
   box.innerHTML='<div class="row spread" style="margin-bottom:12px"><h3 style="margin:0">Edit</h3>'
     +'<button onclick="document.getElementById(\'editpop\').classList.remove(\'open\')" class="btn ghost sm">&#10005;</button></div>'
     +'<label style="font-size:12px;color:var(--muted)">'+label+'</label>'
-    +'<textarea id="editTa" class="inp" rows="3" style="width:100%;margin:6px 0 10px;font-size:16px;direction:'+(isRTL?'rtl':'ltr')+';text-align:'+(isRTL?'right':'left')+';font-family:var(--heb)">'+currentVal+'</textarea>'
+    +'<textarea id="editTa" class="inp" rows="3" style="width:100%;margin:6px 0 10px;font-size:16px;direction:'+(isRTL?'rtl':'ltr')+';text-align:'+(isRTL?'right':'left')+';font-family:var(--heb)">'+shownVal+'</textarea>'
     +'<p class="muted" style="font-size:11px;margin-bottom:10px">Saves everywhere in the app. You can always reset.</p>'
     +'<div class="row" style="gap:8px;justify-content:flex-end">'
     +'<button id="editReset" class="btn ghost sm" style="color:#e57373;margin-right:auto">Reset to original</button>'
@@ -7757,12 +7759,12 @@ function showEditOverlay(key,currentVal,opts){
   overlay.classList.add('open');
   document.getElementById('editReset').onclick=function(){
     if(S.edits&&S.edits[key])delete S.edits[key];
-    save();overlay.classList.remove('open');render();showToast('Reset to original');
+    save();overlay.classList.remove('open');render();try{toast('Reset to original');}catch(e){}
   };
   document.getElementById('editSave').onclick=function(){
-    var v=document.getElementById('editTa').value.trim();
-    if(v){applyEdit(key,v);}
-    overlay.classList.remove('open');render();
+    try{ var v=document.getElementById('editTa').value.trim(); if(v){applyEdit(key,v);} }catch(e){}
+    overlay.classList.remove('open');
+    try{ render(); }catch(e){}
   };
   setTimeout(function(){var ta=document.getElementById('editTa');if(ta)ta.focus();},60);
 }
@@ -7973,7 +7975,7 @@ function bind(){
   const sv=document.getElementById('setVoice');if(sv)sv.onchange=()=>{S.voiceURI=sv.value;save();};
   const srng=document.getElementById('setRate');if(srng)srng.oninput=()=>{S.rate=+srng.value;document.getElementById('rateVal').textContent=(+srng.value).toFixed(2)+'x';save();};
   const tv=document.getElementById('testVoice');if(tv)tv.onclick=()=>speak('שלום, מה שלומך?');
-  var gk=document.getElementById('setGttsKey'); if(gk){gk.oninput=function(){if(!S.cfg)S.cfg={};S.cfg.gttsKey=gk.value.trim();var m=document.getElementById('gttsMsg');if(m)m.textContent=gk.value.trim()?'Key entered. It saves when you click away.':'Key cleared.';};gk.onblur=function(){try{if(typeof save==='function')save();}catch(e){}var m=document.getElementById('gttsMsg');if(m)m.textContent=(S.cfg&&S.cfg.gttsKey)?'Key saved and synced to your devices.':'Key cleared.';};}
+  var gk=document.getElementById('setGttsKey'); if(gk){var _gkT=null;gk.oninput=function(){var v=gk.value.trim();if(!S.cfg)S.cfg={};S.cfg.gttsKey=v;try{if(v)localStorage.setItem(GTTS_KEY_LS,v);else localStorage.removeItem(GTTS_KEY_LS);}catch(e){}if(_gkT)clearTimeout(_gkT);_gkT=setTimeout(function(){if(typeof save==='function')save();var m=document.getElementById('gttsMsg');if(m)m.textContent=(S.cfg&&S.cfg.gttsKey)?'Key saved and synced to your devices.':'Key cleared.';},600);};gk.onblur=function(){if(_gkT){clearTimeout(_gkT);_gkT=null;}if(typeof save==='function')save();var m=document.getElementById('gttsMsg');if(m)m.textContent=(S.cfg&&S.cfg.gttsKey)?'Key saved and synced to your devices.':'Key cleared.';};}
   var glv=document.getElementById('gttsLoadVoices'); if(glv)glv.onclick=function(){var m=document.getElementById('gttsMsg');if(m)m.textContent='Loading voices...';gttsListVoices().then(function(list){var sel=document.getElementById('setGttsVoice');if(!sel){return;}if(!list.length){if(m)m.textContent='No voices loaded. Check the key in this field, then try again.';return;}sel.innerHTML=list.map(function(v){return '<option value="'+v.name+'" '+(v.name===gttsVoice()?'selected':'')+'>'+v.name+' ('+(v.ssmlGender||'')+')</option>';}).join('');if(m)m.textContent=list.length+' Hebrew voices loaded. Pick one, then test.';});};
   var gsv=document.getElementById('setGttsVoice'); if(gsv)gsv.onchange=function(){S.ttsVoice=gsv.value;save();};
   var gon=document.getElementById('setGttsOn'); if(gon)gon.onchange=function(){S.audioEngine=gon.checked?'google':'device';save();var m=document.getElementById('gttsMsg');if(m)m.textContent=gon.checked?'Neural voice on.':'Using the device voice.';};
