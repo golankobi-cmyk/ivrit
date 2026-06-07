@@ -5393,6 +5393,26 @@ function _pilotPrereq(id){
   }
   return {vocab:Object.keys(vocabKeys), grammar:Object.keys(grammarIds), phrases:Object.keys(phraseKeys)};
 }
+/* B3: safe leading-particle strip for the staged-story cloze. At the consonantal
+   skeleton level (after stripN + _pilotTkey) the fused definite forms collapse to a
+   single letter, so a single-letter strip of one attached particle from this set also
+   covers the definite cases (e.g. ba-/la-/me-). One particle only, never a cluster. */
+var PILOT_PARTICLES={'\u05D1':1,'\u05D4':1,'\u05DC':1,'\u05D5':1,'\u05DE':1,'\u05E9':1,'\u05DB':1}; /* b h l v m sh k */
+function _pilotMatchTaught(raw, taught){
+  /* Returns {key, item, viaStrip, token} or null. Direct match always wins, so a token
+     that is itself a taught word is never stripped. Strip only when: the token is not
+     itself taught, it starts with one particle letter, and the remainder (>=2 letters,
+     never empty) is itself a taught word. This guards against meaning-changing strips
+     and against blanking a word via a prefix when the bare form is not actually taught. */
+  var bare=_pilotTkey(stripN(raw));
+  if(!bare) return null;
+  if(taught[bare]) return {key:bare, item:taught[bare], viaStrip:false, token:raw};
+  if(bare.length>=3 && PILOT_PARTICLES[bare.charAt(0)]){
+    var stripped=bare.slice(1);
+    if(stripped.length>=2 && taught[stripped]) return {key:stripped, item:taught[stripped], viaStrip:true, token:raw};
+  }
+  return null;
+}
 function pilotStoryPlan(lesson,band,allowedVocab){
   var r=resolveStoryForLesson(lesson);
   if(!r) return null;
@@ -5402,18 +5422,18 @@ function pilotStoryPlan(lesson,band,allowedVocab){
   (allowedVocab||[]).forEach(function(it){ var k=_pilotTkey(it.p)||_pilotTkey(stripN(it.v)); if(k)taught[k]=it; });
   var preTaught=[], cloze=null;
   sents.forEach(function(s){
-    (''+(s.he||'')).split(/\s+/).forEach(function(w){ var bare=_pilotTkey(stripN(w)); if(bare&&taught[bare]&&preTaught.indexOf(bare)<0)preTaught.push(bare); });
+    (''+(s.he||'')).split(/\s+/).forEach(function(w){ var m=_pilotMatchTaught(w,taught); if(m&&preTaught.indexOf(m.key)<0)preTaught.push(m.key); });
   });
   for(var i=0;i<sents.length&&!cloze;i++){
     var ws=(''+sents[i].he).split(/\s+/);
-    for(var j=0;j<ws.length;j++){ var raw=ws[j], bare=_pilotTkey(stripN(raw));
-      if(bare&&taught[bare]){
-        var answer=taught[bare];
+    for(var j=0;j<ws.length;j++){ var raw=ws[j], m=_pilotMatchTaught(raw,taught);
+      if(m){
+        var answer=m.item;
         var pool=(allowedVocab||[]).filter(function(it){return it.key!==answer.key&&it.p;});
         var distract=shuffle(pool).slice(0,2);
         if(distract.length>=1){
           var opts=shuffle([answer].concat(distract));
-          cloze={sentenceIdx:i, blankToken:raw, options:opts.map(function(o){return {p:o.p,v:o.v,en:o.en,correct:o.key===answer.key};}), display:sents[i]};
+          cloze={sentenceIdx:i, blankToken:raw, viaStrip:m.viaStrip, options:opts.map(function(o){return {p:o.p,v:o.v,en:o.en,correct:o.key===answer.key};}), display:sents[i]};
         }
         break;
       }
@@ -5508,7 +5528,11 @@ function pilotRenderStory(lesson){
   b+='<div class="rstep-t" dir="auto" style="line-height:1.7">'+sp.exposure.map(function(e){return '<div dir="rtl" data-speak="'+encodeURIComponent(e.he)+'" style="cursor:pointer">'+escHTML(e.he)+'</div><div dir="ltr" style="opacity:.8">'+escHTML(e.tl)+'</div><div dir="ltr" style="opacity:.7">'+escHTML(e.en)+'</div>';}).join('<div style="height:8px"></div>')+'</div>';
   if(sp.cloze){
     var cz=sp.cloze, he=''+cz.display.he, pos=he.indexOf(cz.blankToken);
-    var blanked=pos>=0?(escHTML(he.slice(0,pos))+'<b class="cz-blank">_____</b>'+escHTML(he.slice(pos+cz.blankToken.length))):escHTML(he);
+    /* Blank only the word (particle included). Any punctuation attached to the token by the
+       whitespace tokenizer (e.g. a sentence-final period) stays visible around the blank. */
+    var tok=cz.blankToken, hm=tok.match(/[\u0590-\u05FF]/), lm=tok.match(/[\u0590-\u05FF][^\u0590-\u05FF]*$/);
+    var lead=hm?tok.slice(0,hm.index):'', trail=(hm&&lm)?tok.slice(lm.index+1):'';
+    var blanked=pos>=0?(escHTML(he.slice(0,pos))+escHTML(lead)+'<b class="cz-blank">_____</b>'+escHTML(trail)+escHTML(he.slice(pos+tok.length))):escHTML(he);
     b+='<div class="rstep-h" style="margin-top:12px">Fill the gap (a word you have learned)</div>';
     b+='<div class="pilotcloze" data-pilot-cloze="'+lesson.id+'|story"><div class="rstep-heb" dir="rtl" style="margin:6px 0">'+blanked+'</div><div class="opts">'
       +cz.options.map(function(o){return '<button class="pq-opt" data-cz-correct="'+(o.correct?'1':'0')+'">'+escHTML(o.p)+'</button>';}).join('')
