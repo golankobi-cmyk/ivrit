@@ -5341,7 +5341,7 @@ if(typeof window!=='undefined'){window.__ivritResolverCoverage=__ivritResolverCo
    lessons are untouched: every pilot branch returns null and falls
    back to the existing renderer. Verified IDs only (no invented refs).
 =================================================================== */
-var PILOT_LESSONS=[1,2,3,4,5,6,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36];
+var PILOT_LESSONS=[1,2,3,4,5,6,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60];
 /* Authored overlay: ONLY the word-level teaching selection the prose
    cannot give unambiguously, as verified indices into VOCAB categories.
    Everything else (phrases, grammar, story, practice, writing, output)
@@ -5392,7 +5392,40 @@ var PILOT_VOCAB_PICK={
   33:[{cat:"Drinks & beverages",idx:[1,5,9]},{cat:"Food & drink",idx:[30,35]},{cat:"Restaurant & ordering",idx:[1,16]}],
   34:[{cat:"Fruits & vegetables",idx:[0,8,9,10,11]},{cat:"Food & drink",idx:[2,38]},{cat:"Israeli food",idx:[4,15]}],
   35:[{cat:"Food & drink",idx:[0,30,31]},{cat:"Restaurant & ordering",idx:[11,15]},{cat:"Common adjectives",idx:[2,3,4]}],
-  36:[{cat:"Food & drink",idx:[2,23,28,38]},{cat:"Restaurant & ordering",idx:[0,2]},{cat:"Israeli food",idx:[0,2]},{cat:"Fruits & vegetables",idx:[0,8]}]
+  36:[{cat:"Food & drink",idx:[2,23,28,38]},{cat:"Restaurant & ordering",idx:[0,2]},{cat:"Israeli food",idx:[0,2]},{cat:"Fruits & vegetables",idx:[0,8]}],
+  /* Chapters A1g-A1j (lessons 37-60): family/people, movement/city, time/weather/plans, and the
+     A1 milestone block. Verified indices into live VOCAB, A1/A2 only. Several lesson cards name
+     B1 categories (Personality traits, Feelings & emotions, Relationships & social) whose words
+     would block under an A1 lesson; those concepts are carried in prose and the pick substitutes
+     verified A1/A2 anchors instead. Per-chapter content flags are in the QA. */
+  /* A1g - family and people */
+  37:[{cat:"Family & people",idx:[1,2,3,4,5,6,9,10,11,12]},{cat:"Family extended",idx:[4]}],
+  38:[{cat:"Family & people",idx:[0,1,2,5]},{cat:"Common adjectives",idx:[2,4]}],
+  39:[{cat:"Common adjectives",idx:[0,1,10,11]},{cat:"Colours & clothing",idx:[0,1]}],
+  40:[{cat:"Family & people",idx:[7,8]},{cat:"Greetings & basics",idx:[15]}],
+  41:[{cat:"Family & people",idx:[1,2,5,6]},{cat:"Professions",idx:[0,1,4]},{cat:"Verbs of daily life",idx:[11]}],
+  42:[{cat:"Family & people",idx:[0,1,2,5,6]},{cat:"Family extended",idx:[2,3,4]},{cat:"Common adjectives",idx:[2,4]}],
+  /* A1h - movement and city */
+  43:[{cat:"Verbs of movement",idx:[0,2,3,8,15]},{cat:"Travel & places",idx:[0]},{cat:"Berlin daily life",idx:[5]}],
+  44:[{cat:"Question words",idx:[2,3,8]},{cat:"Directions & places",idx:[7,8]},{cat:"Berlin daily life",idx:[0,1]}],
+  45:[{cat:"Directions & places",idx:[0,1,2,5,6]},{cat:"Transport & directions",idx:[9,10]}],
+  46:[{cat:"Transport types",idx:[0,1,2,3,4,9]},{cat:"Transport & directions",idx:[0,6]}],
+  47:[{cat:"City & buildings",idx:[0,1,2,11,12]},{cat:"Sea & nature",idx:[0,1]},{cat:"Berlin daily life",idx:[0]}],
+  48:[{cat:"Travel & places",idx:[0,5,6,7,8]},{cat:"Transport & directions",idx:[0,1,2,4]},{cat:"Berlin daily life",idx:[0,1,5]}],
+  /* A1i - time, weather, plans */
+  49:[{cat:"Numbers",idx:[11,12,13,14]}],
+  50:[{cat:"Time & calendar",idx:[0,1,2,12,13]},{cat:"Numbers",idx:[1,2,18]}],
+  51:[{cat:"Days & months",idx:[0,1,2,3,4,5,6,7,18]},{cat:"Weather & seasons",idx:[13,14,15,16,17]}],
+  52:[{cat:"Weather & seasons",idx:[0,1,2,3,4,5,7,8]},{cat:"Weather phenomena",idx:[18,19]}],
+  53:[{cat:"Time expressions",idx:[0,1,8]},{cat:"Question words",idx:[3]}],
+  54:[{cat:"Time & calendar",idx:[1,2,4,12,13]},{cat:"Days & months",idx:[0,6,7]},{cat:"Weather & seasons",idx:[1,2,14,15]}],
+  /* A1j - A1 milestone block */
+  55:[{cat:"Greetings & basics",idx:[0,1,9]},{cat:"Home & interior design",idx:[0,2,3]},{cat:"Family & people",idx:[0,1,2]}],
+  56:[{cat:"Greetings & basics",idx:[8]},{cat:"Food & drink",idx:[0,2]},{cat:"Family & people",idx:[0]}],
+  57:[{cat:"Daily care & hygiene",idx:[0,17]},{cat:"Family & people",idx:[0,1,2]},{cat:"Food & drink",idx:[0,28]}],
+  58:[{cat:"Greetings & basics",idx:[3,4,22]},{cat:"Question words",idx:[0,5]}],
+  59:[{cat:"Pronouns & function",idx:[16,17]},{cat:"Greetings & basics",idx:[5,6]}],
+  60:[{cat:"Greetings & basics",idx:[0,1,9]},{cat:"Family & people",idx:[0,1,2]},{cat:"Food & drink",idx:[0,23,28]},{cat:"Home & interior design",idx:[0,2,3]}]
 };
 /* Authored verb overlay: verified indices into VERBS only. A1c introduces לראות (to see)
    and לאהוב (to love/like) with את; both are A1 and gate to allow. Used by the level-scoped
