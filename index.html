@@ -546,7 +546,7 @@ function ttsText(t){
   return stripN(t);
 }
 /* ===IVRIT-EDITORIAL-OVERRIDES v1 START - do not edit outside these markers=== */
-const EDITORIAL_OVERRIDES = { sent:{}, vocab:{}, phrase:{}, story:{}, storyMetrics:{}, course:{}, alt:{}, tts:{}, translit:{}, spelling:{} };
+const EDITORIAL_OVERRIDES = { sent:{}, vocab:{}, phrase:{}, story:{}, storyMetrics:{}, course:{"13":{"story":"s90"},"15":{"story":"s90"},"18":{"story":"s98"}}, alt:{}, tts:{}, translit:{}, spelling:{} };
 /* ===IVRIT-EDITORIAL-OVERRIDES v1 END=== */
 /* ---------- Editorial override engine (additive, render-time, durable) ----------
    Canonical committed corrections live in the fenced EDITORIAL_OVERRIDES block above.
@@ -605,6 +605,9 @@ function mergedStoryMeta(meta,storyId){ return _eoMerge(meta, getOverride('story
 function mergedSentence(text,sentKey){ var o=getOverride('sent',sentKey); return (typeof o==='string')?o:text; }
 function mergedTTS(text){ var o=getOverride('tts',text); return (typeof o==='string')?o:null; }
 function mergedAlt(conceptKey){ return getOverride('alt',conceptKey); }
+/* Render-time course override: re-point a lesson's referenced story without touching
+   the COURSE array. Returns the override id when present, else the original prose. */
+function mergedLessonStory(lesson){ if(!lesson) return null; var o=getOverride('course', String(lesson.id), 'story'); return (typeof o==='string'&&o)?o:lesson.story; }
 /* stable content-based key derivation (index-independent, survives rebuilds) */
 function _eoDjb2(str){ var h=5381; str=''+str; for(var i=0;i<str.length;i++){ h=((h<<5)+h+str.charCodeAt(i))>>>0; } return h.toString(36); }
 function phraseKey(p){ if(!p) return null; var he=Array.isArray(p.he)?(p.he[1]||p.he[0]||''):(p.he||''); return 'p_'+_eoDjb2(stripN(he)+'|'+(p.en||p.mean||'')); }
@@ -5137,7 +5140,7 @@ function pickSubstitute(lessonBand,lessonId){
   return null;
 }
 function resolveStoryForLesson(lesson){
-  var base=resolveStoryRef(lesson?lesson.story:null);
+  var base=resolveStoryRef(lesson?mergedLessonStory(lesson):null);
   if(!base) return null;
   if(!base.resolved){ base.mode='unresolved'; return base; }
   var origId=base.id, meta=_storyMeta(origId), lb=deriveLessonBand(lesson);
@@ -5338,7 +5341,7 @@ if(typeof window!=='undefined'){window.__ivritResolverCoverage=__ivritResolverCo
    lessons are untouched: every pilot branch returns null and falls
    back to the existing renderer. Verified IDs only (no invented refs).
 =================================================================== */
-var PILOT_LESSONS=[1,2,3,4,5,6];
+var PILOT_LESSONS=[1,2,3,4,5,6,13,14,15,16,17,18];
 /* Authored overlay: ONLY the word-level teaching selection the prose
    cannot give unambiguously, as verified indices into VOCAB categories.
    Everything else (phrases, grammar, story, practice, writing, output)
@@ -5350,7 +5353,24 @@ var PILOT_VOCAB_PICK={
   3:[{cat:"Greetings & basics",idx:[0,12,13,14,11,1,3,5,6,4,8]}],
   4:[{cat:"Hebrew alphabet & writing",idx:[1,7,10]}],
   5:[{cat:"Greetings & basics",idx:[0,1,3,5,6,11]}],
-  6:[{cat:"Greetings & basics",idx:[0,12,11,1,3]},{cat:"Hebrew alphabet & writing",idx:[0,7,10]}]
+  6:[{cat:"Greetings & basics",idx:[0,12,11,1,3]},{cat:"Hebrew alphabet & writing",idx:[0,7,10]}],
+  /* Chapter A1c (lessons 13-18): sentence-level vocabulary plus yesh/ein/the/object-marker.
+     Verified indices into the live VOCAB categories only (no invented refs). L13 teaches the
+     existence/answer cluster yesh/ein/ken/lo, so the in-level (gated) story excerpt of s26
+     yields a live cloze on a word this lesson actually taught. */
+  13:[{cat:"Greetings & basics",idx:[20,21,5,6]},{cat:"Home & interior design",idx:[0,1,2,8,11,14,12,13]}],
+  14:[{cat:"Home & interior design",idx:[14,12,13,15,4]},{cat:"Bathroom & bedroom",idx:[0,1,7,8]},{cat:"Daily objects",idx:[4,5]}],
+  15:[{cat:"Home & interior design",idx:[0,2,3,5,6,7]},{cat:"Daily objects",idx:[0,2,3]}],
+  16:[{cat:"Greetings & basics",idx:[0,1]},{cat:"Home & interior design",idx:[0,1]}],
+  17:[{cat:"Common adjectives",idx:[0,1,2,4,5]},{cat:"Home & interior design",idx:[1,2,8]}],
+  18:[{cat:"Home & interior design",idx:[0,2,8]},{cat:"Daily objects",idx:[4]},{cat:"Common adjectives",idx:[0,1]}]
+};
+/* Authored verb overlay: verified indices into VERBS only. A1c introduces לראות (to see)
+   and לאהוב (to love/like) with את; both are A1 and gate to allow. Used by the level-scoped
+   practice generator below. */
+var PILOT_VERB_PICK={
+  16:[5,33],
+  18:[5,33]
 };
 function isPilotLesson(id){return PILOT_LESSONS.indexOf(parseInt(id,10))>=0;}
 function _pilotVocabItems(picks){
@@ -5417,9 +5437,12 @@ function pilotBank(lessonOrId){
   var prc=resolvePracticeRef(lesson.practice); var practice=null;
   if(prc&&prc.resolved){ var p=PRACTICE.find(function(x){return x&&x.ch===prc.ch;}); practice={ch:prc.ch,title:p?p.t:'',lvl:p?p.lvl:'',count:(p&&p.items)?p.items.length:0,decision:p?gateCEFR(p.lvl,cefr):'allow'}; }
   var wr=resolveWritingRef(lesson.writing); var writing=(wr&&wr.resolved)?{id:wr.id,label:wr.label}:null;
+  var vbItems=_pilotVerbItems(PILOT_VERB_PICK[parseInt(lesson.id,10)]||[]);
+  var allowedVerbs=[], aboveVerbs=[];
+  vbItems.forEach(function(v){ var gd=gateCEFR(v.lvl||cefr,cefr); if(gd==='block')aboveVerbs.push(v); else allowedVerbs.push(v); });
   var output=_sanitizeOutputTask(lesson);
   return {id:lesson.id, cefr:cefr, band:band, goal:lesson.communicationGoal||'',
-    allowed:{vocab:allowedVocab, aboveVocab:aboveVocab, phrases:phraseItems, grammar:grammar, practice:practice, writing:writing, story:story, output:output},
+    allowed:{vocab:allowedVocab, aboveVocab:aboveVocab, verbs:allowedVerbs, aboveVerbs:aboveVerbs, phrases:phraseItems, grammar:grammar, practice:practice, writing:writing, story:story, output:output},
     prerequisites:_pilotPrereq(lesson.id)};
 }
 /* Evidence-based completion: set the step done in state and reflect it in
@@ -5514,21 +5537,68 @@ function pilotMiniBankCard(){
     var g=bk.allowed.grammar?('#'+bk.allowed.grammar.id+' '+bk.allowed.grammar.title+' ['+bk.allowed.grammar.decision+']'):'-';
     var st=(bk.allowed.story&&bk.allowed.story.resolved)?(bk.allowed.story.label+' \u00b7 '+bk.allowed.story.mode+(bk.allowed.story.cloze?' \u00b7 cloze ready':' \u00b7 exposure + gist')):'-';
     var pr=bk.allowed.practice?('ch'+bk.allowed.practice.ch+' ['+bk.allowed.practice.decision+']'):'-';
+    var vb=(bk.allowed.verbs&&bk.allowed.verbs.length)?bk.allowed.verbs.map(function(x){return x.en;}).join(', '):'-';
+    var gen=pilotPracticeGen(bk);
+    var genTxt=gen.pool.length+' drill items ('+gen.fresh.length+' new \u00b7 '+gen.verbs.length+' verb forms \u00b7 '+gen.review.length+' review), level-scoped';
     var above=bk.allowed.aboveVocab.length;
     return '<div style="border-top:1px solid var(--line);padding:8px 0">'
       +'<b>L'+lid+' '+escHTML(l.title)+'</b> <span class="muted">('+escHTML(bk.cefr)+' \u00b7 band '+escHTML(bk.band)+')</span>'
       +'<div style="font-size:12px;margin-top:4px"><b>vocab</b> ('+bk.allowed.vocab.length+'): '+escHTML(v)+'</div>'
       +'<div style="font-size:12px"><b>phrases</b>: '+escHTML(ph)+'</div>'
       +'<div style="font-size:12px"><b>grammar</b>: '+escHTML(g)+'</div>'
+      +'<div style="font-size:12px"><b>verbs</b>: '+escHTML(vb)+'</div>'
+      +'<div style="font-size:12px"><b>practice (generated)</b>: '+escHTML(genTxt)+'</div>'
       +'<div style="font-size:12px"><b>reading</b>: '+escHTML(st)+'</div>'
       +'<div style="font-size:12px"><b>practice</b>: '+escHTML(pr)+'</div>'
       +'<div style="font-size:12px"><b>prerequisites carried in</b>: '+bk.prerequisites.vocab.length+' vocab \u00b7 '+bk.prerequisites.grammar.length+' grammar \u00b7 '+bk.prerequisites.phrases.length+' phrases</div>'
       +(above?'<div style="font-size:11.5px;color:#b4513a">held back (above level): '+above+'</div>':'<div style="font-size:11.5px;color:#2f8a5b">no above-level leaks</div>')
       +'</div>';
   }).join('');
-  return '<div class="card" style="margin-top:14px"><h3>Lesson mini-bank - pilot A1a <span class="muted" style="font-size:12px">(editorial)</span></h3>'
-    +'<p class="muted" style="font-size:12.5px">Chapter A1a lessons 1 to 6 now own a resolved, level-gated bank. Each guided step in these lessons draws only from this bank plus what earlier lessons taught. This report proves the resolution end to end and shows whether any above-level material leaks in.</p>'
+  return '<div class="card" style="margin-top:14px"><h3>Lesson mini-bank - pilot A1a + A1c <span class="muted" style="font-size:12px">(editorial)</span></h3>'
+    +'<p class="muted" style="font-size:12.5px">Chapters A1a (lessons 1 to 6) and A1c (lessons 13 to 18) now own a resolved, level-gated bank. Each guided step in these lessons draws only from this bank plus what earlier lessons taught, including a level-scoped practice drill generated from the bank. This report proves the resolution end to end, shows the live story cloze, and shows whether any above-level material leaks in.</p>'
     +rows+'</div>';
+}
+/* ===================================================================
+   B2: level-scoped practice generator (pilot only). Builds drill items
+   from a lesson's allowed vocab + allowed verbs + cumulative prerequisite
+   vocab, every item re-gated to the lesson level so nothing above level
+   can leak in. Wired into the pilot practice step instead of the static
+   practice chapter. Additive, render-time, mutates no data array.
+=================================================================== */
+function _pilotVerbItems(idxs){
+  var out=[]; (idxs||[]).forEach(function(i){ var v=VERBS[i]; if(v) out.push(v); }); return out;
+}
+function _pilotPrereqVocabItems(lessonId, cefr){
+  var keys=_pilotPrereq(lessonId).vocab, seen={}, out=[];
+  keys.forEach(function(k){ var it=LEX.find(function(x){return x.key===k;});
+    if(it && gateCEFR(it.lvl||cefr,cefr)!=='block' && !seen[it.key]){ seen[it.key]=1; out.push(it); } });
+  return out;
+}
+function pilotPracticeGen(bank){
+  if(!bank) return {pool:[], fresh:[], review:[], verbs:[]};
+  var cefr=bank.cefr, seen={}, fresh=[], review=[], verbs=[];
+  function push(arr,v,p,en){ if(p && !seen[p]){ seen[p]=1; arr.push({v:v,p:p,en:en}); } }
+  (bank.allowed.vocab||[]).forEach(function(it){ if(gateCEFR(it.lvl||cefr,cefr)!=='block') push(fresh,it.v,it.p,it.en); });
+  (bank.allowed.verbs||[]).forEach(function(v){
+    var m=(v.present||[]).find(function(p){return p[0]==='m.sg';}); var form=m?m[1]:null;
+    if(form && gateCEFR(v.lvl||cefr,cefr)!=='block') push(verbs,form[0],form[1],(v.en||'')+' (he)');
+  });
+  _pilotPrereqVocabItems(bank.id, cefr).forEach(function(it){ push(review,it.v,it.p,it.en); });
+  return {pool:fresh.concat(verbs).concat(review), fresh:fresh, review:review, verbs:verbs};
+}
+function pilotRenderPractice(lesson){
+  var bk=pilotBank(lesson); if(!bk) return null;
+  var gen=pilotPracticeGen(bk);
+  var quizPool=gen.fresh.concat(gen.verbs);
+  if(quizPool.length<2) quizPool=quizPool.concat(gen.review);
+  if(quizPool.length<2) return null;
+  var b='<div class="rstep-ok">Practice built from this lesson \u00b7 '+escHTML(bk.cefr)+'</div>';
+  b+='<div class="rstep-t">These drills use only what this lesson taught ('+gen.fresh.length+' word'+(gen.fresh.length===1?'':'s')
+    +(gen.verbs.length?' + '+gen.verbs.length+' verb form'+(gen.verbs.length===1?'':'s'):'')
+    +') plus '+gen.review.length+' carried over from earlier lessons. Nothing above your level appears here.</div>';
+  b+='<div class="rstep-h" style="margin-top:12px">Choose the meaning</div>';
+  b+=_pilotMeaningQuiz(quizPool, lesson.id, 'practice');
+  return b;
 }
 /* ===== END PILOT MINI-BANK (B1) ===== */
 
@@ -5843,6 +5913,7 @@ function renderLessonStepPlaceholder(step, lesson, index, total){
     return b;
   }
   if(step.type==='practiceDrill'){
+    if(isPilotLesson(lesson.id)){var _ppr=pilotRenderPractice(lesson); if(_ppr!=null) return _ppr;}
     if(r.resolved){ var p=PRACTICE.find(function(x){return x&&x.ch===r.ch;});
       b+='<div class="rstep-ok">Practice Chapter '+r.ch+(p&&p.t?' \u00b7 '+escHTML(p.t):'')+(p&&p.items?' <span class="muted">('+p.items.length+' items)</span>':'')+'</div>';
       if(p&&p.items&&p.items.length) b+='<button class="btn sm" data-runner-practice="1">Start practice chapter \u2192</button>'; }
