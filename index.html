@@ -5443,6 +5443,36 @@ function pilotStoryPlan(lesson,band,allowedVocab){
           exposure:sents, preTaught:preTaught, cloze:cloze,
           origAbove:(r.mode==='substituted'||r.mode==='excerpt')};
 }
+/* B4: phrase-level gating. Compute a phrase's CEFR level by scanning the words it contains
+   for their vocabulary levels, then take the max. All phrases are A1 for now (built from A1 vocab),
+   but the gating logic enables future extensibility and guards against future above-level phrases. */
+function phraseLevel(phrase,vocabArray){
+  if(!phrase) return 'A1';
+  // extract Hebrew: prefer plain (he[1]) for easier tokenization
+  const he = Array.isArray(phrase.he) ? (phrase.he[1]||phrase.he[0]||'') : (phrase.he||'');
+  if(!he) return 'A1';
+  // tokenize: split on spaces, punctuation, hyphens; keep only Hebrew-range tokens
+  const tokens = he.split(/[\s\-(),،؟;:.!?]/g).filter(t => /[\u0590-\u05FF]/.test(t));
+  let maxRank = 0;
+  tokens.forEach(tok => {
+    // strip nikud to match vocab
+    const stripped = tok.replace(/[\u0591-\u05C7]/g, '');
+    // scan vocab for matching entries (p or v)
+    if(vocabArray) {
+      vocabArray.forEach(v => {
+        if(!v) return;
+        const vp = (v.p||'').replace(/[\u0591-\u05C7]/g, '');
+        const vv = (v.v||'').replace(/[\u0591-\u05C7]/g, '');
+        if(vp===stripped || vv===stripped) {
+          const r = _cefrRank(v.lvl||'A1');
+          if(r > maxRank) maxRank = r;
+        }
+      });
+    }
+  });
+  const order = ['A1','A2','B1','B2','C1','C2'];
+  return order[maxRank] || 'A1';
+}
 function pilotBank(lessonOrId){
   var lesson=(lessonOrId&&typeof lessonOrId==='object')?lessonOrId:_lessonById(lessonOrId);
   if(!lesson||!isPilotLesson(lesson.id)) return null;
@@ -5451,6 +5481,8 @@ function pilotBank(lessonOrId){
   var allowedVocab=[], aboveVocab=[];
   vitems.forEach(function(it){ var gd=gateCEFR(it.lvl||cefr,cefr); if(gd==='block')aboveVocab.push(it); else allowedVocab.push(it); });
   var pr=resolvePhraseRefs(lesson.phrases); var phraseItems=(pr&&pr.items)?pr.items:[];
+  var allowedPhrases=[], abovePhrases=[];
+  phraseItems.forEach(function(p){ var lvl=phraseLevel(p,allowedVocab); var gd=gateCEFR(lvl,cefr); if(gd==='block')abovePhrases.push(p); else allowedPhrases.push(p); });
   var gr=resolveGrammarRef(lesson.grammar); var grammar=null;
   if(gr&&gr.resolved){ var gobj=GRAMMAR.find(function(x){return x.id===gr.id;}); grammar={id:gr.id,title:gobj?gobj.t:gr.label,lvl:gobj?gobj.lvl:'',decision:gobj?gateCEFR(gobj.lvl,cefr):'allow'}; }
   var story=pilotStoryPlan(lesson,band,allowedVocab);
@@ -5462,7 +5494,7 @@ function pilotBank(lessonOrId){
   vbItems.forEach(function(v){ var gd=gateCEFR(v.lvl||cefr,cefr); if(gd==='block')aboveVerbs.push(v); else allowedVerbs.push(v); });
   var output=_sanitizeOutputTask(lesson);
   return {id:lesson.id, cefr:cefr, band:band, goal:lesson.communicationGoal||'',
-    allowed:{vocab:allowedVocab, aboveVocab:aboveVocab, verbs:allowedVerbs, aboveVerbs:aboveVerbs, phrases:phraseItems, grammar:grammar, practice:practice, writing:writing, story:story, output:output},
+    allowed:{vocab:allowedVocab, aboveVocab:aboveVocab, verbs:allowedVerbs, aboveVerbs:aboveVerbs, phrases:allowedPhrases, grammar:grammar, practice:practice, writing:writing, story:story, output:output},
     prerequisites:_pilotPrereq(lesson.id)};
 }
 /* Evidence-based completion: set the step done in state and reflect it in
