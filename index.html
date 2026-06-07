@@ -5333,6 +5333,206 @@ function __ivritResolverCoverage(){
 }
 if(typeof window!=='undefined'){window.__ivritResolverCoverage=__ivritResolverCoverage;}
 /* ===================================================================
+   PILOT MINI-BANK (B1) - chapter A1a, lessons 1-6 only.
+   Additive, render-time, ID-keyed. Mutates no data array. Non-pilot
+   lessons are untouched: every pilot branch returns null and falls
+   back to the existing renderer. Verified IDs only (no invented refs).
+=================================================================== */
+var PILOT_LESSONS=[1,2,3,4,5,6];
+/* Authored overlay: ONLY the word-level teaching selection the prose
+   cannot give unambiguously, as verified indices into VOCAB categories.
+   Everything else (phrases, grammar, story, practice, writing, output)
+   is derived from the existing resolvers and gates, so the bank stays
+   faithful to the live data and cannot drift from it. */
+var PILOT_VOCAB_PICK={
+  1:[{cat:"Hebrew alphabet & writing",idx:[0,1,2,3,4,5,6,7,8,9,10,11,12,13]}],
+  2:[{cat:"Hebrew alphabet & writing",idx:[14,15,16,17]}],
+  3:[{cat:"Greetings & basics",idx:[0,12,13,14,11,1,3,5,6,4,8]}],
+  4:[{cat:"Hebrew alphabet & writing",idx:[1,7,10]}],
+  5:[{cat:"Greetings & basics",idx:[0,1,3,5,6,11]}],
+  6:[{cat:"Greetings & basics",idx:[0,12,11,1,3]},{cat:"Hebrew alphabet & writing",idx:[0,7,10]}]
+};
+function isPilotLesson(id){return PILOT_LESSONS.indexOf(parseInt(id,10))>=0;}
+function _pilotVocabItems(picks){
+  var out=[];
+  (picks||[]).forEach(function(pk){
+    var items=catItems(pk.cat);
+    (pk.idx||[]).forEach(function(i){ if(items[i]) out.push(items[i]); });
+  });
+  return out;
+}
+function _pilotTkey(s){return (''+s).replace(/[^\u0590-\u05FF]/g,'');}
+function _pilotPrereq(id){
+  var n=parseInt(id,10), vocabKeys={}, grammarIds={}, phraseKeys={};
+  for(var e=0;e<PILOT_LESSONS.length;e++){ var lid=PILOT_LESSONS[e]; if(lid>=n) break;
+    _pilotVocabItems(PILOT_VOCAB_PICK[lid]||[]).forEach(function(it){vocabKeys[it.key]=1;});
+    var l=_lessonById(lid); if(l){
+      var gr=resolveGrammarRef(l.grammar); if(gr&&gr.resolved)grammarIds[gr.id]=1;
+      var pr=resolvePhraseRefs(l.phrases); if(pr&&pr.items)pr.items.forEach(function(p){var k=phraseKey(p);if(k)phraseKeys[k]=1;});
+    }
+  }
+  return {vocab:Object.keys(vocabKeys), grammar:Object.keys(grammarIds), phrases:Object.keys(phraseKeys)};
+}
+function pilotStoryPlan(lesson,band,allowedVocab){
+  var r=resolveStoryForLesson(lesson);
+  if(!r) return null;
+  if(!r.resolved||!r.id) return {resolved:false,reason:(r.reason||'no in-level reading'),label:(r.label||'')};
+  var sents=_excerptOf(r.id,3);
+  var taught={};
+  (allowedVocab||[]).forEach(function(it){ var k=_pilotTkey(it.p)||_pilotTkey(stripN(it.v)); if(k)taught[k]=it; });
+  var preTaught=[], cloze=null;
+  sents.forEach(function(s){
+    (''+(s.he||'')).split(/\s+/).forEach(function(w){ var bare=_pilotTkey(stripN(w)); if(bare&&taught[bare]&&preTaught.indexOf(bare)<0)preTaught.push(bare); });
+  });
+  for(var i=0;i<sents.length&&!cloze;i++){
+    var ws=(''+sents[i].he).split(/\s+/);
+    for(var j=0;j<ws.length;j++){ var raw=ws[j], bare=_pilotTkey(stripN(raw));
+      if(bare&&taught[bare]){
+        var answer=taught[bare];
+        var pool=(allowedVocab||[]).filter(function(it){return it.key!==answer.key&&it.p;});
+        var distract=shuffle(pool).slice(0,2);
+        if(distract.length>=1){
+          var opts=shuffle([answer].concat(distract));
+          cloze={sentenceIdx:i, blankToken:raw, options:opts.map(function(o){return {p:o.p,v:o.v,en:o.en,correct:o.key===answer.key};}), display:sents[i]};
+        }
+        break;
+      }
+    }
+  }
+  return {resolved:true, id:r.id, label:r.label, mode:r.mode, band:r.band, reason:r.reason,
+          exposure:sents, preTaught:preTaught, cloze:cloze,
+          origAbove:(r.mode==='substituted'||r.mode==='excerpt')};
+}
+function pilotBank(lessonOrId){
+  var lesson=(lessonOrId&&typeof lessonOrId==='object')?lessonOrId:_lessonById(lessonOrId);
+  if(!lesson||!isPilotLesson(lesson.id)) return null;
+  var cefr=_lessonCEFR(lesson), band=deriveLessonBand(lesson);
+  var vitems=_pilotVocabItems(PILOT_VOCAB_PICK[parseInt(lesson.id,10)]||[]);
+  var allowedVocab=[], aboveVocab=[];
+  vitems.forEach(function(it){ var gd=gateCEFR(it.lvl||cefr,cefr); if(gd==='block')aboveVocab.push(it); else allowedVocab.push(it); });
+  var pr=resolvePhraseRefs(lesson.phrases); var phraseItems=(pr&&pr.items)?pr.items:[];
+  var gr=resolveGrammarRef(lesson.grammar); var grammar=null;
+  if(gr&&gr.resolved){ var gobj=GRAMMAR.find(function(x){return x.id===gr.id;}); grammar={id:gr.id,title:gobj?gobj.t:gr.label,lvl:gobj?gobj.lvl:'',decision:gobj?gateCEFR(gobj.lvl,cefr):'allow'}; }
+  var story=pilotStoryPlan(lesson,band,allowedVocab);
+  var prc=resolvePracticeRef(lesson.practice); var practice=null;
+  if(prc&&prc.resolved){ var p=PRACTICE.find(function(x){return x&&x.ch===prc.ch;}); practice={ch:prc.ch,title:p?p.t:'',lvl:p?p.lvl:'',count:(p&&p.items)?p.items.length:0,decision:p?gateCEFR(p.lvl,cefr):'allow'}; }
+  var wr=resolveWritingRef(lesson.writing); var writing=(wr&&wr.resolved)?{id:wr.id,label:wr.label}:null;
+  var output=_sanitizeOutputTask(lesson);
+  return {id:lesson.id, cefr:cefr, band:band, goal:lesson.communicationGoal||'',
+    allowed:{vocab:allowedVocab, aboveVocab:aboveVocab, phrases:phraseItems, grammar:grammar, practice:practice, writing:writing, story:story, output:output},
+    prerequisites:_pilotPrereq(lesson.id)};
+}
+/* Evidence-based completion: set the step done in state and reflect it in
+   the nav inline (no full re-render, so the activity stays visible).
+   Mark-done / undo remain in the nav as the reversible secondary path. */
+function pilotEvidence(lessonId, stepKey){
+  if(lessonId==null||!stepKey) return;
+  setLessonStepDone(lessonId, stepKey, true);
+  var mid=document.querySelector('.runner-nav-mid');
+  if(mid){ mid.innerHTML='<span class="rstep-doneflag">\u2713 done</span> <button class="btn sm ghost" data-runner-undone="1" title="undo this step">undo</button>';
+    var u=mid.querySelector('[data-runner-undone]'); if(u)u.onclick=function(){markCurrentLessonStepUndone();}; }
+  try{toast('Step complete \u2713');}catch(e){}
+}
+function _pilotMeaningQuiz(pairs, lessonId, stepKey){
+  /* pairs: [{v,p,en}] for vocab or [{he,plain,en}] for phrases */
+  var pool=pairs.filter(function(x){return x.en;});
+  if(pool.length<2) return '';
+  var qs=shuffle(pool).slice(0,Math.min(4,pool.length));
+  var allEn=pool.map(function(x){return x.en;}).filter(function(e,i,a){return a.indexOf(e)===i;});
+  var html='<div class="pilotquiz" data-pilot-quiz="'+lessonId+'|'+stepKey+'" data-pq-total="'+qs.length+'">';
+  qs.forEach(function(x,qi){
+    var distract=shuffle(allEn.filter(function(e){return e!==x.en;})).slice(0,2);
+    var opts=shuffle([x.en].concat(distract));
+    var heV=(x.v!=null?x.v:x.he), heP=(x.p!=null?x.p:x.plain);
+    html+='<div class="pq-q" data-pq="'+qi+'" style="margin-bottom:12px"><div class="rstep-heb" dir="rtl" style="margin:4px 0" data-speak="'+encodeURIComponent(heV)+'">'+H(heV,heP)+'</div><div class="opts">'
+      +opts.map(function(o){return '<button class="pq-opt" data-pq-correct="'+(o===x.en?'1':'0')+'">'+escHTML(o)+'</button>';}).join('')+'</div></div>';
+  });
+  html+='<div class="pq-score muted" style="font-size:12.5px"></div></div>';
+  return html;
+}
+function pilotRenderVocab(lesson){
+  var bk=pilotBank(lesson); if(!bk) return null;
+  var items=bk.allowed.vocab; if(!items.length) return null;
+  var b='<div class="rstep-ok">This lesson teaches '+items.length+' word'+(items.length===1?'':'s')+' \u00b7 '+escHTML(bk.cefr)+'</div>';
+  b+='<div class="rstep-t">Tap to hear, flip for the meaning. These are the exact words this lesson owns, gated to your level, so nothing above your level appears here.</div>';
+  b+='<div class="wcards">'+items.map(function(it){return _warmupCard(it,false);}).join('')+'</div>';
+  var quiz=_pilotMeaningQuiz(items, lesson.id, 'vocab');
+  if(quiz) b+='<div class="rstep-h" style="margin-top:14px">Quick check: choose the meaning</div>'+quiz;
+  else b+='<div class="rstep-meta">Flip each card to review, then mark done.</div>';
+  if(bk.allowed.aboveVocab.length) b+='<div class="rstep-fb">Held back as not-yet-level: '+bk.allowed.aboveVocab.map(function(x){return escHTML(x.en);}).join(', ')+'</div>';
+  return b;
+}
+function pilotRenderPhrases(lesson){
+  var bk=pilotBank(lesson); if(!bk) return null;
+  var items=bk.allowed.phrases; if(!items.length) return null;
+  var b='<div class="rstep-h">Useful phrases (owned by this lesson)</div><div class="rstep-t">Tap to hear, flip for the meaning, then check yourself below.</div>';
+  b+='<div class="wcards">'+items.map(_phraseCard).join('')+'</div>';
+  var quiz=_pilotMeaningQuiz(items, lesson.id, 'phrases');
+  if(quiz) b+='<div class="rstep-h" style="margin-top:14px">Quick check: choose the meaning</div>'+quiz;
+  else b+='<div class="rstep-meta">Flip each card to review, then mark done.</div>';
+  return b;
+}
+function pilotRenderStory(lesson){
+  var bk=pilotBank(lesson); if(!bk) return null;
+  var sp=bk.allowed.story; if(!sp) return null;
+  if(!sp.resolved){ return '<div class="rstep-fb">'+escHTML(sp.label||'')+' No in-level reading for this lesson ('+escHTML(sp.reason||'')+'). Mark done to continue.</div>'; }
+  var b='<div class="rstep-ok">Reading: '+escHTML(sp.label||sp.id)+(sp.band?' <span class="muted">('+escHTML(sp.band)+')</span>':'')+'</div>';
+  if(sp.origAbove) b+='<div class="rstep-fb">The lesson originally named a more advanced text. You get a short, gated taste here for listening only. The full text waits in the Stories library until your level reaches it. You are not asked to read it alone or retell it.</div>';
+  if(sp.preTaught&&sp.preTaught.length){
+    b+='<div class="rstep-h" style="margin-top:10px">Words you already know in this text</div><div class="rstep-heb" dir="rtl">'+sp.preTaught.map(function(w){return '<span data-speak="'+encodeURIComponent(w)+'" style="cursor:pointer">'+escHTML(w)+'</span>';}).join(' \u00b7 ')+'</div>';
+  }
+  b+='<div class="rstep-h" style="margin-top:10px">Listen and follow</div>';
+  b+='<div class="rstep-t" dir="auto" style="line-height:1.7">'+sp.exposure.map(function(e){return '<div dir="rtl" data-speak="'+encodeURIComponent(e.he)+'" style="cursor:pointer">'+escHTML(e.he)+'</div><div dir="ltr" style="opacity:.8">'+escHTML(e.tl)+'</div><div dir="ltr" style="opacity:.7">'+escHTML(e.en)+'</div>';}).join('<div style="height:8px"></div>')+'</div>';
+  if(sp.cloze){
+    var cz=sp.cloze, he=''+cz.display.he, pos=he.indexOf(cz.blankToken);
+    var blanked=pos>=0?(escHTML(he.slice(0,pos))+'<b class="cz-blank">_____</b>'+escHTML(he.slice(pos+cz.blankToken.length))):escHTML(he);
+    b+='<div class="rstep-h" style="margin-top:12px">Fill the gap (a word you have learned)</div>';
+    b+='<div class="pilotcloze" data-pilot-cloze="'+lesson.id+'|story"><div class="rstep-heb" dir="rtl" style="margin:6px 0">'+blanked+'</div><div class="opts">'
+      +cz.options.map(function(o){return '<button class="pq-opt" data-cz-correct="'+(o.correct?'1':'0')+'">'+escHTML(o.p)+'</button>';}).join('')
+      +'</div><div class="cz-score muted" style="font-size:12.5px"></div></div>';
+  } else {
+    b+='<div class="rstep-h" style="margin-top:12px">Did you follow the gist?</div>';
+    b+='<div class="pilotgist" data-pilot-gist="'+lesson.id+'|story"><div class="opts"><button class="pq-opt" data-gist="1">Yes, I got the general idea</button><button class="pq-opt" data-gist="1">I listened; some words are still new</button></div></div>';
+    b+='<div class="rstep-meta">At this level you are not expected to understand every word. Listening exposure is the goal, not full comprehension.</div>';
+  }
+  return b;
+}
+function pilotOutputHint(lesson){
+  var bk=pilotBank(lesson); if(!bk) return '';
+  var chips=[];
+  bk.allowed.vocab.slice(0,8).forEach(function(it){chips.push(escHTML(it.p)+' <span class="muted">'+escHTML(it.en)+'</span>');});
+  bk.allowed.phrases.slice(0,4).forEach(function(p){if(p.en)chips.push(escHTML(p.plain||p.he)+' <span class="muted">'+escHTML(p.en)+'</span>');});
+  if(!chips.length) return '';
+  return '<div class="rstep-meta" style="margin-bottom:6px"><b>Use what this lesson taught</b>: '+chips.slice(0,10).join(' \u00b7 ')+'. You are only asked to produce words and grammar already covered.</div>';
+}
+function pilotMiniBankCard(){
+  if(!editEnabled()) return '';
+  var rows=PILOT_LESSONS.map(function(lid){
+    var bk=pilotBank(lid); var l=_lessonById(lid); if(!bk||!l) return '';
+    var v=bk.allowed.vocab.map(function(x){return x.en;}).join(', ')||'-';
+    var ph=bk.allowed.phrases.map(function(p){return p.en||p.plain;}).filter(Boolean).join(', ')||'-';
+    var g=bk.allowed.grammar?('#'+bk.allowed.grammar.id+' '+bk.allowed.grammar.title+' ['+bk.allowed.grammar.decision+']'):'-';
+    var st=(bk.allowed.story&&bk.allowed.story.resolved)?(bk.allowed.story.label+' \u00b7 '+bk.allowed.story.mode+(bk.allowed.story.cloze?' \u00b7 cloze ready':' \u00b7 exposure + gist')):'-';
+    var pr=bk.allowed.practice?('ch'+bk.allowed.practice.ch+' ['+bk.allowed.practice.decision+']'):'-';
+    var above=bk.allowed.aboveVocab.length;
+    return '<div style="border-top:1px solid var(--line);padding:8px 0">'
+      +'<b>L'+lid+' '+escHTML(l.title)+'</b> <span class="muted">('+escHTML(bk.cefr)+' \u00b7 band '+escHTML(bk.band)+')</span>'
+      +'<div style="font-size:12px;margin-top:4px"><b>vocab</b> ('+bk.allowed.vocab.length+'): '+escHTML(v)+'</div>'
+      +'<div style="font-size:12px"><b>phrases</b>: '+escHTML(ph)+'</div>'
+      +'<div style="font-size:12px"><b>grammar</b>: '+escHTML(g)+'</div>'
+      +'<div style="font-size:12px"><b>reading</b>: '+escHTML(st)+'</div>'
+      +'<div style="font-size:12px"><b>practice</b>: '+escHTML(pr)+'</div>'
+      +'<div style="font-size:12px"><b>prerequisites carried in</b>: '+bk.prerequisites.vocab.length+' vocab \u00b7 '+bk.prerequisites.grammar.length+' grammar \u00b7 '+bk.prerequisites.phrases.length+' phrases</div>'
+      +(above?'<div style="font-size:11.5px;color:#b4513a">held back (above level): '+above+'</div>':'<div style="font-size:11.5px;color:#2f8a5b">no above-level leaks</div>')
+      +'</div>';
+  }).join('');
+  return '<div class="card" style="margin-top:14px"><h3>Lesson mini-bank - pilot A1a <span class="muted" style="font-size:12px">(editorial)</span></h3>'
+    +'<p class="muted" style="font-size:12.5px">Chapter A1a lessons 1 to 6 now own a resolved, level-gated bank. Each guided step in these lessons draws only from this bank plus what earlier lessons taught. This report proves the resolution end to end and shows whether any above-level material leaks in.</p>'
+    +rows+'</div>';
+}
+/* ===== END PILOT MINI-BANK (B1) ===== */
+
+/* ===================================================================
    PHASE 9B.3: guided lesson runner shell (visible, placeholder steps).
    Builds an ordered step list for a lesson from resolveLessonResources,
    shows one step at a time with back / next / mark-done / resume, stores
@@ -5589,8 +5789,9 @@ function renderLessonStepPlaceholder(step, lesson, index, total){
     return b;
   }
   if(step.type==='outputTask'){
+    var _pilotOut=isPilotLesson(lesson.id)?pilotOutputHint(lesson):'';
     var ot=_sanitizeOutputTask(lesson);
-    b='<div class="rstep-h">Your turn: produce it</div>';
+    b='<div class="rstep-h">Your turn: produce it</div>'+_pilotOut;
     b+='<div class="rstep-t" dir="auto">'+(v2FieldShown(ot)?v2FieldText(ot):'Use today\u2019s words and grammar in a short spoken or written attempt.')+'</div>';
     b+='<textarea class="inp" id="outAttempt" rows="3" placeholder="Optional: write your attempt here\u2026" style="margin:10px 0;width:100%;box-sizing:border-box"></textarea>';
     b+='<div class="rstep-h" style="margin-top:4px">Self-check</div>';
@@ -5603,6 +5804,7 @@ function renderLessonStepPlaceholder(step, lesson, index, total){
   if(step.type==='completionSummary') return '<div class="rstep-t">You have gone through every step of this lesson. Finish to mark it complete'+(lessonDone(lesson.id)?' (already counted, no extra XP).':' and earn +15 XP.')+'</div>';
   var r=step.res;
   if(step.type==='vocabularyExposure'){
+    if(isPilotLesson(lesson.id)){var _pv=pilotRenderVocab(lesson); if(_pv!=null) return _pv;}
     if(r.matched.length){ b+='<div class="rstep-ok">Ready: '+r.matched.length+' vocabulary '+(r.matched.length===1?'set':'sets')+'</div>';
       b+='<ul class="rstep-list">'+r.matched.map(function(m){return '<li>'+escHTML(m.cat)+' <span class="muted">('+m.count+' words'+(m.lvl?', '+m.lvl:'')+')</span></li>';}).join('')+'</ul>';
       b+='<button class="btn sm" data-runner-vocab="1">Practice these words \u2192</button>'; }
@@ -5630,6 +5832,7 @@ function renderLessonStepPlaceholder(step, lesson, index, total){
     return b;
   }
   if(step.type==='phraseExposure'){
+    if(isPilotLesson(lesson.id)){var _pp=pilotRenderPhrases(lesson); if(_pp!=null) return _pp;}
     var items=(r&&r.items)?r.items:[];
     if(!items.length) return '<div class="rstep-fb">No phrases linked to this lesson. Mark done to continue.</div>';
     b='<div class="rstep-h">Useful phrases</div><div class="rstep-t">Tap a phrase to hear it, flip for the meaning, then check yourself below.</div>';
@@ -5647,6 +5850,7 @@ function renderLessonStepPlaceholder(step, lesson, index, total){
     return b;
   }
   if(step.type==='storyReading'){
+    if(isPilotLesson(lesson.id)){var _ps=pilotRenderStory(lesson); if(_ps!=null) return _ps;}
     if(r.resolved&&r.mode==='excerpt'&&r.excerpt&&r.excerpt.length){ b+='<div class="rstep-ok">Short excerpt from: '+escHTML(r.label||'')+'</div>';
       b+='<div class="rstep-t" dir="auto" style="line-height:1.7">'+r.excerpt.map(function(e){return '<div dir="rtl">'+escHTML(e.he)+'</div><div dir="ltr" style="opacity:.8">'+escHTML(e.tl)+'</div><div dir="ltr" style="opacity:.7">'+escHTML(e.en)+'</div>';}).join('<div style="height:8px"></div>')+'</div>';
       b+='<div class="rstep-fb">A few sentences for listening exposure. The full text is more advanced and stays in the Stories library.</div>'; }
@@ -7132,6 +7336,7 @@ function vSettings(){const c=S.cfg||{};const vlist=voices.filter(v=>v.lang&&v.la
    ${editorialCard()}
    ${homographCard()}
    ${gatingReportCard()}
+   ${pilotMiniBankCard()}
    ${spokenAltCard()}
    ${translitNoteCard()}
    <div class="card" style="margin-top:14px"><h3>Reset progress</h3><p class="muted" style="font-size:13px">Clears mastery, course progress and streak. Cannot be undone.</p><button class="btn ghost sm" id="resetProg" style="margin-top:8px">Reset my progress</button></div>`;
@@ -7231,6 +7436,45 @@ function bind(){
   document.querySelectorAll('[data-runner-conversa]').forEach(b=>b.onclick=()=>runnerLaunchConversa());
   document.querySelectorAll('[data-runner-writing]').forEach(b=>b.onclick=()=>runnerLaunchWriting());
   document.querySelectorAll('[data-runner-return]').forEach(b=>b.onclick=()=>returnToRunnerStep(true));
+  document.querySelectorAll('.pilotquiz').forEach(function(qz){
+    var lk=(qz.dataset.pilotQuiz||'').split('|'); var lid=lk[0], skey=lk[1];
+    qz.querySelectorAll('.pq-q').forEach(function(q){
+      q.querySelectorAll('.pq-opt').forEach(function(opt){
+        opt.onclick=function(){
+          if(q.dataset.answered)return; q.dataset.answered='1';
+          var correct=opt.dataset.pqCorrect==='1';
+          opt.classList.add(correct?'ok':'bad');
+          if(!correct) q.querySelectorAll('.pq-opt').forEach(function(o){if(o.dataset.pqCorrect==='1')o.classList.add('ok');});
+          var ans=qz.querySelectorAll('.pq-q[data-answered]').length, tot=+qz.dataset.pqTotal;
+          var sc=qz.querySelector('.pq-score');
+          if(ans>=tot){ if(sc)sc.textContent='\u2713 Check complete. This step is done. Tap next to continue.'; pilotEvidence(lid, skey); }
+          else if(sc) sc.textContent=ans+' / '+tot;
+        };
+      });
+    });
+  });
+  document.querySelectorAll('.pilotcloze').forEach(function(cz){
+    var lk=(cz.dataset.pilotCloze||'').split('|'); var lid=lk[0], skey=lk[1];
+    cz.querySelectorAll('.pq-opt').forEach(function(opt){
+      opt.onclick=function(){
+        if(cz.dataset.answered)return; cz.dataset.answered='1';
+        var ok=opt.dataset.czCorrect==='1';
+        opt.classList.add(ok?'ok':'bad');
+        if(!ok) cz.querySelectorAll('.pq-opt').forEach(function(o){if(o.dataset.czCorrect==='1')o.classList.add('ok');});
+        var sc=cz.querySelector('.cz-score'); if(sc)sc.textContent=ok?'\u2713 correct':'the highlighted word was the answer';
+        pilotEvidence(lid, skey);
+      };
+    });
+  });
+  document.querySelectorAll('.pilotgist').forEach(function(gz){
+    var lk=(gz.dataset.pilotGist||'').split('|'); var lid=lk[0], skey=lk[1];
+    gz.querySelectorAll('.pq-opt').forEach(function(opt){
+      opt.onclick=function(){
+        if(gz.dataset.answered)return; gz.dataset.answered='1';
+        opt.classList.add('ok'); pilotEvidence(lid, skey);
+      };
+    });
+  });
   var vsEl=document.getElementById('verbSearch');
   if(vsEl){vsEl.oninput=function(){if(vsEl._t)clearTimeout(vsEl._t);vsEl._t=setTimeout(function(){route.extra=vsEl.value.trim();render();},350);};vsEl.onfocus=function(){vsEl.select();};}
   var vbEl=document.getElementById('vocabSearch');
