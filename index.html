@@ -164,6 +164,7 @@ tr:last-child td{border-bottom:none}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .chips button{all:unset;cursor:pointer;font-size:13px;border:1px solid var(--line);border-radius:999px;padding:6px 11px;color:var(--muted)}
 .chips button:hover{background:var(--hover);color:var(--gold2)}
+.chips button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
 /* inputs */
 .inp,textarea,select{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:11px;
   color:var(--ink);padding:10px 13px;font-family:var(--sans);font-size:14px;backdrop-filter:blur(8px)}
@@ -458,6 +459,35 @@ table.gtable td.say{font-style:italic;color:var(--muted)}
 .explore-card h3{font-family:var(--serif);font-size:17px;font-weight:500;margin-bottom:4px;color:var(--paper)}
 .explore-card p{font-size:12px;color:var(--muted);line-height:1.4}
 @media(max-width:760px){.dash-cols{grid-template-columns:1fr}.km-cards{grid-template-columns:repeat(2,1fr)}.explore-cards{grid-template-columns:repeat(2,1fr)}.dash-hero{padding:26px 22px}.dash-stats{gap:24px}.dash-hero h1{font-size:clamp(26px,8vw,34px)}}
+/* TODAY page (daily session twin) */
+.t-eyebrow{font-family:ui-monospace,monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-bottom:10px;font-weight:500}
+.t-h1{font-family:var(--serif);font-weight:400;font-size:clamp(30px,4vw,46px);line-height:1.05;letter-spacing:-.025em;margin-bottom:14px;color:var(--paper)}
+.t-lede{font-size:16px;line-height:1.55;color:var(--warm);max-width:64ch;margin-bottom:26px}
+.t-prog{max-width:720px;margin-bottom:18px}
+.t-prog-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.t-prog-k{font-family:ui-monospace,monospace;font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.06em}
+.t-prog-v{font-family:ui-monospace,monospace;font-size:12px}
+.t-prog-bar{height:6px;background:var(--track);border-radius:3px;overflow:hidden}
+.t-prog-bar i{display:block;height:100%;transition:width .4s ease}
+.t-prog-note{font-size:13px;color:var(--good);margin-top:8px}
+.t-steps{max-width:720px;display:flex;flex-direction:column;gap:10px}
+.lesson-row{display:flex;align-items:center;gap:14px;padding:13px 16px;background:var(--card);border:1px solid var(--line);border-radius:12px;cursor:pointer;backdrop-filter:blur(8px);transition:.18s}
+.lesson-row:hover{border-color:var(--gold);transform:translateX(-2px);box-shadow:var(--shadow-sm)}
+.lesson-row.completed{background:var(--good-wash);border-color:rgba(58,125,92,.22)}
+.lesson-row.completed .lesson-title{color:var(--good)}
+.lesson-row.current{background:linear-gradient(to left,var(--accent-wash),var(--card));border-color:var(--accent)}
+.lesson-row.current .lesson-title{color:var(--accent)}
+.lesson-marker{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--line);background:var(--card);font-size:12px;color:var(--faint);flex-shrink:0;font-weight:600}
+.lesson-row.completed .lesson-marker{background:var(--good);border-color:var(--good);color:#fff}
+.lesson-row.current .lesson-marker{background:var(--accent);border-color:var(--accent);color:#fff}
+.lesson-icon{width:30px;height:30px;border-radius:8px;background:var(--gold-wash);display:flex;align-items:center;justify-content:center;color:var(--gold2);flex-shrink:0;font-size:12px;font-weight:600}
+.lesson-row.current .lesson-icon{background:var(--accent-wash);color:var(--accent)}
+.lesson-body{flex:1;min-width:0}
+.lesson-title{font-weight:600;font-size:14.5px;line-height:1.3;color:var(--paper)}
+.lesson-sub{font-size:12px;color:var(--faint);font-style:italic}
+.lesson-meta{font-family:ui-monospace,monospace;font-size:10px;color:var(--faint);flex-shrink:0}
+.t-further{max-width:720px;margin-top:30px}
+@media(max-width:760px){.lesson-row{padding:11px 14px;gap:10px}.t-h1{font-size:clamp(24px,8vw,32px)}}
 </style>
 </head>
 <body>
@@ -7208,7 +7238,7 @@ function drillDone(){
    NAV & ROUTER
 =================================================================== */
 const TABS=[
- ["dash","Today","◆"],["course","Course","❡"],["grammar","Grammar","✎"],["binyanim","Binyanim","⬡"],
+ ["dash","Dashboard","◆"],["today","Today","☉"],["course","Course","❡"],["grammar","Grammar","✎"],["binyanim","Binyanim","⬡"],
  ["vocab","Vocab","✦"],["verbs","Verbs","⟳"],["stories","Stories","❧"],["practice","Practice","✓"],
  ["conversa","Conversa","❝"],["write","Write","✒"],["phrases","Phrases","✷"],["pron","Sounds","♪"],["settings","Settings","⚙"]
 ];
@@ -7218,12 +7248,12 @@ function go(section,item,sub,extra){route={section,item:item||null,sub:sub||null
 function buildNav(){
   document.getElementById('nav').innerHTML=TABS.map(t=>`<button data-v="${t[0]}" class="${t[0]===route.section?'on':''}"><span class="ic">${t[2]}</span>${t[1]}</button>`).join('');
   document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>go(b.dataset.v));
-  const mob=[["dash","Today","◆"],["course","Course","❡"],["practice","Practice","✓"],["vocab","Vocab","✦"],["conversa","Talk","❝"],["settings","More","⚙"]];
+  const mob=[["dash","Home","◆"],["today","Today","☉"],["course","Course","❡"],["vocab","Vocab","✦"],["practice","Practice","✓"],["settings","More","⚙"]];
   document.getElementById('mobnav').innerHTML=mob.map(t=>`<button data-v="${t[0]}" class="${t[0]===route.section?'on':''}"><span class="ic">${t[2]}</span>${t[1]}</button>`).join('');
   document.querySelectorAll('#mobnav button').forEach(b=>b.onclick=()=>go(b.dataset.v));
 }
 function render(){const m=document.getElementById('main');
-  const f={dash:vDash,course:vCourse,runner:vRunner,grammar:vGrammar,binyanim:vBinyanim,vocab:vVocab,verbs:vVerbs,stories:vStories,practice:vPractice,drill:vDrill,conversa:vConversa,write:vWrite,phrases:vPhrases,pron:vPron,settings:vSettings}[route.section]||vDash;
+  const f={dash:vDash,today:vToday,course:vCourse,runner:vRunner,grammar:vGrammar,binyanim:vBinyanim,vocab:vVocab,verbs:vVerbs,stories:vStories,practice:vPractice,drill:vDrill,conversa:vConversa,write:vWrite,phrases:vPhrases,pron:vPron,settings:vSettings}[route.section]||vDash;
   m.innerHTML=runnerReturnBanner()+f();bind();}
 
 /* small helpers */
@@ -7239,8 +7269,72 @@ function stageHTML(s,i){let body='';
 function rateRow(id){const v=S.grammar[id]||0;return `<div class="row spread" style="margin-top:12px"><div class="rate" data-rate="${id}"><span class="muted" style="font-size:12px;margin-inline-end:4px">How confident?</span>${[1,2,3,4,5].map(n=>`<b class="${v>=n?'on':''}" data-n="${n}">${n}</b>`).join('')}</div></div>`;}
 
 /* ===================================================================
-   DASHBOARD  (knowledge map + continue + sequenced today)
+   TODAY  (daily session twin of the Italian "30 minutes, built for you")
+   A sequenced session: warm-up weak words, the next course lesson, a
+   piece of comprehensible input (story), then mixed practice. Step state
+   resets each day. A step counts as done on ENTRY (the learner started it),
+   matching the Italian app's behaviour for multi-step inline flows.
 =================================================================== */
+function todayDoneSet(){
+  var dk=new Date().toISOString().slice(0,10);
+  if(!S.today||typeof S.today!=='object'||S.today.date!==dk){S.today={date:dk,done:{}};}
+  return S.today.done;
+}
+function todayMark(id){todayDoneSet()[id]=true;save();}
+function todaySteps(){
+  var steps=[];
+  var weak=weakPool(15);
+  if(weak.length){steps.push({id:'warm',kind:'weak',icon:'W',title:'Warm-up: weak words',sub:weak.length+' words due for review',mins:5});}
+  var lc=currentLesson();var sess=getActiveSession();
+  var resuming=!!(sess&&getLessonRunnerState(sess.lessonId)&&String(sess.lessonId)===String(lc.id));
+  steps.push({id:'lesson',kind:'lesson:'+lc.id,icon:'L',title:(resuming?'Resume: ':'Lesson: ')+escHTML(lc.title),sub:escHTML(chTitle(lc.ch)),mins:12});
+  var story=STORIES.find(function(s){return !S.stories[s.id]&&/A1/i.test(s.lvl||'');})
+    ||STORIES.find(function(s){return !S.stories[s.id];})||STORIES[0];
+  if(story){steps.push({id:'story',kind:'story:'+story.id,icon:'S',title:'Read: '+escHTML(story.en),sub:escHTML((story.lvl||'')+' \u00b7 '+(story.rt||(story.s.length+' lines'))),mins:7});}
+  steps.push({id:'mixed',kind:'mixed',icon:'P',title:'Mixed practice',sub:'Spaced review across what you have seen',mins:6});
+  return steps;
+}
+function vToday(){
+  var done=todayDoneSet();
+  var steps=todaySteps();
+  var total=steps.reduce(function(a,s){return a+s.mins;},0);
+  var dmin=steps.filter(function(s){return done[s.id];}).reduce(function(a,s){return a+s.mins;},0);
+  var nextIdx=steps.findIndex(function(s){return !done[s.id];});
+  var allDone=nextIdx===-1&&steps.length>0;
+  var pct=total?Math.min(100,Math.round(dmin/total*100)):0;
+  var dlabel=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+  var rows=steps.map(function(s,i){
+    var d=!!done[s.id];var cur=i===nextIdx;
+    return '<div class="lesson-row '+(d?'completed':'')+' '+(cur?'current':'')+'" data-today-go="'+s.kind+'" data-today-id="'+s.id+'">'
+      +'<div class="lesson-marker">'+(d?'\u2713':(i+1))+'</div>'
+      +'<div class="lesson-icon">'+s.icon+'</div>'
+      +'<div class="lesson-body"><div class="lesson-title">'+s.title+'</div><div class="lesson-sub">'+s.sub+'</div></div>'
+      +'<div class="lesson-meta">'+s.mins+' min</div>'
+    +'</div>';
+  }).join('');
+  return ''
+  +'<div class="t-eyebrow">Today \u00b7 '+dlabel+'</div>'
+  +'<h1 class="t-h1">'+( (S.cfg&&S.cfg.dailyMinutes)||30 )+' minutes, built for you.</h1>'
+  +'<p class="t-lede">A sequence drawn from your weakest words, your next course lesson, and a piece of real Hebrew to read. Follow it in order: each step feeds the next.</p>'
+  +'<div class="t-prog">'
+    +'<div class="t-prog-top"><span class="t-prog-k">Time progress</span><span class="t-prog-v" style="color:'+(allDone?'var(--good)':'var(--muted)')+'">'+dmin+' / '+total+' min'+(allDone?' \u00b7 \u2713 done for today':'')+'</span></div>'
+    +'<div class="t-prog-bar"><i style="width:'+pct+'%;background:'+(allDone?'var(--good)':'var(--accent)')+'"></i></div>'
+    +(allDone?'<div class="t-prog-note">Session complete. Anything else today is bonus, not duty.</div>':'')
+  +'</div>'
+  +'<div class="t-steps">'+rows+'</div>'
+  +'<div class="t-further card">'
+    +'<div class="sec-kicker" style="margin-bottom:6px">After today\u2019s session</div>'
+    +'<h3 style="font-family:var(--serif);font-weight:500;font-size:18px;margin-bottom:6px">Want to go further?</h3>'
+    +'<p class="muted" style="font-size:13.5px;margin-bottom:14px">Jump into the next course lesson or explore freely. Progress keeps building.</p>'
+    +'<div class="row" style="gap:8px;flex-wrap:wrap">'
+      +'<button class="btn ghost sm" data-go2="course">Open course</button>'
+      +'<button class="btn ghost sm" data-go2="stories">Read a story</button>'
+      +'<button class="btn ghost sm" data-go2="practice">More practice</button>'
+    +'</div>'
+  +'</div>';
+}
+
+
 function _dashGrad(i){var g=['linear-gradient(135deg,#d99b86,#c97f63)','linear-gradient(135deg,#e6c074,#d9a449)','linear-gradient(135deg,#8aa6bf,#5d7f9e)','linear-gradient(135deg,#b39bc4,#8f6fa3)','linear-gradient(135deg,#9bbf9f,#6f9e78)','linear-gradient(135deg,#3a4a63,#2a3550)'];return g[i%g.length];}
 function vDash(){
   var hour=new Date().getHours();
@@ -7270,7 +7364,7 @@ function vDash(){
     +'<div class="dash-greet">'+H(gr[0],gr[1])+', Vincenzo.</div>'
     +'<h1>Pick up where <span class="ac">you left off.</span></h1>'
     +'<div class="dash-hsub">Your Hebrew is waiting. Today, one small step closer to the conversations you actually want to have.</div>'
-    +'<div class="dash-cta"><button class="p" '+primaryAttr+'>Today\u2019s session \u2192</button><button class="o" data-go2="course">Continue: '+escHTML(contLabel)+'</button></div>'
+    +'<div class="dash-cta"><button class="p" data-go2="today">Today\u2019s session \u2192</button><button class="o" data-go2="course">Continue: '+escHTML(contLabel)+'</button></div>'
     +'<div class="dash-stats">'
       +'<div class="dash-stat"><b>'+(S.streak||0)+'<small> days</small></b><span>Streak</span></div>'
       +'<div class="dash-stat"><b>'+enc+'<small> /'+LEX.length+'</small></b><span>Words encountered</span></div>'
@@ -7284,7 +7378,7 @@ function vDash(){
       +'<div class="bar" style="margin-bottom:18px"><i style="width:'+Math.max(coursePct,2)+'%"></i></div>'
       +'<button class="btn ghost" data-go2="course">Open course map</button></div>'
     +'<div class="dash-actions">'
-      +'<div class="dash-action" '+primaryAttr+'><span class="dash-av">i</span><div><div class="t">Today\u2019s session</div><div class="s">'+mins+' min \u00b7 personalized</div></div><span class="ar">\u2192</span></div>'
+      +'<div class="dash-action" data-go2="today"><span class="dash-av">i</span><div><div class="t">Today\u2019s session</div><div class="s">'+mins+' min \u00b7 personalized</div></div><span class="ar">\u2192</span></div>'
       +'<div class="dash-action" data-go2="stories"><span class="dash-av">s</span><div><div class="t">Stories library</div><div class="s">Read for fun. It still counts.</div></div><span class="ar">\u2192</span></div>'
       +'<div class="dash-action" data-go2="conversa"><span class="dash-av">a</span><div><div class="t">Talk to Angela</div><div class="s">Roleplay scenarios</div></div><span class="ar">\u2192</span></div>'
     +'</div>'
@@ -7985,32 +8079,32 @@ function vStories(){
   return storiesList();
 }
 function typeBadge(t){const m={short:['Short','st-short'],long:['Long','st-long'],extended:['Extended','st-ext'],magazine:['Magazine','st-mag']}[t]||['',''];return m[0]?`<span class="stbadge ${m[1]}">${m[0]}</span>`:'';}function storiesList(){
-  var LV=['A1','A2','B1','B2'];
-  var LVNAME={A1:'A1 \u00b7 Beginner',A2:'A2 \u00b7 Elementary',B1:'B1 \u00b7 Intermediate',B2:'B2 \u00b7 Upper intermediate'};
-  var bucket=function(lv){var p=(''+(lv||'A1')).split(/[-\/ ]/)[0].toUpperCase();return LV.indexOf(p)>=0?p:'A1';};
-  var selLvl=(route.sub||'').toUpperCase();
-  var card=function(s){var done=S.stories[s.id];
-    var fl=s.s&&s.s[0]&&s.s[0][0];var nik=Array.isArray(fl)?fl[0]:fl;var preview=stripN(nik||'').slice(0,52);
-    var subt=s.topic?escHTML(s.topic):escHTML(preview);
-    return '<div class="item '+(done?'done':'')+'" data-story="'+s.id+'"><div class="meta" style="min-width:0">'
-      +'<div class="row" style="gap:6px"><span style="font-weight:600;color:var(--paper)">'+hebClick(s.t[0],s.t[1])+'</span></div>'
-      +'<div class="row" style="gap:5px;margin:2px 0">'+lvlBadge(s.sub||s.lvl)+typeBadge(s.type)+'<span class="tag">'+s.s.length+' lines</span>'+(s.rt?'<span class="tag">'+escHTML(s.rt)+'</span>':'')+(done?'<span class="tag" style="color:var(--good)">&#10003;</span>':'')+'</div>'
-      +'<div class="muted" style="font-size:12px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">'+subt+'</div></div><span class="chev">&#8250;</span></div>';};
-  if(LV.indexOf(selLvl)>=0){
-    var list=STORIES.filter(function(s){return bucket(s.lvl)===selLvl;});
-    var out='<button class="back" data-go2="stories">&#8592; all levels</button><div class="topbar"><div><h1>'+escHTML(LVNAME[selLvl])+'</h1><div class="lead">'+list.length+' stories</div></div>'+nikToggle()+'</div>';
-    var TY=['short','story','long','extended','magazine'];var byT={};
-    list.forEach(function(s){var t=TY.indexOf(s.type)>=0?s.type:'story';(byT[t]=byT[t]||[]).push(s);});
-    var any=false;
-    TY.forEach(function(t){if(!byT[t]||!byT[t].length)return;any=true;out+='<div class="verb-group" open><div class="verb-group-head">'+t.charAt(0).toUpperCase()+t.slice(1)+' <span class="cnt">'+byT[t].length+'</span></div><div class="verb-group-body">'+byT[t].map(card).join('')+'</div></div>';});
-    if(!any)out+='<p class="muted">No stories at this level yet.</p>';
-    return out;
-  }
-  var out='<div class="topbar"><div><h1>Stories</h1><div class="lead">'+STORIES.length+' texts. Real Hebrew, real life.</div></div>'+nikToggle()+'</div>';
-  LV.forEach(function(lv){var list=STORIES.filter(function(s){return bucket(s.lvl)===lv;});if(!list.length)return;var done=list.filter(function(s){return !!S.stories[s.id];}).length;
-    out+='<div class="topic-card" data-go2="stories||'+lv+'"><div class="meta"><div class="t">'+escHTML(LVNAME[lv])+'</div><div class="muted" style="font-size:12px">'+list.length+' stories'+(done?' \u00b7 '+done+' read':'')+'</div></div><span class="chev">&#8250;</span></div>';});
-  var recent=STORIES.filter(function(s){return !!S.stories[s.id];}).slice(-3).reverse();if(recent.length){out+='<h2 style="margin-top:20px">Recently read</h2>'+recent.map(card).join('');}
-  return out;
+  var FILTERS=[['all','All'],['short','Short'],['long','Long & extended'],['magazine','Magazine'],['inprogress','In progress']];
+  var f=(route.sub||'all');
+  var match=function(s){
+    if(f==='all')return true;
+    if(f==='inprogress')return !!S.stories[s.id];
+    if(f==='long')return s.type==='long'||s.type==='extended';
+    return s.type===f;
+  };
+  var list=STORIES.filter(match);
+  var card=function(s,i){
+    var done=!!S.stories[s.id];
+    var lenTag=(s.rt||(s.s.length+' lines'));
+    return '<div class="read-card" data-story="'+s.id+'">'
+      +'<div class="read-cover" style="background:'+_dashGrad(i)+'"><div class="read-tags"><span>'+escHTML(s.sub||s.lvl||'')+'</span><span>'+escHTML(lenTag)+'</span>'+(done?'<span>\u2713 read</span>':'')+'</div></div>'
+      +'<div class="read-body"><div class="k">'+escHTML((s.lvl||'')+' \u00b7 '+(s.type||'story'))+'</div>'
+      +'<h3>'+escHTML(s.en)+'</h3><div class="he">'+H(s.t[0],s.t[1])+'</div>'
+      +'<p>'+escHTML(s.topic||'')+'</p>'
+      +(done?'<div class="bar" style="margin-top:10px"><i style="width:100%"></i></div>':'')
+      +'</div></div>';
+  };
+  var tabs='<div class="chips" style="margin:4px 0 18px">'+FILTERS.map(function(t){return '<button class="'+(t[0]===f?'on':'')+'" data-story-filter="'+t[0]+'">'+t[1]+'</button>';}).join('')+'</div>';
+  var grid=list.length?'<div class="read-cards">'+list.map(card).join('')+'</div>':'<p class="muted">No stories in this view yet.</p>';
+  return '<div class="t-eyebrow">Stories \u00b7 '+STORIES.length+' texts</div>'
+    +'<div class="topbar"><div><h1 class="t-h1" style="margin-bottom:6px">Reading is where it sticks.</h1></div>'+nikToggle()+'</div>'
+    +'<p class="t-lede">Real Hebrew, real life. Read for meaning, tap any word to hear it and see the gloss. Every story you finish feeds your word bank.</p>'
+    +tabs+grid;
 }
 function storyQuiz(st){
   return `<button class="back" data-back="stories">← stories</button>
@@ -8846,6 +8940,13 @@ function bind(){
   document.querySelectorAll('[data-open-lesson]').forEach(b=>b.onclick=()=>{lsStage=0;go('course',b.dataset.openLesson);});
   // guided lesson runner (Phase 9B.3)
   document.querySelectorAll('[data-runner-start]').forEach(b=>b.onclick=()=>startLessonRunner(b.dataset.runnerStart));
+  document.querySelectorAll('[data-today-go]').forEach(b=>b.onclick=()=>{
+    var g=b.dataset.todayGo, id=b.dataset.todayId; todayMark(id);
+    if(g==='weak'){var w=weakPool(15); if(!w.length){toast('No weak words yet. Learn some first.');render();return;} startVocabDrill(w,{title:'Warm-up',back:'today'});}
+    else if(g==='mixed'){var p=learnedPool(); if(!p.length){toast('Learn some words first.');render();return;} startVocabDrill(p,{title:'Mixed practice',max:12,back:'today'});}
+    else if(g.indexOf('lesson:')===0){var lid=g.slice(7); var s=getActiveSession(); if(s&&getLessonRunnerState(s.lessonId)&&String(s.lessonId)===String(lid)){resumeLessonRunner();}else{startLessonRunner(lid);}}
+    else if(g.indexOf('story:')===0){go('stories',g.slice(6));}
+  });
   document.querySelectorAll('[data-runner-resume]').forEach(b=>b.onclick=()=>resumeLessonRunner());
   document.querySelectorAll('[data-runner-nav]').forEach(b=>b.onclick=()=>goLessonStep(b.dataset.runnerNav==='next'?1:-1));
   document.querySelectorAll('[data-runner-done]').forEach(b=>b.onclick=()=>markCurrentLessonStepDone());
