@@ -7088,7 +7088,7 @@ function startGrammarDrill(chItems,opts){opts=opts||{};
   go('drill');}
 function startVerbDrill(verbs,opts){opts=opts||{};
   verbs=(verbs||VERBS).filter(Boolean);
-  const tenses=[["present","Present"],["past","Past"],["future","Future"]];
+  var tenses=[["present","Present"],["past","Past"],["future","Future"]];if(opts.tenses&&opts.tenses.length)tenses=tenses.filter(function(t){return opts.tenses.indexOf(t[0])>=0;});
   const items=[];
   verbs.forEach(v=>{
     tenses.forEach(t=>{const rows=v[t[0]];if(!rows)return;
@@ -7815,40 +7815,49 @@ function addVerbForm(){
     +'<button class="btn full" style="margin-top:16px" id="avSave">Add verb</button>'
     +'</div>';
 }
+function _hebInline(s){return String(s).replace(/[\u0590-\u05FF\u05B0-\u05C7]+(?:[ \u05BE.,!?'"\u2013\u2014-]+[\u0590-\u05FF\u05B0-\u05C7]+)*/g,function(m){return '<span class="h">'+m+'</span>';});}
+function _verbBinyan(v){if(typeof BINYANIM==='undefined')return null;var key=(v.binyan||'').toLowerCase();return BINYANIM.find(function(b){return (b.tl&&b.tl.toLowerCase()===key)||(b.name&&String(b.name).toLowerCase().indexOf(key)>=0);})||null;}
+function _verbConjTable(vid,tenseKey,rows){var pfx=tenseKey==='present'?'pres':(tenseKey==='future'?'fut':'past');
+  return '<table class="gtable"><thead><tr><th>person</th><th>hebrew</th></tr></thead><tbody>'+rows.map(function(r,ri){
+    var ev=getEdit('verb',vid,pfx+'|'+ri)||r[1][0];
+    return '<tr><td>'+r[0]+'</td><td class="tgt"><span data-speak="'+encodeURIComponent(ev)+'" style="cursor:pointer">'+H(ev,r[1][1])+'</span> <button class="edit-btn" data-edit-key="verb|'+vid+'|'+pfx+'|'+ri+'" data-edit-val="'+encodeURIComponent(ev)+'" data-edit-label="'+r[0]+'" title="Edit">\u270e</button></td></tr>';
+  }).join('')+'</tbody></table>';}
+function renderVerbDetail(v){
+  var vid=v.inf[0];var ed_en=getEdit('verb',vid,'en')||v.en;var enc=encodeURIComponent(vid);
+  var tenses=[['inf','Infinitive'],['present','Present'],['past','Past'],['future','Future']];
+  var avail=tenses.filter(function(t){return t[0]==='inf'||(v[t[0]]&&v[t[0]].length);});
+  var active=route.sub;if(!avail.some(function(t){return t[0]===active;}))active=(v.present&&v.present.length)?'present':'inf';
+  var tabs='<div class="subtabs">'+avail.map(function(t){return '<button class="'+(t[0]===active?'on':'')+'" data-go2="verbs|'+enc+'|'+t[0]+'">'+t[1]+'</button>';}).join('')+'</div>';
+  var panel='';
+  if(active==='inf'){
+    panel='<table class="gtable"><tbody>'
+      +'<tr><td>infinitive</td><td class="tgt"><span data-speak="'+enc+'" style="cursor:pointer">'+H(v.inf[0],v.inf[1])+'</span></td></tr>'
+      +'<tr><td>meaning</td><td>'+ed_en+'</td></tr>'
+      +'<tr><td>root</td><td class="tgt">'+H(v.root)+'</td></tr></tbody></table>'
+      +'<div class="gt-foot">The dictionary form. The <span class="h">ל</span> at the front carries "to ...". Drop it and conjugate to use the verb in a sentence.</div>';
+  }else{
+    panel=_verbConjTable(vid,active,v[active])
+      +'<div class="row" style="margin-top:12px"><button class="btn sm" data-verb-tense-drill="'+enc+'|'+active+'">Practice the '+active+'</button></div>';
+  }
+  var b=_verbBinyan(v);
+  var acc='<details class="gt" open><summary><span class="gt-num">i</span><span class="gt-title">About this verb</span><span class="gt-chev">\u203a</span></summary><div class="gt-body"><table class="gtable"><tbody>'
+    +'<tr><td>meaning</td><td>'+ed_en+'</td></tr><tr><td>binyan</td><td>'+v.binyan+'</td></tr>'
+    +'<tr><td>root</td><td class="tgt">'+H(v.root)+'</td></tr><tr><td>level</td><td>'+(v.lvl||'')+'</td></tr></tbody></table></div></details>';
+  if(v.note)acc+='<details class="gt"><summary><span class="gt-num">ii</span><span class="gt-title">Good to know</span><span class="gt-chev">\u203a</span></summary><div class="gt-body"><div class="gt-note">'+_hebInline(v.note)+'</div></div></details>';
+  if(b)acc+='<details class="gt"><summary><span class="gt-num">iii</span><span class="gt-title">The pattern: '+(b.tl||v.binyan)+'</span><span class="gt-chev">\u203a</span></summary><div class="gt-body"><div class="gt-note">'+(b.voice?'<b style="color:var(--accent)">'+b.voice+'</b><br>':'')+(b.desc||'')+'</div><div class="row" style="margin-top:10px"><button class="btn ghost sm" data-binyan="'+b.id+'">Study '+(b.tl||'this binyan')+'</button></div></div></details>';
+  return '<button class="back" data-go2="verbs">\u2190 all verbs</button>'
+    +'<div class="topbar"><div><h1>'+hebClick(v.inf[0],v.inf[1])+'</h1>'
+    +'<div class="lead">'+ed_en+' &middot; '+v.binyan+' &middot; '+lvlBadge(v.lvl)+'</div></div>'+nikToggle()+'</div>'
+    +'<div class="row" style="gap:8px;margin-bottom:14px">'+speakBtn(v.inf[0])
+    +'<span class="muted">root</span> '+hebClick(v.root)
+    +'<button class="btn sm ghost" data-verb-drill="'+enc+'">Drill all tenses</button>'
+    +'<button class="edit-btn" data-edit-key="verb|'+vid+'|en" data-edit-val="'+encodeURIComponent(ed_en)+'" data-edit-label="English meaning" data-edit-rtl="false" title="Edit English">\u270e</button></div>'
+    +tabs+'<div class="sec" style="padding:14px 16px">'+panel+'</div>'+acc;
+}
 function vVerbs(){
   if(route.item==='__add__')return addVerbForm();
   var v=route.item?VERBS.find(function(x){return x.inf[0]===decodeURIComponent(route.item);}):null;
-  if(v){
-    var vid=v.inf[0];
-    var ed_en=getEdit('verb',vid,'en')||v.en;
-    return '<button class="back" data-go2="verbs">&#8592; all verbs</button>'
-      +'<div class="topbar"><div><h1>'+hebClick(v.inf[0],v.inf[1])+'</h1>'
-      +'<div class="lead">'+ed_en+' &middot; '+v.binyan+' &middot; '+lvlBadge(v.lvl)+'</div></div>'+nikToggle()+'</div>'
-      +'<div class="row" style="gap:8px;margin-bottom:12px">'+speakBtn(v.inf[0])
-      +'<span class="muted">root</span> '+hebClick(v.root)
-      +' <button class="btn sm" data-verb-drill="'+encodeURIComponent(v.inf[0])+'">drill</button>'
-      +'<button class="edit-btn" data-edit-key="verb|'+vid+'|en" data-edit-val="'+encodeURIComponent(ed_en)+'" data-edit-label="English meaning" data-edit-rtl="false" title="Edit English">&#9998;</button>'
-      +'</div>'
-      +(v.present&&v.present.length?'<div class="sec"><h3>Present</h3>'+v.present.map(function(r,ri){
-        var ek='verb|'+vid+'|pres|'+ri;var ev=getEdit('verb',vid,'pres|'+ri)||r[1][0];
-        return '<div class="item"><span class="muted">'+r[0]+'</span>'
-          +'<div style="flex:1">'+hebClick(ev,r[1][1])+'</div>'
-          +speakBtn(ev)
-          +'<button class="edit-btn" data-edit-key="'+ek+'" data-edit-val="'+encodeURIComponent(ev)+'" data-edit-label="Present: '+r[0]+'" title="Edit">&#9998;</button>'
-          +'</div>';}).join('')+'</div>':'')
-      +(v.past?'<div class="sec"><h3>Past</h3>'+v.past.map(function(r,ri){
-        var ek='verb|'+vid+'|past|'+ri;var ev=getEdit('verb',vid,'past|'+ri)||r[1][0];
-        return '<div class="item"><span class="muted">'+r[0]+'</span>'
-          +'<div style="flex:1">'+hebClick(ev,r[1][1])+'</div>'
-          +'<button class="edit-btn" data-edit-key="'+ek+'" data-edit-val="'+encodeURIComponent(ev)+'" data-edit-label="Past: '+r[0]+'" title="Edit">&#9998;</button>'
-          +'</div>';}).join('')+'</div>':'')
-      +(v.future?'<div class="sec"><h3>Future</h3>'+v.future.map(function(r,ri){
-        var ek='verb|'+vid+'|fut|'+ri;var ev=getEdit('verb',vid,'fut|'+ri)||r[1][0];
-        return '<div class="item"><span class="muted">'+r[0]+'</span>'
-          +'<div style="flex:1">'+hebClick(ev,r[1][1])+'</div>'
-          +'<button class="edit-btn" data-edit-key="'+ek+'" data-edit-val="'+encodeURIComponent(ev)+'" data-edit-label="Future: '+r[0]+'" title="Edit">&#9998;</button>'
-          +'</div>';}).join('')+'</div>':'');
-  }
+  if(v){return renderVerbDetail(v);}
   return verbsList();
 }
 function verbsList(){
@@ -8878,6 +8887,7 @@ function bind(){
   // verbs
   document.querySelectorAll('[data-verb]').forEach(b=>b.onclick=()=>go('verbs',decodeURIComponent(b.dataset.verb)));
   document.querySelectorAll('[data-verb-drill]').forEach(b=>b.onclick=()=>{const v=VERBS.find(x=>x.inf[0]===decodeURIComponent(b.dataset.verbDrill));startVerbDrill([v],{title:v.en+' · conjugation',max:12,back:'verbs'});});
+  document.querySelectorAll('[data-verb-tense-drill]').forEach(b=>b.onclick=()=>{const parts=b.dataset.verbTenseDrill.split('|');const v=VERBS.find(x=>x.inf[0]===decodeURIComponent(parts[0]));if(v)startVerbDrill([v],{title:v.en+' · '+parts[1],tenses:[parts[1]],max:12,back:'verbs'});});
 
   // stories
   document.querySelectorAll('[data-story-filter]').forEach(b=>b.onclick=()=>go('stories',null,b.dataset.storyFilter));
