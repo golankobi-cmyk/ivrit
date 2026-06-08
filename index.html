@@ -91,11 +91,11 @@ p{color:var(--warm);font-size:14px;line-height:1.65}
 .stbadge.st-long{background:rgba(58,110,140,.14);color:var(--info)}
 .stbadge.st-ext{background:var(--gold-wash);color:var(--gold2)}
 .stbadge.st-mag{background:var(--accent-wash);color:var(--accent)}
-.btn{all:unset;cursor:pointer;background:var(--gold);color:#2a210c;
-  font-weight:600;font-size:13px;padding:10px 16px;border-radius:11px;transition:.15s var(--ease);text-align:center;box-shadow:0 2px 8px rgba(160,120,30,.20)}
+.btn{all:unset;cursor:pointer;background:var(--accent);color:#fff;
+  font-weight:600;font-size:13px;padding:10px 16px;border-radius:11px;transition:.15s var(--ease);text-align:center;box-shadow:0 2px 8px rgba(150,55,25,.24)}
 .btn:hover{filter:brightness(1.04);transform:translateY(-1px)}
 .btn:active{transform:none}
-.btn.ghost{background:var(--panel);color:var(--gold2);border:1px solid var(--line);box-shadow:none;backdrop-filter:blur(8px)}
+.btn.ghost{background:var(--panel);color:var(--accent);border:1px solid var(--line);box-shadow:none;backdrop-filter:blur(8px)}
 .btn.ghost:hover{background:var(--hover)}
 .btn.sm{padding:6px 12px;font-size:12px}
 .btn.full{display:block;width:100%;box-sizing:border-box}
@@ -133,7 +133,7 @@ tr:last-child td{border-bottom:none}
 .rate{display:flex;gap:5px;align-items:center}
 .rate b{width:25px;height:25px;border-radius:7px;border:1px solid var(--line);display:grid;place-items:center;
   cursor:pointer;color:var(--muted);font-size:12px}
-.rate b.on{background:var(--gold);color:#2a210c;border-color:var(--gold)}
+.rate b.on{background:var(--accent);color:#fff;border-color:var(--accent)}
 /* tabs within a section */
 .subtabs{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 16px;border-bottom:1px solid var(--line);padding-bottom:0}
 .subtabs button{all:unset;cursor:pointer;padding:8px 13px;color:var(--muted);font-size:13px;border-bottom:2px solid transparent;margin-bottom:-1px}
@@ -157,7 +157,7 @@ tr:last-child td{border-bottom:none}
 .chat{display:flex;flex-direction:column;gap:9px;max-height:48vh;overflow:auto;padding:6px 2px}
 .msg{max-width:80%;padding:10px 14px;border-radius:14px;font-size:15px;line-height:1.5}
 .msg.ai{align-self:flex-start;background:var(--panel);border:1px solid var(--line);border-bottom-left-radius:4px;backdrop-filter:blur(8px)}
-.msg.me{align-self:flex-end;background:var(--gold);color:#2a210c;border-bottom-right-radius:4px}
+.msg.me{align-self:flex-end;background:var(--accent);color:#fff;border-bottom-right-radius:4px}
 .msg .heb{font-size:18px;font-weight:300}
 .msg.me .heb{font-weight:400}
 .typing{align-self:flex-start;color:var(--faint);font-size:13px;padding:4px 10px}
@@ -382,6 +382,28 @@ details.verb-group[open]>summary::after{transform:rotate(90deg);color:var(--acce
 .runner-return .rr-t{font-size:13px;color:var(--muted)}
 .session-card{border-color:var(--gold)}
 .rstep-doneflag{color:var(--good);font-weight:600;font-size:13px}
+
+/* ===== deep grammar teaching (Italian accordion + gtable) ===== */
+.gteach{margin-bottom:14px}
+.gt-meta{margin-bottom:10px}
+.gt-lede{font-size:15px;line-height:1.6;color:var(--muted);padding-left:14px;border-left:2px solid var(--accent);margin:6px 0 18px}
+details.gt{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden;backdrop-filter:blur(8px)}
+details.gt>summary{list-style:none;cursor:pointer;padding:14px 18px;display:flex;align-items:center;gap:12px}
+details.gt>summary::-webkit-details-marker{display:none}
+.gt-num{font-family:ui-monospace,monospace;font-size:10px;letter-spacing:.1em;color:var(--faint)}
+.gt-title{font-family:var(--serif);font-weight:500;font-size:15.5px;flex:1;color:var(--paper)}
+.gt-chev{color:var(--faint);font-size:18px;transition:transform .2s}
+details.gt[open] .gt-chev{transform:rotate(90deg);color:var(--accent)}
+.gt-body{padding:0 18px 18px}
+table.gtable{width:100%;border-collapse:collapse;margin-top:2px}
+table.gtable th{font-family:ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);background:var(--bg2);font-weight:500;padding:8px 12px;text-align:start}
+table.gtable td{padding:8px 12px;border-bottom:1px solid var(--line2);font-size:13.5px;color:var(--muted)}
+table.gtable tr:last-child td{border-bottom:none}
+table.gtable td.tgt{font-family:var(--heb);direction:rtl;font-size:18px;font-weight:500;color:var(--accent);cursor:pointer}
+table.gtable td.say{font-style:italic;color:var(--muted)}
+.gt-foot{font-size:12.5px;color:var(--muted);margin-top:10px;padding:9px 12px;background:var(--hover);border-radius:9px}
+.gt-foot .h,.gt-note .h,.gt-lede .h{font-family:var(--heb);direction:rtl;color:var(--accent);font-weight:500}
+.gt-note{font-size:14px;line-height:1.65;color:var(--warm)}
 </style>
 </head>
 <body>
@@ -7435,12 +7457,102 @@ function renderMini(lid){
 /* ===================================================================
    GRAMMAR  (list + detail + attached practice)
 =================================================================== */
+/* ===== IVRIT deep-grammar teaching layer (additive; GRAMMAR array untouched) ===== */
+var TEACH={
+10:{lvl:'A1',lede:'Hebrew has no present-tense verb for "to be". There is no am, is, are. You place the two things side by side: <span class="h">אני מורה</span> literally "I teacher" means "I am a teacher".',
+ secs:[
+  {t:'The personal pronouns',type:'table',cols:['person','hebrew','say'],rows:[
+   ['I',{he:'אני',p:'אֲנִי'},{say:'ani'}],
+   ['you (m)',{he:'אתה',p:'אַתָּה'},{say:'ata'}],
+   ['you (f)',{he:'את',p:'אַתְּ'},{say:'at'}],
+   ['he',{he:'הוא',p:'הוּא'},{say:'hu'}],
+   ['she',{he:'היא',p:'הִיא'},{say:'hi'}],
+   ['we',{he:'אנחנו',p:'אֲנַחְנוּ'},{say:'anachnu'}],
+   ['you (m. pl)',{he:'אתם',p:'אַתֶּם'},{say:'atem'}],
+   ['you (f. pl)',{he:'אתן',p:'אַתֶּן'},{say:'aten'}],
+   ['they (m)',{he:'הם',p:'הֵם'},{say:'hem'}],
+   ['they (f)',{he:'הן',p:'הֵן'},{say:'hen'}]
+  ]},
+  {t:'No "to be" in the present',type:'note',html:'To say "I am tired", "she is a doctor", "we are here", drop the verb entirely: <span class="h">אני עייף</span> = I (am) tired, <span class="h">היא רופאה</span> = she (is a) doctor, <span class="h">אנחנו כאן</span> = we (are) here.'},
+  {t:'The linking word in definitions',type:'note',html:'In a definition sentence <span class="h">הוא / היא / הם / הן</span> can act as a small linking word "is/are": <span class="h">תל אביב היא עיר גדולה</span> = "Tel Aviv is a big city". Optional, common in careful speech.'}
+ ]},
+3:{lvl:'A1',lede:'A present-tense verb does not change for person, only for gender and number. Four forms cover I, you, he, she, we, they. The pa\'al pattern carries the "music" o-e: <span class="h">כותב</span> ko-tev.',
+ secs:[
+  {t:'לכתוב · to write',type:'table',cols:['form','hebrew','say','meaning'],rows:[
+   ['m. singular',{he:'כותב',p:'כּוֹתֵב'},{say:'kotev'},'writes'],
+   ['f. singular',{he:'כותבת',p:'כּוֹתֶבֶת'},{say:'kotevet'},'writes'],
+   ['m. plural',{he:'כותבים',p:'כּוֹתְבִים'},{say:'kotvim'},'write'],
+   ['f. plural',{he:'כותבות',p:'כּוֹתְבוֹת'},{say:'kotvot'},'write']
+  ],foot:'With any matching pronoun: <span class="h">אני כותב</span> ani kotev, <span class="h">הם כותבים</span> hem kotvim.'},
+  {t:'ללמוד · to learn (same pattern)',type:'table',cols:['form','hebrew','say'],rows:[
+   ['m. singular',{he:'לומד',p:'לוֹמֵד'},{say:'lomed'}],
+   ['f. singular',{he:'לומדת',p:'לוֹמֶדֶת'},{say:'lomedet'}],
+   ['m. plural',{he:'לומדים',p:'לוֹמְדִים'},{say:'lomdim'}],
+   ['f. plural',{he:'לומדות',p:'לוֹמְדוֹת'},{say:'lomdot'}]
+  ]},
+  {t:'When a root letter is a guttural',type:'note',html:'If the second or third root letter is <span class="h">ע ח א ה</span>, the vowels soften: <span class="h">שומע</span> shome-a (to hear), <span class="h">עובד</span> oved (to work). Same four-form idea, slightly different sound.'}
+ ]},
+18:{lvl:'B1',lede:'Many short words (of, to, in, the object marker) are not stand-alone in speech. They take pronoun endings and become one word. One of the highest-value tables in Hebrew.',
+ secs:[
+  {t:'של · of / belonging to',type:'table',cols:['person','hebrew','say'],rows:[
+   ['my',{he:'שלי',p:'שֶׁלִּי'},{say:'sheli'}],
+   ['your (m)',{he:'שלך',p:'שֶׁלְּךָ'},{say:'shelcha'}],
+   ['your (f)',{he:'שלך',p:'שֶׁלָּךְ'},{say:'shelach'}],
+   ['his',{he:'שלו',p:'שֶׁלּוֹ'},{say:'shelo'}],
+   ['her',{he:'שלה',p:'שֶׁלָּהּ'},{say:'shela'}],
+   ['our',{he:'שלנו',p:'שֶׁלָּנוּ'},{say:'shelanu'}],
+   ['your (pl)',{he:'שלכם',p:'שֶׁלָּכֶם'},{say:'shelachem'}],
+   ['their',{he:'שלהם',p:'שֶׁלָּהֶם'},{say:'shelahem'}]
+  ],foot:'<span class="h">הספר שלי</span> ha-sefer sheli = "the book of-mine" = my book.'},
+  {t:'ל · to / for',type:'table',cols:['person','hebrew','say'],rows:[
+   ['to me',{he:'לי',p:'לִי'},{say:'li'}],
+   ['to you (m)',{he:'לך',p:'לְךָ'},{say:'lecha'}],
+   ['to you (f)',{he:'לך',p:'לָךְ'},{say:'lach'}],
+   ['to him',{he:'לו',p:'לוֹ'},{say:'lo'}],
+   ['to her',{he:'לה',p:'לָהּ'},{say:'la'}],
+   ['to us',{he:'לנו',p:'לָנוּ'},{say:'lanu'}],
+   ['to you (pl)',{he:'לכם',p:'לָכֶם'},{say:'lachem'}],
+   ['to them',{he:'להם',p:'לָהֶם'},{say:'lahem'}]
+  ]},
+  {t:'את · the object marker, declined',type:'note',html:'When me/you/him is the direct object, <span class="h">את</span> declines: <span class="h">אותי</span> oti (me), <span class="h">אותך</span> otcha/otach (you), <span class="h">אותו</span> oto (him), <span class="h">אותה</span> ota (her), <span class="h">אותנו</span> otanu (us), <span class="h">אותם</span> otam (them). Example: <span class="h">אני אוהב אותך</span> ani ohev otcha = "I love you".'}
+ ]}
+};
+function gtCell(c){
+  if(c&&typeof c==='object'){
+    if(c.he!=null){var p=c.p||c.he;return '<td class="tgt" data-speak="'+encodeURIComponent(p)+'">'+c.he+'</td>';}
+    if(c.say!=null)return '<td class="say">'+c.say+'</td>';
+    if(c.en!=null)return '<td>'+c.en+'</td>';
+  }
+  return '<td>'+(c==null?'':c)+'</td>';
+}
+function renderGrammarTeach(id){
+  var T=TEACH[id]; if(!T) return '';
+  var out='';
+  if(T.lede) out+='<div class="gt-lede">'+T.lede+'</div>';
+  T.secs.forEach(function(s,i){
+    var open=(s.open===true||i===0)?' open':'';
+    out+='<details class="gt"'+open+'><summary><span class="gt-num">'+('0'+(i+1)).slice(-2)+'</span><span class="gt-title">'+s.t+'</span><span class="gt-chev">\u203a</span></summary><div class="gt-body">';
+    if(s.type==='table'){
+      out+='<table class="gtable"><thead><tr>'+s.cols.map(function(c){return '<th>'+c+'</th>';}).join('')+'</tr></thead><tbody>'+
+        s.rows.map(function(r){return '<tr>'+r.map(gtCell).join('')+'</tr>';}).join('')+'</tbody></table>';
+      if(s.foot) out+='<div class="gt-foot">'+s.foot+'</div>';
+    } else {
+      out+='<div class="gt-note">'+s.html+'</div>';
+    }
+    out+='</div></details>';
+  });
+  return '<div class="gteach">'+out+'</div>';
+}
+function grammarBody(c){
+  if(typeof TEACH!=='undefined' && TEACH[c.id]) return renderGrammarTeach(c.id)+'<div class="sec" style="padding:14px 18px;margin-top:6px">'+rateRow(c.id)+'</div>';
+  return '<div class="sec">'+c.stages.map(function(s,i){return stageHTML(s,i);}).join('')+rateRow(c.id)+'</div>';
+}
 function vGrammar(){
   if(route.item){const c=GRAMMAR.find(x=>''+x.id===''+route.item);if(!c)return grammarList();
     const pr=PRACTICE.find(p=>p.ch===c.id);const lesson=COURSE.find(l=>l.grammar===c.id);
     return `<button class="back" data-back="grammar">← all topics</button>
      <div class="topbar"><div><h1>${c.t}</h1><div class="lead">${lvlBadge(c.lvl)} · chapter ${c.id} of ${GRAMMAR.length}</div></div>${nikToggle()}</div>
-     <div class="sec">${c.stages.map((s,i)=>stageHTML(s,i)).join('')}${rateRow(c.id)}</div>
+     ${grammarBody(c)}
      <div class="card" style="text-align:center"><h3>Practice this topic</h3><p class="muted" style="font-size:13px">${pr?'Typed exercises on '+c.t.toLowerCase()+'.':(lesson?'Drill the words from the matching lesson.':'Try the matching practice set.')}</p>
        <button class="btn" style="margin-top:10px" data-practice-topic="${c.id}">Start practice</button></div>
      <div class="row" style="gap:8px;margin-top:12px">${c.id>1?`<button class="btn ghost sm" data-go2="grammar|${c.id-1}">← previous</button>`:''}${c.id<GRAMMAR.length?`<button class="btn sm" data-go2="grammar|${c.id+1}">next topic →</button>`:''}</div>`;
