@@ -7081,10 +7081,10 @@ let drill=null;
 function startVocabDrill(items,opts){opts=opts||{};
   items=items.filter(Boolean);
   if(!items.length){toast('Nothing to practise here yet');return;}
-  drill={typed:false,items:shuffle(items).slice(0,opts.max||Math.min(items.length,12)),i:0,score:0,wrong:[],answered:null,done:opts.onDone,title:opts.title||'Practice',back:opts.back||'practice'};
+  drill={typed:false,items:shuffle(items).slice(0,opts.max||Math.min(items.length,12)),i:0,score:0,wrong:[],answered:null,done:opts.onDone,title:opts.title||'Practice',back:opts.back||'practice',topic:opts.topic||null};
   go('drill');}
 function startGrammarDrill(chItems,opts){opts=opts||{};
-  drill={typed:true,items:shuffle(chItems).slice(0,opts.max||chItems.length),i:0,score:0,wrong:[],answered:null,done:opts.onDone,title:opts.title||'Practice',back:opts.back||'practice'};
+  drill={typed:true,items:shuffle(chItems).slice(0,opts.max||chItems.length),i:0,score:0,wrong:[],answered:null,done:opts.onDone,title:opts.title||'Practice',back:opts.back||'practice',topic:opts.topic||null};
   go('drill');}
 function startVerbDrill(verbs,opts){opts=opts||{};
   verbs=(verbs||VERBS).filter(Boolean);
@@ -7106,7 +7106,7 @@ function vDrill(){
   const d=drill;if(!d)return '<p>No drill.</p>';
   if(d.i>=d.items.length)return drillDone();
   const pct=Math.round(d.i/d.items.length*100);
-  const head=`<div class="dprog"><button class="back" data-drill-exit="1" style="margin:0">← exit</button><div class="track"><i style="width:${pct}%"></i></div><div class="num">${d.i+1} / ${d.items.length}</div></div><div class="steplabel">${d.title}</div>`;
+  const head=`<div class="dprog"><button class="back" data-drill-exit="1" style="margin:0">← exit</button><div class="track"><i style="width:${pct}%"></i></div><div class="num">${d.i+1} / ${d.items.length}</div></div><div class="steplabel">${d.title}</div>${(d.topic&&typeof TEACH!=='undefined'&&TEACH[d.topic])?'<button class="btn ghost sm" data-table-hint="'+d.topic+'" style="margin:0 0 12px">&#9636; table hint</button>':''}`;
   if(d.typed)return head+drillTyped(d);
   return head+drillVocab(d);
 }
@@ -7459,6 +7459,72 @@ function renderMini(lid){
 =================================================================== */
 /* ===== IVRIT deep-grammar teaching layer (additive; GRAMMAR array untouched) ===== */
 var TEACH={
+1:{lvl:'A1',lede:'Hebrew has 22 letters, written right to left, with no capital letters. Five letters take a different shape at the end of a word. Two letters, alef and ayin, carry no sound of their own.',
+ secs:[
+  {t:'The 22 letters',type:'table',cols:['letter','name','sound','final'],rows:[
+   [{he:'א'},{say:'alef'},'silent',''],[{he:'ב'},{say:'bet / vet'},'b / v',''],[{he:'ג'},{say:'gimel'},'g',''],
+   [{he:'ד'},{say:'dalet'},'d',''],[{he:'ה'},{say:'hey'},'h',''],[{he:'ו'},{say:'vav'},'v',''],
+   [{he:'ז'},{say:'zayin'},'z',''],[{he:'ח'},{say:'chet'},'ch',''],[{he:'ט'},{say:'tet'},'t',''],
+   [{he:'י'},{say:'yud'},'y',''],[{he:'כ'},{say:'kaf / chaf'},'k / ch',{he:'ך'}],[{he:'ל'},{say:'lamed'},'l',''],
+   [{he:'מ'},{say:'mem'},'m',{he:'ם'}],[{he:'נ'},{say:'nun'},'n',{he:'ן'}],[{he:'ס'},{say:'samech'},'s',''],
+   [{he:'ע'},{say:'ayin'},'silent',''],[{he:'פ'},{say:'pe / fe'},'p / f',{he:'ף'}],[{he:'צ'},{say:'tsadi'},'ts',{he:'ץ'}],
+   [{he:'ק'},{say:'kuf'},'k',''],[{he:'ר'},{say:'resh'},'r',''],[{he:'ש'},{say:'shin / sin'},'sh / s',''],[{he:'ת'},{say:'tav'},'t','']
+  ],foot:'Final forms appear only at the end of a word: <span class="h">ך ם ן ף ץ</span>.'}
+ ]},
+2:{lvl:'A1',lede:'Vowels are small marks placed under or beside a letter. Modern text usually leaves them out, but they show how to say a new word. Shown here on the letter bet.',
+ secs:[
+  {t:'The vowel marks',type:'table',cols:['mark','name','sound'],rows:[
+   [{he:'בַ',p:'בַּ'},{say:'patach'},'a'],[{he:'בָ',p:'בָּ'},{say:'kamatz'},'a'],
+   [{he:'בֶ',p:'בֶּ'},{say:'segol'},'e'],[{he:'בֵ',p:'בֵּ'},{say:'tsere'},'e'],
+   [{he:'בִ',p:'בִּ'},{say:'chirik'},'i'],[{he:'בֹ',p:'בֹּ'},{say:'holam'},'o'],
+   [{he:'בֻ',p:'בֻּ'},{say:'kubuts'},'u'],[{he:'בְ',p:'בְּ'},{say:'shva'},'e / silent']
+  ],foot:'Two sounds often use a helper letter: <span class="h">וֹ</span> for o, <span class="h">וּ</span> for oo.'}
+ ]},
+4:{lvl:'A1',lede:'Every noun is masculine or feminine, there is no neuter. Gender drives the adjectives, numbers and verbs around it. Most feminine nouns end in ה or ת.',
+ secs:[
+  {t:'Gender and plural',type:'table',cols:['noun','say','gender','plural'],rows:[
+   [{he:'ילד',p:'יֶלֶד'},{say:'yeled'},'m',{he:'ילדים',p:'יְלָדִים'}],
+   [{he:'ילדה',p:'יַלְדָּה'},{say:'yalda'},'f',{he:'ילדות',p:'יְלָדוֹת'}],
+   [{he:'ספר',p:'סֵפֶר'},{say:'sefer'},'m',{he:'ספרים',p:'סְפָרִים'}],
+   [{he:'מיטה',p:'מִיטָּה'},{say:'mita'},'f',{he:'מיטות',p:'מִיטּוֹת'}]
+  ],foot:'Masculine plural usually adds <span class="h">ים</span> -im, feminine adds <span class="h">ות</span> -ot. A few break the rule (<span class="h">שולחן</span> shulchan goes to <span class="h">שולחנות</span> shulchanot), so learn the plural with the word.'},
+  {t:'Quick gender clues',type:'note',html:'Words ending in <span class="h">ה</span> or <span class="h">ת</span> are usually feminine. Body parts that come in pairs (eyes, hands, legs) are feminine. Most other nouns are masculine.'}
+ ]},
+5:{lvl:'A1',lede:'Hebrew has no word for "a". For "the", attach הַ to the front of the word. When a verb acts on a definite thing, mark that object with את.',
+ secs:[
+  {t:'The definite article ה',type:'note',html:'Stick <span class="h">הַ</span> on the front: <span class="h">בית</span> bayit = a house, <span class="h">הבית</span> ha-bayit = the house. There is no separate word for "a" or "an".'},
+  {t:'את before a definite object',type:'table',cols:['sentence','meaning'],rows:[
+   [{he:'אני רואה ילד',p:'אֲנִי רוֹאֶה יֶלֶד'},'I see a boy (no et)'],
+   [{he:'אני רואה את הילד',p:'אֲנִי רוֹאֶה אֶת הַיֶּלֶד'},'I see the boy (et + ha)'],
+   [{he:'אני אוהב את תל אביב',p:'אֲנִי אוֹהֵב אֶת תֵּל אָבִיב'},'I love Tel Aviv (a name is definite)']
+  ],foot:'<span class="h">את</span> has no English word. Use it only before a definite object: the..., a name, my..., this... .'}
+ ]},
+6:{lvl:'A1',lede:'An adjective comes after the noun and must match it in gender and number, and copy its "the". Four forms, like the present tense.',
+ secs:[
+  {t:'גדול · big',type:'table',cols:['form','hebrew','say'],rows:[
+   ['m. sg',{he:'גדול',p:'גָּדוֹל'},{say:'gadol'}],
+   ['f. sg',{he:'גדולה',p:'גְּדוֹלָה'},{say:'gdola'}],
+   ['m. pl',{he:'גדולים',p:'גְּדוֹלִים'},{say:'gdolim'}],
+   ['f. pl',{he:'גדולות',p:'גְּדוֹלוֹת'},{say:'gdolot'}]
+  ]},
+  {t:'Agreement and the article',type:'note',html:'Noun first, adjective second, both matching: <span class="h">ילד גדול</span> a big boy, <span class="h">ילדה גדולה</span> a big girl. When the noun is definite the adjective takes <span class="h">ה</span> too: <span class="h">הילד הגדול</span> the big boy.'}
+ ]},
+7:{lvl:'A1',lede:'Hebrew numbers have two forms, masculine and feminine. The short feminine form is what you count with and what you use for time and phone numbers.',
+ secs:[
+  {t:'1 to 10',type:'table',cols:['#','feminine','say','masculine','say'],rows:[
+   ['1',{he:'אחת',p:'אַחַת'},{say:'achat'},{he:'אחד',p:'אֶחָד'},{say:'echad'}],
+   ['2',{he:'שתיים',p:'שְׁתַּיִם'},{say:'shtayim'},{he:'שניים',p:'שְׁנַיִם'},{say:'shnayim'}],
+   ['3',{he:'שלוש',p:'שָׁלוֹשׁ'},{say:'shalosh'},{he:'שלושה',p:'שְׁלוֹשָׁה'},{say:'shlosha'}],
+   ['4',{he:'ארבע',p:'אַרְבַּע'},{say:'arba'},{he:'ארבעה',p:'אַרְבָּעָה'},{say:'arbaa'}],
+   ['5',{he:'חמש',p:'חָמֵשׁ'},{say:'chamesh'},{he:'חמישה',p:'חֲמִשָּׁה'},{say:'chamisha'}],
+   ['6',{he:'שש',p:'שֵׁשׁ'},{say:'shesh'},{he:'שישה',p:'שִׁשָּׁה'},{say:'shisha'}],
+   ['7',{he:'שבע',p:'שֶׁבַע'},{say:'sheva'},{he:'שבעה',p:'שִׁבְעָה'},{say:'shiva'}],
+   ['8',{he:'שמונה',p:'שְׁמוֹנֶה'},{say:'shmone'},{he:'שמונה',p:'שְׁמוֹנָה'},{say:'shmona'}],
+   ['9',{he:'תשע',p:'תֵּשַׁע'},{say:'tesha'},{he:'תשעה',p:'תִּשְׁעָה'},{say:'tisha'}],
+   ['10',{he:'עשר',p:'עֶשֶׂר'},{say:'eser'},{he:'עשרה',p:'עֲשָׂרָה'},{say:'asara'}]
+  ]},
+  {t:'Telling time',type:'note',html:'Time uses the feminine numbers with <span class="h">שעה</span> sha-a (hour): <span class="h">השעה שלוש</span> ha-sha-a shalosh = it is three o\'clock. Half past is <span class="h">וחצי</span> va-chetzi, quarter past <span class="h">ורבע</span> va-reva.'}
+ ]},
 10:{lvl:'A1',lede:'Hebrew has no present-tense verb for "to be". There is no am, is, are. You place the two things side by side: <span class="h">אני מורה</span> literally "I teacher" means "I am a teacher".',
  secs:[
   {t:'The personal pronouns',type:'table',cols:['person','hebrew','say'],rows:[
@@ -7547,6 +7613,20 @@ function grammarBody(c){
   if(typeof TEACH!=='undefined' && TEACH[c.id]) return renderGrammarTeach(c.id)+'<div class="sec" style="padding:14px 18px;margin-top:6px">'+rateRow(c.id)+'</div>';
   return '<div class="sec">'+c.stages.map(function(s,i){return stageHTML(s,i);}).join('')+rateRow(c.id)+'</div>';
 }
+function openTableHint(id){
+  if(typeof TEACH==='undefined'||!TEACH[id])return;
+  closeTableHint();
+  var ov=document.createElement('div');ov.id='tableHintOv';
+  ov.setAttribute('style','position:fixed;inset:0;z-index:300;background:rgba(20,16,8,.45);backdrop-filter:blur(4px);display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;overflow:auto');
+  var box=document.createElement('div');box.className='pop-box';box.setAttribute('style','max-width:560px;width:100%;margin:auto');
+  var ttl=(GRAMMAR.find(function(g){return ''+g.id===''+id;})||{}).t||'Reference';
+  box.innerHTML='<div class="row spread" style="margin-bottom:8px"><h3 style="margin:0">'+ttl+'</h3><button class="back" id="thClose" style="margin:0">close \u2715</button></div>'+renderGrammarTeach(id);
+  ov.appendChild(box);document.body.appendChild(ov);
+  ov.onclick=function(e){if(e.target===ov)closeTableHint();};
+  var c=document.getElementById('thClose');if(c)c.onclick=closeTableHint;
+  box.querySelectorAll('[data-speak]').forEach(function(s){s.onclick=function(){try{speak(decodeURIComponent(s.dataset.speak));}catch(e){}};});
+}
+function closeTableHint(){var o=document.getElementById('tableHintOv');if(o)o.remove();}
 function vGrammar(){
   if(route.item){const c=GRAMMAR.find(x=>''+x.id===''+route.item);if(!c)return grammarList();
     const pr=PRACTICE.find(p=>p.ch===c.id);const lesson=COURSE.find(l=>l.grammar===c.id);
@@ -8665,6 +8745,7 @@ function dailyBtns(){
 function bind(){
   document.querySelectorAll('.w').forEach(el=>el.onclick=e=>{e.stopPropagation();wordPopover(decodeURIComponent(el.dataset.word),e);});
   document.querySelectorAll('[data-speak]').forEach(b=>b.onclick=e=>{e.stopPropagation();speak(decodeURIComponent(b.dataset.speak));});
+  document.querySelectorAll('[data-table-hint]').forEach(b=>b.onclick=()=>openTableHint(+b.dataset.tableHint));
   document.querySelectorAll('[data-go2]').forEach(b=>b.onclick=()=>{const[s,i,sub,ex]=b.dataset.go2.split('|');go(s,i,sub,ex);});
   document.querySelectorAll('[data-setdaily]').forEach(function(b){b.onclick=function(){if(!S.cfg)S.cfg={};S.cfg.dailyMinutes=+b.dataset.setdaily;save();render();};});
   document.querySelectorAll('[data-del-custom]').forEach(function(b){b.onclick=function(){
@@ -8782,8 +8863,8 @@ function bind(){
   // grammar
   document.querySelectorAll('[data-grammar]').forEach(b=>b.onclick=()=>go('grammar',b.dataset.grammar));
   const pt=document.querySelector('[data-practice-topic]');if(pt)pt.onclick=()=>{const id=+pt.dataset.practiceTopic;const pr=PRACTICE.find(p=>p.ch===id);
-    if(pr){startGrammarDrill(pr.items,{title:pr.t,back:'grammar'});}
-    else{const l=COURSE.find(x=>x.grammar===id);const items=l?catItems(l.vocab):LEX.slice(0,10);startVocabDrill(items,{title:'Practice',back:'grammar'});}};
+    if(pr){startGrammarDrill(pr.items,{title:pr.t,back:'grammar',topic:id});}
+    else{const l=COURSE.find(x=>x.grammar===id);const items=l?catItems(l.vocab):LEX.slice(0,10);startVocabDrill(items,{title:'Practice',back:'grammar',topic:id});}};
 
   // binyanim
   document.querySelectorAll('[data-binyan]').forEach(b=>b.onclick=()=>go('binyanim',b.dataset.binyan));
