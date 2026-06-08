@@ -716,7 +716,7 @@ function speakSeq(arr){ playHebrewSeq(arr); }
 function gttsListVoices(){
   var key=gttsKey(); if(!key) return Promise.resolve([]);
   return fetch('https://texttospeech.googleapis.com/v1/voices?key='+encodeURIComponent(key)+'&languageCode=he-IL')
-    .then(function(r){return r.ok?r.json():{voices:[]};}).then(function(d){return (d&&d.voices)||[];}).catch(function(){return [];});
+    .then(function(r){return r.ok?r.json():{voices:[]};}).then(function(d){var vs=(d&&d.voices)||[];return vs.filter(function(v){return !/chirp/i.test(v.name||'');}).sort(function(a,b){return (''+(a.name||'')).localeCompare(''+(b.name||''));});}).catch(function(){return [];});
 }
 function _lessonAudioTexts(lesson){
   var out=[]; if(!lesson)return out;
@@ -787,6 +787,9 @@ function prepareAllAudio(onProgress){
   });
 }
 
+function offlineVoices(){try{return JSON.parse(localStorage.getItem('ivrit_offline_voices')||'{}')||{};}catch(e){return {};}}
+function markOfflineVoice(voice,total){try{var m=offlineVoices();m[voice]={total:total,at:Date.now()};localStorage.setItem('ivrit_offline_voices',JSON.stringify(m));}catch(e){}}
+function countCachedForVoice(voice){return _audioDB().then(function(db){return new Promise(function(res){try{var tx=db.transaction('clips','readonly');var st=tx.objectStore('clips');var pre=voice+'|';var nn=0;var rq=st.openKeyCursor();rq.onsuccess=function(e){var cur=e.target.result;if(!cur){res(nn);return;}if((''+cur.key).indexOf(pre)===0)nn++;cur.continue();};rq.onerror=function(){res(nn);};}catch(e){res(0);}});});}
 /* ---------- Supabase sync ---------- */
 async function syncUp(){if(!SUPA_URL||!SUPA_KEY){setSync(false);return;}
   try{const r=await fetch(SUPA_URL+'/rest/v1/progress?on_conflict=user_id',{method:'POST',
@@ -8446,6 +8449,7 @@ function vSettings(){const c=S.cfg||{};const vlist=voices.filter(v=>v.lang&&v.la
        <p class="muted" style="font-size:12px;margin-top:6px">One-time download of the whole app in the current voice, so it works fully offline anywhere. You can keep using the app while it runs; keep this tab open. Safe to stop and resume.</p>
        <div class="muted" id="gttsPrepMsg" style="font-size:12.5px;margin-top:4px"></div>
        <div id="gttsPrepBarWrap" style="height:8px;background:var(--line);border-radius:4px;margin-top:8px;overflow:hidden;display:none"><i id="gttsPrepBar" style="display:block;height:100%;width:0;background:#cbb279"></i></div>
+       <div class="muted" id="offlineStatus" style="font-size:12.5px;margin-top:8px"></div>
      </div></div>
    ${audioSourceCard()}${audioReadinessCard()}`,
     learning:`<div class="card" style="margin-top:14px"><h3>Daily study goal</h3><p class="muted" style="font-size:13px">Today's lesson adapts to fit your chosen time.</p><div class="row" style="gap:8px;flex-wrap:wrap;margin-top:10px">${dailyBtns()}</div></div>
@@ -8713,7 +8717,7 @@ function bind(){
   const srng=document.getElementById('setRate');if(srng)srng.oninput=()=>{S.rate=+srng.value;document.getElementById('rateVal').textContent=(+srng.value).toFixed(2)+'x';save();};
   const tv=document.getElementById('testVoice');if(tv)tv.onclick=()=>speak('שלום, מה שלומך?');
   var gk=document.getElementById('setGttsKey'); if(gk){var _gkT=null;gk.oninput=function(){var v=gk.value.trim();if(!S.cfg)S.cfg={};S.cfg.gttsKey=v;try{if(v)localStorage.setItem(GTTS_KEY_LS,v);else localStorage.removeItem(GTTS_KEY_LS);}catch(e){}if(_gkT)clearTimeout(_gkT);_gkT=setTimeout(function(){if(typeof save==='function')save();var m=document.getElementById('gttsMsg');if(m)m.textContent=(S.cfg&&S.cfg.gttsKey)?'Key saved and synced to your devices.':'Key cleared.';},600);};gk.onblur=function(){if(_gkT){clearTimeout(_gkT);_gkT=null;}if(typeof save==='function')save();var m=document.getElementById('gttsMsg');if(m)m.textContent=(S.cfg&&S.cfg.gttsKey)?'Key saved and synced to your devices.':'Key cleared.';};}
-  var glv=document.getElementById('gttsLoadVoices'); if(glv)glv.onclick=function(){var m=document.getElementById('gttsMsg');if(m)m.textContent='Loading voices...';gttsListVoices().then(function(list){var sel=document.getElementById('setGttsVoice');if(!sel){return;}if(!list.length){if(m)m.textContent='No voices loaded. Check the key in this field, then try again.';return;}sel.innerHTML=list.map(function(v){return '<option value="'+v.name+'" '+(v.name===gttsVoice()?'selected':'')+'>'+v.name+' ('+(v.ssmlGender||'')+')</option>';}).join('');if(m)m.textContent=list.length+' Hebrew voices loaded. Pick one, then test.';});};
+  var glv=document.getElementById('gttsLoadVoices'); if(glv)glv.onclick=function(){var m=document.getElementById('gttsMsg');if(m)m.textContent='Loading voices...';gttsListVoices().then(function(list){var sel=document.getElementById('setGttsVoice');if(!sel){return;}if(!list.length){if(m)m.textContent='No voices loaded. Check the key in this field, then try again.';return;}var _ov=offlineVoices();sel.innerHTML=list.map(function(v){var sv=_ov[v.name]?'  \u2713 saved offline':'';return '<option value="'+v.name+'" '+(v.name===gttsVoice()?'selected':'')+'>'+v.name+' ('+(v.ssmlGender||'')+')'+sv+'</option>';}).join('');if(m)m.textContent=list.length+' Hebrew voices loaded. Pick one, then test.';});};
   var gsv=document.getElementById('setGttsVoice'); if(gsv)gsv.onchange=function(){S.ttsVoice=gsv.value;save();};
   var gon=document.getElementById('setGttsOn'); if(gon)gon.onchange=function(){S.audioEngine=gon.checked?'google':'device';save();var m=document.getElementById('gttsMsg');if(m)m.textContent=gon.checked?'Neural voice on.':'Using the device voice.';};
   var gsh=document.getElementById('setGttsShare'); if(gsh)gsh.onchange=function(){S.audioShared=gsh.checked;save();var m=document.getElementById('gttsMsg');if(m)m.textContent=gsh.checked?'Sharing audio across devices. Make sure the "audio" storage bucket exists.':'Audio stays on this device only.';};
@@ -8727,10 +8731,12 @@ function bind(){
     prepareAllAudio(function(d,t){ if(m)m.textContent='Downloaded '+d+' / '+t+' clips...'; if(bar&&t)bar.style.width=Math.round(d*100/t)+'%'; }).then(function(r){
       gpa.disabled=false; if(gps)gps.style.display='none';
       if(r.busy){if(m)m.textContent='Already preparing. Let it finish or press Stop.';return;}
-      if(m)m.textContent=r.cancelled?('Stopped at '+r.done+' / '+r.total+'. Press again to continue where it left off.'):('All set. '+r.done+' clips saved. The app now works fully offline in this voice.');
+      if(!r.cancelled){try{markOfflineVoice(gttsVoice(),r.total);}catch(e){}}if(m)m.textContent=r.cancelled?('Stopped at '+r.done+' / '+r.total+'. Press again to continue where it left off.'):('All set. '+r.done+' clips saved for '+gttsVoice()+'. This voice now works fully offline on this device. To save another voice, pick it above and run this again.');try{refreshOfflineStatus();}catch(e){}
     });
   };
   if(gps)gps.onclick=function(){cancelPrepareAll();var m=document.getElementById('gttsPrepMsg');if(m)m.textContent='Stopping...';};
+  function refreshOfflineStatus(){var os=document.getElementById('offlineStatus');if(!os)return;var cv=gttsVoice();var mp=offlineVoices();var names=Object.keys(mp);os.textContent='Checking saved offline audio...';countCachedForVoice(cv).then(function(cn){var line='On this device: '+cn+' clip'+(cn===1?'':'s')+' saved for '+cv+(mp[cv]?' (fully prepared)':'');if(names.length)line+='.  Voices prepared on this device: '+names.join(', ');else if(!cn)line='No audio saved offline on this device yet. Pick a voice and press "Prepare everything for offline".';os.textContent=line;});}
+  refreshOfflineStatus();
   const spm=document.getElementById('setPronMode');if(spm)spm.onchange=()=>{S.pronunciationMode=spm.value;save();var m=document.getElementById('pronTestMsg');if(m)m.textContent=(spm.value==='none')?'Audio is off. Transliteration stays as reading support.':'';};
   const ptVowel=document.getElementById('pronTestVowel');if(ptVowel)ptVowel.onclick=()=>{speakLiteral('\u05D0\u05B8\u05DC\u05B6\u05E3');var m=document.getElementById('pronTestMsg');if(m)m.textContent='Vowelled \u05D0\u05B8\u05DC\u05B6\u05E3 sent to the voice.';};
   const ptPlain=document.getElementById('pronTestPlain');if(ptPlain)ptPlain.onclick=()=>{speakLiteral(plainHebForm('\u05D0\u05B8\u05DC\u05B6\u05E3'));var m=document.getElementById('pronTestMsg');if(m)m.textContent='Plain Hebrew form sent to the voice.';};
