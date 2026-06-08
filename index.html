@@ -404,6 +404,60 @@ table.gtable td.say{font-style:italic;color:var(--muted)}
 .gt-foot{font-size:12.5px;color:var(--muted);margin-top:10px;padding:9px 12px;background:var(--hover);border-radius:9px}
 .gt-foot .h,.gt-note .h,.gt-lede .h{font-family:var(--heb);direction:rtl;color:var(--accent);font-weight:500}
 .gt-note{font-size:14px;line-height:1.65;color:var(--warm)}
+
+/* ===== twin dashboard (matches Italian dashboard layout) ===== */
+.dash-hero{background:linear-gradient(135deg,#291f17 0%,#3a2a1c 55%,#4a3624 100%);border-radius:20px;padding:38px 40px 30px;color:#efe6d9;margin-bottom:22px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.dash-greet{font-size:13.5px;color:#cab79d;margin-bottom:12px;font-family:var(--heb)}
+.dash-hero h1{font-family:var(--serif);font-weight:500;font-size:clamp(30px,4.2vw,46px);line-height:1.04;letter-spacing:-.02em;color:#f4ece0;margin-bottom:14px}
+.dash-hero h1 .ac{color:var(--accent2)}
+.dash-hsub{font-size:15px;color:#cdbba4;max-width:560px;line-height:1.55;margin-bottom:24px}
+.dash-cta{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:28px}
+.dash-cta .p{background:#f4ece0;color:#291f17;border:none;border-radius:999px;padding:12px 22px;font-weight:600;font-size:14px;cursor:pointer;transition:.15s}
+.dash-cta .p:hover{transform:translateY(-1px)}
+.dash-cta .o{background:transparent;color:#e7dccb;border:1px solid rgba(255,255,255,.26);border-radius:999px;padding:12px 22px;font-weight:500;font-size:14px;cursor:pointer;transition:.15s}
+.dash-cta .o:hover{background:rgba(255,255,255,.06)}
+.dash-stats{display:flex;gap:42px;flex-wrap:wrap}
+.dash-stat b{font-family:var(--serif);font-size:30px;color:#f4ece0;font-weight:500;display:block;line-height:1}
+.dash-stat b small{font-size:14px;color:#a8967e;font-weight:400}
+.dash-stat span{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#a8967e;display:block;margin-top:7px;font-family:ui-monospace,monospace}
+.dash-cols{display:grid;grid-template-columns:1.7fr 1fr;gap:16px;margin-bottom:14px}
+.dash-prog{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;backdrop-filter:blur(8px)}
+.dash-prog .k{font-family:ui-monospace,monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+.dash-prog h3{font-family:var(--serif);font-size:24px;font-weight:500;margin-bottom:3px;color:var(--paper)}
+.dash-prog .it{color:var(--accent);font-style:italic;font-family:var(--serif);font-size:14px;margin-bottom:18px}
+.dash-actions{display:flex;flex-direction:column;gap:10px}
+.dash-action{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 18px;cursor:pointer;backdrop-filter:blur(8px);transition:.15s}
+.dash-action:hover{border-color:var(--gold);transform:translateY(-1px);box-shadow:var(--shadow-sm)}
+.dash-av{width:34px;height:34px;border-radius:9px;background:var(--gold-wash);color:var(--gold2);display:grid;place-items:center;font-family:var(--serif);font-size:15px;flex:0 0 auto}
+.dash-action .t{font-weight:600;font-size:14px;color:var(--paper)}
+.dash-action .s{font-size:12px;color:var(--muted)}
+.dash-action .ar{margin-left:auto;color:var(--faint);font-size:16px}
+.sec-head2{display:flex;justify-content:space-between;align-items:baseline;margin:32px 0 4px}
+.sec-head2 h2{font-family:var(--serif);font-size:24px;font-weight:500;margin:0;color:var(--paper)}
+.sec-head2 a{color:var(--accent);font-size:13px;cursor:pointer}
+.sec-kicker{font-family:ui-monospace,monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:16px}
+.km-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.km-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;backdrop-filter:blur(8px)}
+.km-card b{font-family:var(--serif);font-size:38px;font-weight:500;display:block;line-height:1}
+.km-card span{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);display:block;margin-top:9px}
+.read-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.read-card{border:1px solid var(--line);border-radius:16px;overflow:hidden;cursor:pointer;background:var(--card);transition:.15s;backdrop-filter:blur(8px)}
+.read-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-sm);border-color:var(--gold)}
+.read-cover{height:128px;display:flex;align-items:flex-end;padding:12px}
+.read-tags{display:flex;gap:6px}
+.read-tags span{background:rgba(255,255,255,.85);color:#3a2e1e;font-size:10.5px;font-weight:600;border-radius:999px;padding:3px 9px}
+.read-body{padding:14px 16px 16px}
+.read-body .k{font-family:ui-monospace,monospace;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+.read-body h3{font-family:var(--serif);font-size:18px;font-weight:500;margin-bottom:2px;color:var(--paper)}
+.read-body .he{font-family:var(--heb);direction:rtl;color:var(--accent);font-size:14px;margin-bottom:8px}
+.read-body p{font-size:12.5px;color:var(--muted);line-height:1.45}
+.explore-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:10px}
+.explore-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;cursor:pointer;backdrop-filter:blur(8px);transition:.15s}
+.explore-card:hover{border-color:var(--gold);transform:translateY(-1px);box-shadow:var(--shadow-sm)}
+.explore-card .av{width:30px;height:30px;border-radius:8px;background:var(--gold-wash);color:var(--gold2);display:grid;place-items:center;font-family:var(--serif);margin-bottom:12px}
+.explore-card h3{font-family:var(--serif);font-size:17px;font-weight:500;margin-bottom:4px;color:var(--paper)}
+.explore-card p{font-size:12px;color:var(--muted);line-height:1.4}
+@media(max-width:760px){.dash-cols{grid-template-columns:1fr}.km-cards{grid-template-columns:repeat(2,1fr)}.explore-cards{grid-template-columns:repeat(2,1fr)}.dash-hero{padding:26px 22px}.dash-stats{gap:24px}.dash-hero h1{font-size:clamp(26px,8vw,34px)}}
 </style>
 </head>
 <body>
@@ -7187,59 +7241,75 @@ function rateRow(id){const v=S.grammar[id]||0;return `<div class="row spread" st
 /* ===================================================================
    DASHBOARD  (knowledge map + continue + sequenced today)
 =================================================================== */
+function _dashGrad(i){var g=['linear-gradient(135deg,#d99b86,#c97f63)','linear-gradient(135deg,#e6c074,#d9a449)','linear-gradient(135deg,#8aa6bf,#5d7f9e)','linear-gradient(135deg,#b39bc4,#8f6fa3)','linear-gradient(135deg,#9bbf9f,#6f9e78)','linear-gradient(135deg,#3a4a63,#2a3550)'];return g[i%g.length];}
 function vDash(){
   var hour=new Date().getHours();
-  var gr=hour<12?['\u05d1\u05bc\u05b9\u05e7\u05b6\u05e8 \u05d8\u05d5\u05b9\u05d1','\u05d1\u05d5\u05e7\u05e8 \u05d8\u05d5\u05d1']:hour<18?['\u05e6\u05b8\u05d4\u05b3\u05e8\u05b7\u05d9\u05b4\u05d9\u05dd \u05d8\u05d5\u05b9\u05d1\u05b4\u05d9\u05dd','\u05e6\u05d4\u05e8\u05d9\u05d9\u05dd \u05d8\u05d5\u05d1\u05d9\u05dd']:['\u05e2\u05b6\u05e8\u05b6\u05d1 \u05d8\u05d5\u05b9\u05d1','\u05e2\u05e8\u05d1 \u05d8\u05d5\u05d1'];
-  var c=masteryCounts();var tot=c.enc+c.weak+c.fam+c.mas||1;
-  var l=currentLesson();var weak=weakPool(10);
-  var doneToday=S.dailyDone[new Date().toDateString()];
+  var gr=hour<12?['\u05d1\u05bc\u05b9\u05e7\u05b6\u05e8 \u05d8\u05d5\u05b9\u05d1','\u05d1\u05d5\u05e7\u05e8 \u05d8\u05d5\u05d1']:hour<18?['\u05e6\u05b8\u05d4\u05b3\u05e8\u05b7\u05d9\u05b4\u05dd \u05d8\u05d5\u05b9\u05d1\u05b4\u05d9\u05dd','\u05e6\u05d4\u05e8\u05d9\u05d9\u05dd \u05d8\u05d5\u05d1\u05d9\u05dd']:['\u05e2\u05b6\u05e8\u05b6\u05d1 \u05d8\u05d5\u05b9\u05d1','\u05e2\u05e8\u05d1 \u05d8\u05d5\u05d1'];
+  var c=masteryCounts();var enc=c.enc+c.weak+c.fam+c.mas;var notyet=Math.max(0,LEX.length-enc);
+  var lessonsDone=COURSE.filter(function(l){return lessonDone(l.id);}).length;
+  var courseTotal=COURSE.length;var coursePct=Math.round(lessonsDone/courseTotal*100);
   var mins=(S.cfg&&S.cfg.dailyMinutes)||30;
-  var sess=getActiveSession();
-  var sessSt=sess?getLessonRunnerState(sess.lessonId):null; if(sess&&!sessSt) sess=null;
-  var allDone=lessonDone(currentLesson().id);
-  var primaryLesson, primaryStatus, primaryBtnLabel, primaryBtnAttr, stepLine='';
-  if(sess&&sessSt){
-    primaryLesson=sessSt.lesson;
-    var _nonDone=Math.max(1,sessSt.steps.length-1);
-    var _doneCount=sessSt.steps.filter(function(s){return s.key!=='done'&&sessSt.doneMap[s.key];}).length;
-    var _pos=Math.min((sess.stepIndex||0)+1,_nonDone);
-    primaryStatus='In progress';
-    stepLine='Step '+_pos+' of '+_nonDone+' \u00b7 '+_doneCount+' done';
-    primaryBtnLabel='Continue today\u2019s session';
-    primaryBtnAttr='data-runner-resume="1"';
-  } else if(!allDone){
-    primaryLesson=currentLesson();
-    primaryStatus='Not started';
-    primaryBtnLabel='Start today\u2019s session';
-    primaryBtnAttr='data-runner-start="'+primaryLesson.id+'"';
-  } else {
-    primaryLesson=currentLesson();
-    primaryStatus='Course complete';
-    primaryBtnLabel='Review last lesson';
-    primaryBtnAttr='data-runner-start="'+primaryLesson.id+'"';
-  }
-  var qi=[{label:'Course',sub:'all chapters',icon:'\u2261',a:'data-go2="course"'},{label:'Reading library',sub:'texts to read',icon:'\u2767',a:'data-go2="stories"'},{label:'Vocabulary',sub:LEX.length+' words',icon:'\u2726',a:'data-go2="vocab"'},{label:'Grammar',sub:GRAMMAR.length+' topics',icon:'\u270e',a:'data-go2="grammar"'},{label:'Practice',sub:'free drills',icon:'\u2713',a:'data-go2="practice"'},{label:'Conversa',sub:CONVERSA.length+' AI scenes',icon:'\u275d',a:'data-go2="conversa"'},{label:'Write',sub:'AI feedback',icon:'\u2712',a:'data-go2="write"'},{label:'Verbs',sub:VERBS.length+' conjugations',icon:'\u27f3',a:'data-go2="verbs"'}];
-  return '<div class="topbar"><div><h1>'+H(gr[0],gr[1])+', Vincenzo</h1><div class="lead">'+hebClick('\u05dc\u05b0\u05d0\u05b7\u05d8 \u05dc\u05b0\u05d0\u05b7\u05d8 \u05d6\u05b6\u05d4 \u05d1\u05bc\u05b8\u05d0','\u05dc\u05d0\u05d8 \u05dc\u05d0\u05d8 \u05d6\u05d4 \u05d1\u05d0')+' \u00b7 slowly it comes.</div></div><span class="pill">'+(S.streak||0)+' day streak \u00b7 '+(S.xp||0)+' XP</span></div>'
-    +'<div class="card" style="margin:0 0 14px"><div class="row spread" style="margin-bottom:8px"><h3 style="margin:0">Knowledge map</h3><span class="muted" style="font-size:12px">of '+LEX.length+' words</span></div><div class="mbar" style="height:8px;border-radius:4px;margin-bottom:10px"><i style="width:'+c.mas/tot*100+'%;background:#6fae86"></i><i style="width:'+c.fam/tot*100+'%;background:#7fa8c9"></i><i style="width:'+c.weak/tot*100+'%;background:#cf8a7c"></i><i style="width:'+c.enc/tot*100+'%;background:#5a6b7a"></i></div><div class="km"><div class="b mas"><b>'+c.mas+'</b><span>mastered</span></div><div class="b fam"><b>'+c.fam+'</b><span>familiar</span></div><div class="b weak"><b>'+c.weak+'</b><span>weak</span></div><div class="b enc"><b>'+c.enc+'</b><span>seen</span></div></div></div>'
-    +'<div class="card session-card" style="margin-bottom:14px">'
-      +'<div class="row spread" style="margin-bottom:6px"><span class="muted" style="font-size:12px;letter-spacing:.04em">TODAY\u2019S SESSION \u00b7 '+mins+' min</span><span class="muted" style="font-size:12px">'+(doneToday?'\u2713 done today':primaryStatus)+'</span></div>'
-      +'<h2 style="margin:0 0 2px">'+pilotLessonLabel(primaryLesson.id,true)+' \u00b7 '+escHTML(primaryLesson.title)+'</h2>'
-      +'<div class="lead" style="margin:0 0 8px">'+lvlBadge(primaryLesson.lvl)+' \u00b7 '+escHTML(chTitle(primaryLesson.ch))+'</div>'
-      +(stepLine?'<div class="muted" style="font-size:12.5px;margin-bottom:8px">'+stepLine+'</div>':'')
-      +'<div class="muted" style="font-size:12.5px;margin-bottom:12px">Starts with a short warm-up, reviews weak or recently learned words, then continues into today\u2019s lesson.</div>'
-      +'<button class="btn full" '+primaryBtnAttr+'>'+primaryBtnLabel+'</button>'
-      +'<div class="muted" style="font-size:11.5px;text-align:center;margin-top:8px">Today\u2019s session is shaped around your daily time setting.</div>'
+  var sess=getActiveSession();var sessSt=sess?getLessonRunnerState(sess.lessonId):null;if(sess&&!sessSt)sess=null;
+  var lc=currentLesson();var allDone=lessonDone(lc.id);
+  var primaryAttr,contLabel;
+  if(sess&&sessSt){primaryAttr='data-runner-resume="1"';contLabel=sessSt.lesson.title;}
+  else {primaryAttr='data-runner-start="'+lc.id+'"';contLabel=lc.title;}
+  var chName=chTitle(lc.ch);
+  var recent=STORIES.filter(function(s){return S.stories&&S.stories[s.id];}).slice(-3).reverse();
+  var started=recent.length>0;var rlist=started?recent:STORIES.slice(0,3);
+  var storyCard=function(s,i){var pct=(S.stories&&S.stories[s.id])?100:0;
+    return '<div class="read-card" data-story="'+s.id+'">'
+      +'<div class="read-cover" style="background:'+_dashGrad(i)+'"><div class="read-tags"><span>'+s.lvl+'</span><span>'+(s.rt||'')+'</span></div></div>'
+      +'<div class="read-body"><div class="k">'+s.lvl+' \u00b7 '+(s.rt||'')+'</div>'
+      +'<h3>'+escHTML(s.en)+'</h3><div class="he">'+H(s.t[0],s.t[1])+'</div>'
+      +'<p>'+escHTML(s.topic||'')+'</p>'
+      +(pct?'<div class="bar" style="margin-top:10px"><i style="width:'+pct+'%"></i></div>':'')
+      +'</div></div>';};
+  return ''
+  +'<div class="dash-hero">'
+    +'<div class="dash-greet">'+H(gr[0],gr[1])+', Vincenzo.</div>'
+    +'<h1>Pick up where <span class="ac">you left off.</span></h1>'
+    +'<div class="dash-hsub">Your Hebrew is waiting. Today, one small step closer to the conversations you actually want to have.</div>'
+    +'<div class="dash-cta"><button class="p" '+primaryAttr+'>Today\u2019s session \u2192</button><button class="o" data-go2="course">Continue: '+escHTML(contLabel)+'</button></div>'
+    +'<div class="dash-stats">'
+      +'<div class="dash-stat"><b>'+(S.streak||0)+'<small> days</small></b><span>Streak</span></div>'
+      +'<div class="dash-stat"><b>'+enc+'<small> /'+LEX.length+'</small></b><span>Words encountered</span></div>'
+      +'<div class="dash-stat"><b>'+lessonsDone+'<small> /'+courseTotal+'</small></b><span>Lessons done</span></div>'
+      +'<div class="dash-stat"><b>'+mins+'<small> min</small></b><span>Daily target</span></div>'
     +'</div>'
-    +(mins>=30?'<h2 style="margin:18px 0 2px">Add more today</h2><div class="muted" style="font-size:12px;margin-bottom:8px">Optional, suggested by your '+mins+'-minute setting.</div><div class="qa-grid">'
-        +'<div class="qa-card" data-go2="stories"><div class="qa-icon">\u2767</div><div class="qa-label">Read a text</div><div class="qa-sub">at your level</div></div>'
-        +(mins>=45?'<div class="qa-card" data-go2="conversa"><div class="qa-icon">\u275d</div><div class="qa-label">Conversa</div><div class="qa-sub">speak with AI</div></div>':'')
-        +(mins>=45?'<div class="qa-card" data-go2="write"><div class="qa-icon">\u2712</div><div class="qa-label">Write</div><div class="qa-sub">AI feedback</div></div>':'')
-      +'</div>':'')
-    +'<button class="btn full ghost" style="margin-top:14px" id="finishDay">'+(doneToday?'\u2713 Today complete':'Mark today done (+10 XP)')+'</button>'
-    +'<h2 style="margin-top:20px">Library</h2><div class="muted" style="font-size:12px;margin-bottom:8px">Free practice, reference, and explore. Your daily path is the session above.</div>'
-    +'<div class="qa-grid">'+qi.map(function(item){return '<div class="qa-card" '+item.a+'><div class="qa-icon">'+item.icon+'</div><div class="qa-label">'+item.label+'</div><div class="qa-sub">'+item.sub+'</div></div>';}).join('')+'</div>'
-    +'<p class="muted" style="font-size:12px;text-align:center">Tap any Hebrew word to hear it</p>';
+  +'</div>'
+  +'<div class="dash-cols">'
+    +'<div class="dash-prog"><div class="k">In progress \u00b7 course</div><h3>'+escHTML(chName)+'</h3><div class="it">'+pilotLessonLabel(lc.id,true)+'</div>'
+      +'<div class="row spread" style="font-size:12.5px;color:var(--muted);margin-bottom:6px"><span>'+lessonsDone+' of '+courseTotal+' lessons</span><span>'+coursePct+'%</span></div>'
+      +'<div class="bar" style="margin-bottom:18px"><i style="width:'+Math.max(coursePct,2)+'%"></i></div>'
+      +'<button class="btn ghost" data-go2="course">Open course map</button></div>'
+    +'<div class="dash-actions">'
+      +'<div class="dash-action" '+primaryAttr+'><span class="dash-av">i</span><div><div class="t">Today\u2019s session</div><div class="s">'+mins+' min \u00b7 personalized</div></div><span class="ar">\u2192</span></div>'
+      +'<div class="dash-action" data-go2="stories"><span class="dash-av">s</span><div><div class="t">Stories library</div><div class="s">Read for fun. It still counts.</div></div><span class="ar">\u2192</span></div>'
+      +'<div class="dash-action" data-go2="conversa"><span class="dash-av">a</span><div><div class="t">Talk to Angela</div><div class="s">Roleplay scenarios</div></div><span class="ar">\u2192</span></div>'
+    +'</div>'
+  +'</div>'
+  +'<div class="sec-head2"><h2>Your knowledge map</h2><a data-go2="vocab">Full vocab \u2192</a></div>'
+  +'<div class="sec-kicker">Snapshot of what you know \u00b7 live</div>'
+  +'<div class="km-cards">'
+    +'<div class="km-card"><b style="color:var(--bad)">'+c.weak+'</b><span>Weak \u00b7 needs repetition</span></div>'
+    +'<div class="km-card"><b style="color:var(--info)">'+c.fam+'</b><span>Familiar \u00b7 recognising</span></div>'
+    +'<div class="km-card"><b style="color:var(--good)">'+c.mas+'</b><span>Mastered \u00b7 sticky</span></div>'
+    +'<div class="km-card"><b style="color:var(--muted)">'+notyet+'</b><span>Not yet encountered</span></div>'
+  +'</div>'
+  +'<div class="sec-head2"><h2>Continue reading</h2><a data-go2="stories">All stories \u2192</a></div>'
+  +'<div class="sec-kicker">'+(started?'Stories you started':'Good places to start')+'</div>'
+  +'<div class="read-cards">'+rlist.map(storyCard).join('')+'</div>'
+  +'<div class="sec-head2"><h2>Explore on your own</h2></div>'
+  +'<div class="sec-kicker">Jump into any topic: it all feeds your progress</div>'
+  +'<div class="explore-cards">'
+    +'<div class="explore-card" data-go2="grammar"><div class="av">g</div><h3>Grammar</h3><p>Every topic in full tables. Read, mark, master.</p></div>'
+    +'<div class="explore-card" data-go2="vocab"><div class="av">v</div><h3>Vocab</h3><p>Themed batches. Practice independent of the course.</p></div>'
+    +'<div class="explore-card" data-go2="practice"><div class="av">p</div><h3>Practice</h3><p>Drills, mixed sessions, weak-spot focus.</p></div>'
+    +'<div class="explore-card" data-go2="phrases"><div class="av">s</div><h3>Phrases</h3><p>How Hebrew is really spoken.</p></div>'
+  +'</div>';
 }
+
 /* ===================================================================
    COURSE  (chapter grid + chapter lessons + lesson view)
 =================================================================== */
