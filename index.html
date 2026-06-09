@@ -197,11 +197,43 @@ label{display:block;font-size:12px;color:var(--muted);margin:14px 0 5px;letter-s
   color:var(--ink);padding:11px 18px;border-radius:12px;font-size:13.5px;opacity:0;transition:.25s;z-index:100;box-shadow:var(--shadow);backdrop-filter:blur(14px)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 /* word popover */
-#wordpop{position:fixed;background:var(--raise);border:1px solid var(--gold);border-radius:13px;padding:13px 15px;z-index:200;box-shadow:var(--shadow);max-width:270px;display:none;backdrop-filter:blur(16px)}
+#wordpop{position:fixed;background:rgba(20,18,15,.97);color:#fff;border:1px solid rgba(255,255,255,.07);border-radius:13px;padding:16px 18px;z-index:200;box-shadow:var(--shadow),0 0 0 1px rgba(255,255,255,.05);max-width:300px;display:none;backdrop-filter:blur(20px)}
 #wordpop.show{display:block}
 #editpop.open{display:flex!important}
 #placepop.open{display:flex!important}
 #wordpop .hw{font-family:var(--heb);font-size:24px;font-weight:300;color:var(--paper);direction:rtl}
+.wp-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:10px;padding-bottom:11px;border-bottom:1px solid rgba(255,255,255,.1)}
+.wp-word{font-family:var(--heb);font-size:23px;font-weight:300;color:#fff;line-height:1.15}
+.wp-audio{all:unset;cursor:pointer;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.08);color:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;transition:background .15s}
+.wp-audio:hover{background:rgba(181,69,27,.6)}
+.wp-grid{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;font-size:12px;margin-bottom:11px}
+.wp-label{color:rgba(255,255,255,.5);font-family:ui-monospace,monospace;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;align-self:center}
+.wp-val{color:rgba(255,255,255,.95)}
+.wp-trans{font-size:14px;color:rgba(255,255,255,.88);margin-bottom:4px;line-height:1.5}
+.wp-note{font-size:11px;color:rgba(255,255,255,.5);margin-bottom:4px;line-height:1.4}
+.wp-muted{color:rgba(255,255,255,.55);font-size:12px}
+#wordpop .faint{color:rgba(255,255,255,.55)!important}
+.wp-actions{display:flex;gap:6px;margin-top:8px}
+.wp-btn{all:unset;cursor:pointer;text-align:center;flex:1;padding:7px 10px;background:rgba(255,255,255,.06);border-radius:7px;font-family:ui-monospace,monospace;font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:rgba(255,255,255,.9);transition:all .12s;box-sizing:border-box}
+.wp-btn:hover{background:rgba(255,255,255,.12)}
+.wp-btn.weak:hover,.wp-btn.weak.on{background:rgba(181,69,27,.55)}
+.wp-btn.strong:hover,.wp-btn.strong.on{background:rgba(77,106,63,.55)}
+.wp-btn.on{background:rgba(255,255,255,.18)}
+.wp-btn.wp-accent{background:var(--accent);color:#fff;width:100%;margin-top:8px;display:block;flex:none}
+.wp-btn.wp-accent:hover{filter:brightness(1.08);background:var(--accent)}
+.lhub-goal{font-size:15px;color:var(--ink);opacity:.85;margin:2px 0 18px;line-height:1.5}
+.lhub{display:flex;flex-direction:column;gap:12px}
+.lhub-sec{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px 18px;box-shadow:var(--shadow-sm)}
+.lhub-sec.done{border-color:rgba(58,125,92,.42);background:var(--good-wash)}
+.lhub-sec-num{flex:none;width:26px;height:26px;border-radius:50%;background:var(--accent-wash);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;font-family:var(--sans)}
+.lhub-sec.done .lhub-sec-num{background:var(--good);color:#fff}
+.lhub-sec-icon{flex:none;color:var(--accent);opacity:.9;display:flex;align-items:center}
+.lhub-sec.done .lhub-sec-icon{color:var(--good)}
+.lhub-sec-body{flex:1;min-width:0}
+.lhub-sec-name{font-family:var(--serif);font-size:17px;font-weight:600;line-height:1.2;color:var(--ink)}
+.lhub-sec-desc{font-size:12.5px;color:var(--muted);margin-top:2px;line-height:1.35}
+.lhub-foot{margin-top:6px;padding-top:16px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.lhub-foot-count{font-family:var(--sans);font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
 /* mobile bottom nav */
 .mobnav{display:none}
 @media(max-width:860px){
@@ -487,6 +519,30 @@ table.gtable td.say{font-style:italic;color:var(--muted)}
 .lesson-sub{font-size:12px;color:var(--faint);font-style:italic}
 .lesson-meta{font-family:ui-monospace,monospace;font-size:10px;color:var(--faint);flex-shrink:0}
 .t-further{max-width:720px;margin-top:30px}
+/* === Course screen - Italian twin: chapter bar + chapter detail card + lesson list === */
+.chapter-bar{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin:6px 0 22px;padding-bottom:2px}
+.chap-grouplabel{flex-basis:100%;font-family:ui-monospace,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:10px 0 1px}
+.chap-grouplabel:first-child{margin-top:0}
+.chap-pill{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;padding:7px 13px;border-radius:999px;font-size:12.5px;font-weight:500;color:var(--muted);background:var(--bg-card);border:1px solid var(--line);cursor:pointer;transition:all .15s var(--ease);flex-shrink:0;max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;backdrop-filter:blur(8px)}
+.chap-pill:hover{color:var(--paper);border-color:var(--border)}
+.chap-pill.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.chap-pill.locked{opacity:.55}
+.chap-pill svg{flex-shrink:0;margin-inline-end:5px;opacity:.8}
+.chap-pill-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--good);margin-inline-end:6px;flex-shrink:0}
+.chap-pill.active .chap-pill-dot{background:#fff}
+.course-layout{display:grid;grid-template-columns:290px 1fr;gap:32px;align-items:start}
+.course-side{position:sticky;top:16px;align-self:start}
+.course-side-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px;backdrop-filter:blur(8px);box-shadow:var(--shadow-sm)}
+.course-side-eyebrow{font-family:ui-monospace,monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;font-weight:600}
+.course-side-title{font-family:var(--serif);font-size:20px;font-weight:500;line-height:1.25;color:var(--paper);margin-bottom:9px}
+.course-side-desc{font-size:13px;color:var(--warm);line-height:1.55;margin-bottom:14px}
+.course-side-note{font-size:12px;color:var(--accent);padding:8px 10px;background:var(--accent-wash);border-radius:8px;margin-bottom:14px;line-height:1.45}
+.course-side-meta{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding-top:14px;border-top:1px solid var(--line2)}
+.course-side-meta-item{font-family:ui-monospace,monospace;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.course-side-meta-num{font-family:var(--serif);font-size:21px;color:var(--paper);display:block;font-weight:500;letter-spacing:-.01em;margin-bottom:2px}
+.section-sub{font-family:ui-monospace,monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;font-weight:600}
+.lesson-icon svg{display:block}
+@media(max-width:980px){.course-layout{grid-template-columns:1fr;gap:18px}.course-side{position:static}}
 @media(max-width:760px){.lesson-row{padding:11px 14px;gap:10px}.t-h1{font-size:clamp(24px,8vw,32px)}}
 </style>
 </head>
@@ -5519,6 +5575,54 @@ function weakPool(limit){const now=Date.now();const arr=[];
   LEX.forEach(it=>{const m=S.mastery[it.key];if(!m)return;if(m.s<=1)arr.push({it,pri:0});else if(m.due<=now)arr.push({it,pri:1});});
   arr.sort((a,b)=>a.pri-b.pri);return arr.slice(0,limit||20).map(x=>x.it);}
 function learnedPool(){return LEX.filter(it=>S.mastery[it.key]);}
+/* ---- Mastery/completion model helpers (locked model, Phase 1 slice 2).
+   Single source of truth for every progress display (R23) and cross-tab
+   propagation (R24). Additive; reads existing state, writes only via the
+   existing mastery functions. ---- */
+/* All vocab mastery keys taught by a lesson (resolved categories -> item keys). */
+function _lessonWordKeys(lesson){
+  try{
+    var res=resolveLessonResources(lesson);
+    if(!res||!res.vocab||!res.vocab.matched) return [];
+    var keys=[];
+    res.vocab.matched.forEach(function(m){ catItems(m.cat).forEach(function(it){ keys.push(it.key); }); });
+    return keys;
+  }catch(e){ return []; }
+}
+/* Model rule: finishing a lesson marks its taught words as seen (never lowers). */
+function markLessonWordsSeen(lessonId){
+  var l=_lessonById(lessonId); if(!l) return 0;
+  var n=0;
+  _lessonWordKeys(l).forEach(function(k){ if(mState(k)<0){ mSeen(k); n++; } });
+  if(n) save();
+  return n;
+}
+/* Three-state group rule, same everywhere: untouched / partial (pct) / done. */
+function groupState(doneCount,total){
+  if(!total) return {state:'untouched',pct:0,done:0,total:0};
+  var pct=Math.round(doneCount/total*100);
+  return {state:doneCount>=total?'done':(doneCount>0?'partial':'untouched'),pct:pct,done:doneCount,total:total};
+}
+/* Knowledge-side group: a word counts when familiar or better. */
+function wordGroupState(keys){
+  var d=0; (keys||[]).forEach(function(k){ if(mState(k)>=2)d++; });
+  return groupState(d,(keys||[]).length);
+}
+/* Journey-side group: a chapter counts by lessons done. */
+function chapterGroupState(chId){
+  var ls=chapterLessons(chId);
+  return groupState(ls.filter(function(l){return lessonDone(l.id);}).length, ls.length);
+}
+/* The two meters (model: Journey moves on lessons, Knowledge on demonstrated recall). */
+function journeyStats(){
+  var done=COURSE.filter(function(l){return lessonDone(l.id);}).length;
+  return {done:done,total:COURSE.length,pct:COURSE.length?Math.round(done/COURSE.length*100):0};
+}
+function knowledgeStats(){
+  var c=masteryCounts();
+  var owned=c.fam+c.mas, met=c.enc+c.weak+owned;
+  return {met:met,weak:c.weak,familiar:c.fam,mastered:c.mas,owned:owned};
+}
 
 /* ===================================================================
    COURSE  (guided, unlocking lessons; each blends the methods)
@@ -5800,7 +5904,7 @@ function getLessonStepState(lessonId, stepKey){var m=S.course&&S.course.steps&&S
 function setLessonStepDone(lessonId, stepKey, val){ensureCourseState(S);if(!S.course.steps[lessonId])S.course.steps[lessonId]={};if(val===false)delete S.course.steps[lessonId][stepKey];else S.course.steps[lessonId][stepKey]=true;save();}
 function lessonStepsDone(lessonId){var m=S.course&&S.course.steps&&S.course.steps[lessonId];return m?Object.keys(m).filter(function(k){return m[k];}).length:0;}
 function getActiveSession(){return (S.session&&typeof S.session==='object'&&!Array.isArray(S.session))?S.session:null;}
-function setActiveSession(lessonId, stepIndex){ensureCourseState(S);S.session={lessonId:lessonId, stepIndex:(typeof stepIndex==='number'?stepIndex:0), startedAt:Date.now()};save();}
+function setActiveSession(lessonId, stepIndex){ensureCourseState(S);S.session={lessonId:lessonId, stepIndex:(stepIndex==='hub'?'hub':(typeof stepIndex==='number'?stepIndex:0)), startedAt:Date.now()};save();}
 function clearActiveSession(){S.session=null;save();}
 /* ===================================================================
    PHASE 9B.2: Course V2 reference resolver (pure, non-visible).
@@ -6801,7 +6905,7 @@ function buildLessonSteps(lesson){
   if(!lesson||typeof lesson!=='object') return [];
   var res=resolveLessonResources(lesson);
   var steps=[];
-  steps.push({key:'overview',type:'overview',title:'Overview'});
+  /* overview step removed (R14: lessons open into the hub) */
   steps.push({key:'warmup',type:'warmupReview',title:'Warm-up'});
   if(!_refEmpty(lesson.newLanguage)) steps.push({key:'newlang',type:'newLanguage',title:'New language'});
   if(res.vocab) steps.push({key:'vocab',type:'vocabularyExposure',title:'Vocabulary',res:res.vocab});
@@ -6828,9 +6932,8 @@ function _firstIncompleteIndex(steps, dm){
 function startLessonRunner(lessonId){
   ensureCourseState(S);
   var st=getLessonRunnerState(lessonId); if(!st) return;
-  var idx=_firstIncompleteIndex(st.steps, st.doneMap);
-  setActiveSession(lessonId, idx);
-  go('runner', String(lessonId), String(idx));
+  setActiveSession(lessonId, 'hub');
+  go('runner', String(lessonId), 'hub');
 }
 function resumeLessonRunner(){
   var s=getActiveSession(); if(!s){go('course');return;}
@@ -6852,8 +6955,8 @@ function markCurrentLessonStepDone(){
   var c=_runnerCtx(); if(!c.st) return;
   var step=c.st.steps[c.idx];
   if(step&&step.key!=='done') setLessonStepDone(c.id, step.key, true);
-  if(c.idx<c.st.steps.length-1) goLessonStep(1);
-  else go('runner', String(c.id), String(c.idx));
+  setActiveSession(c.id, 'hub');
+  go('runner', String(c.id), 'hub');
 }
 function markCurrentLessonStepUndone(){
   var c=_runnerCtx(); if(!c.st) return;
@@ -6865,7 +6968,7 @@ function finishLessonRunner(lessonId){
   var id=lessonId||route.item;
   var already=lessonDone(id);
   setLessonStepDone(id,'done',true);
-  if(!already) completeLesson(id);   /* guard: the runner never double-awards XP */
+  if(!already){ completeLesson(id); markLessonWordsSeen(id); }   /* guard: the runner never double-awards XP; model: finishing marks taught words seen */
   var _dailyAwarded=completeDailySession();   /* TASK 1: finishing a guided lesson organically completes Today (guarded, once per date) */
   clearActiveSession();
   var l=_lessonById(id);
@@ -7131,24 +7234,69 @@ function renderLessonStepPlaceholder(step, lesson, index, total){
   }
   return '<div class="rstep-t">'+escHTML(step.title)+'</div>'+note;
 }
+/* ---- Sectioned lesson hub (R14): the lesson's home. Replaces the teacher-dump
+   page and the linear overview-first runner. Lessons open straight into this hub;
+   each section launches its step and returns here; completion is gated on the
+   sections being done (no ungated mark-done). ---- */
+function _hubSectionMeta(key){
+  var M={
+    warmup:{name:'Warm-up',desc:'A quick review of words you have seen before.',icon:'practice'},
+    newlang:{name:'What is new',desc:'The new language this lesson introduces.',icon:'grammar'},
+    vocab:{name:'Meet the words',desc:'The new vocabulary, with audio and self-rating.',icon:'vocab'},
+    grammar:{name:'Grammar',desc:'The grammar point for this lesson, explained.',icon:'grammar'},
+    verbs:{name:'Verbs',desc:'The verbs in this lesson, fully conjugated.',icon:'vocab'},
+    phrases:{name:'Phrases',desc:'Useful set phrases for this lesson.',icon:'vocab'},
+    practice:{name:'Practice',desc:'Exercises drawn from this lesson.',icon:'practice'},
+    story:{name:'Story',desc:'Read the short story for this lesson.',icon:'story'},
+    conversa:{name:'Conversation',desc:'A roleplay scenario to practise.',icon:'dialogue'},
+    writing:{name:'Writing',desc:'A short writing task.',icon:'vocab'},
+    output:{name:'Put it together',desc:'A final task using what you learned.',icon:'checkpoint'}
+  };
+  return M[key]||{name:key,desc:'',icon:'vocab'};
+}
+function renderLessonHub(l, st){
+  if(!l) return '<button class="back" data-go2="course">\u2190 course</button><div class="note">Lesson not found.</div>';
+  st=st||getLessonRunnerState(l.id);
+  var allSteps=(st&&st.steps)?st.steps:buildLessonSteps(l);
+  var steps=allSteps.filter(function(s){return s.key!=='overview'&&s.key!=='done';});
+  var dm=(st&&st.doneMap)||{};
+  var chName=chTitle(l.ch);
+  var mins=Math.max(8,steps.length*3);
+  var head='<button class="back" data-go2="course||'+l.ch+'">\u2190 '+escHTML(chName)+'</button>'
+    +'<div class="topbar"><div><h1>'+escHTML(l.title)+'</h1><div class="lead">'+lvlBadge(l.lvl)+' \u00b7 '+escHTML(chName)+' \u00b7 ~'+mins+' min</div></div>'+nikToggle()+'</div>';
+  var goal=(typeof v2FieldShown==='function'&&v2FieldShown(l.communicationGoal))?'<div class="lhub-goal" dir="auto">'+v2FieldText(l.communicationGoal)+'</div>':'';
+  var doneN=steps.filter(function(s){return !!dm[s.key];}).length, total=steps.length;
+  var cards=steps.map(function(s,i){var meta=_hubSectionMeta(s.key);var isDone=!!dm[s.key];
+    return '<div class="lhub-sec'+(isDone?' done':'')+'">'
+      +'<div class="lhub-sec-num">'+(isDone?COURSE_CHECK_SVG:(i+1))+'</div>'
+      +'<div class="lhub-sec-icon">'+lessonSvg(meta.icon)+'</div>'
+      +'<div class="lhub-sec-body"><div class="lhub-sec-name">'+escHTML(meta.name)+'</div><div class="lhub-sec-desc">'+escHTML(meta.desc)+'</div></div>'
+      +'<button class="btn sm'+(isDone?' ghost':'')+'" data-hub-step="'+i+'">'+(isDone?'Review':'Start')+'</button>'
+      +'</div>';
+  }).join('');
+  var allDone=total>0&&doneN===total, already=lessonDone(l.id);
+  var foot='<div class="lhub-foot"><div class="lhub-foot-count">'+doneN+' / '+total+' sections done'+(allDone?'':' \u00b7 complete the sections to finish this lesson')+'</div>';
+  if(already) foot+='<button class="btn sm ghost" data-runner-finish="'+l.id+'">lesson complete \u2713 \u00b7 review</button>';
+  else if(allDone) foot+='<button class="btn" data-runner-finish="'+l.id+'">Mark this lesson complete \u2192</button>';
+  else foot+='<button class="btn" disabled aria-disabled="true" style="opacity:.45;cursor:not-allowed">Mark this lesson complete</button>';
+  foot+='</div>';
+  return head+goal+'<div class="lhub">'+cards+foot+'</div>';
+}
 function renderLessonRunner(lessonId, stepIndex){
   var st=getLessonRunnerState(lessonId);
   if(!st) return '<button class="back" data-go2="course">\u2190 course</button><div class="note">Lesson not found.</div>';
   var l=st.lesson, steps=st.steps, total=steps.length;
+  if(String(stepIndex)==='hub') return renderLessonHub(l, st);
   var idx=parseInt(stepIndex,10); if(isNaN(idx))idx=0; idx=Math.max(0,Math.min(idx,total-1));
   var step=steps[idx], done=!!st.doneMap[step.key];
-  var head='<button class="back" data-go2="course||'+l.ch+'">\u2190 '+escHTML(chTitle(l.ch))+'</button>'
-    +'<div class="topbar"><div><h1>'+escHTML(l.title)+'</h1><div class="lead">'+lvlBadge(l.lvl)+' \u00b7 '+pilotLessonLabel(l.id)+' \u00b7 guided</div></div>'+nikToggle()+'</div>';
-  var dots='<div class="runner-stepper">'+steps.map(function(s,i){var cls=i===idx?'cur':(st.doneMap[s.key]?'done':'');return '<span class="rdot '+cls+'" title="'+escHTML(s.title)+'"></span>';}).join('')+'</div>';
-  var prog='<div class="runner-prog">Step '+(idx+1)+' / '+total+' \u00b7 '+escHTML(step.title)+'</div>';
+  if(step.key==='done') return renderLessonHub(l, st);
+  var head='<button class="back" data-runner-hub="'+l.id+'">\u2190 '+escHTML(l.title)+'</button>'
+    +'<div class="topbar"><div><h1>'+escHTML(step.title)+'</h1><div class="lead">'+lvlBadge(l.lvl)+' \u00b7 '+escHTML(l.title)+'</div></div>'+nikToggle()+'</div>';
   var card='<div class="card runner-step"><div class="rstep-type">'+escHTML(step.title)+'</div>'+renderLessonStepPlaceholder(step,l,idx,total)+'</div>';
-  var nav='<div class="runner-nav">';
-  nav+=idx>0?'<button class="btn sm ghost" data-runner-nav="prev">\u2190 back</button>':'<span></span>';
-  if(step.key==='done') nav+='<button class="btn sm" data-runner-finish="'+l.id+'">'+(lessonDone(l.id)?'finish review \u2713':'finish lesson \u2713')+'</button>';
-  else { nav+='<span class="runner-nav-mid">'+(done?'<span class="rstep-doneflag">✓ done</span> <button class="btn sm ghost" data-runner-undone="1" title="undo this step">undo</button>':'<button class="btn sm ghost" data-runner-done="1">mark done</button>')+'</span>';
-    nav+='<button class="btn sm" data-runner-nav="next">next \u2192</button>'; }
+  var nav='<div class="runner-nav"><button class="btn sm ghost" data-runner-hub="'+l.id+'">\u2190 back to lesson</button>';
+  nav+=(done?'<span class="runner-nav-mid"><span class="rstep-doneflag">✓ done</span> <button class="btn sm ghost" data-runner-undone="1" title="undo">undo</button></span><button class="btn sm" data-runner-hub="'+l.id+'">back to lesson \u2192</button>':'<span></span><button class="btn sm" data-runner-done="1">mark done \u2713</button>');
   nav+='</div>';
-  return head+dots+prog+card+nav;
+  return head+card+nav;
 }
 function vRunner(){ var id=route.item, sub=route.sub; if(id==null){ var s=getActiveSession(); if(s){ id=s.lessonId; sub=s.stepIndex; } } return renderLessonRunner(id, sub); }
 function lessonStages(l){
@@ -7458,83 +7606,101 @@ function lessonSub(l){
    the readable resource block, output task and notes. Completion reuses the
    existing data-complete-lesson handler, so unlock/progress behaviour is
    identical to V1. none/empty fields are skipped (no visible "none" rows). */
-function lessonViewV2(l,id){
-  var chName=chTitle(l.ch);
-  var head='<button class="back" data-go2="course||'+l.ch+'">\u2190 '+escHTML(chName)+'</button>'
-    +'<div class="topbar"><div><h1>'+escHTML(l.title)+'</h1><div class="lead">'+lvlBadge(l.lvl)+' \u00b7 '+pilotLessonLabel(id)+' \u00b7 '+escHTML(chName)+'</div></div>'+nikToggle()+'</div>';
-  var body='<div class="v2-lesson">';
-  var _sess=getActiveSession();
-  var _isThis=_sess&&String(_sess.lessonId)===String(l.id);
-  var _ctaLabel=_isThis?'Resume guided lesson':(lessonDone(l.id)?'Review guided lesson':'Start guided lesson');
-  var _ctaAttr=_isThis?'data-runner-resume="1"':'data-runner-start="'+l.id+'"';
-  var cta='<div class="lesson-cta"><button class="btn full" '+_ctaAttr+'>'+_ctaLabel+' \u2192</button><div class="muted lesson-cta-sub">Step-by-step guided flow. The plan below stays available for reference.</div></div>'
-    +'<div class="v2-planlabel">Lesson plan and references</div>';
-  if(v2FieldShown(l.communicationGoal)){
-    body+='<div class="v2-goal"><div class="v2-goal-label">Communication goal</div><div class="v2-goal-text" dir="auto">'+v2FieldText(l.communicationGoal)+'</div></div>';
-  }
-  var blocks='';
-  if(v2FieldShown(l.newLanguage))blocks+='<div class="v2-block"><div class="v2-block-h">New language</div><div class="v2-block-t" dir="auto">'+v2FieldText(l.newLanguage)+'</div></div>';
-  if(v2FieldShown(l.recycle))blocks+='<div class="v2-block"><div class="v2-block-h">Recycle</div><div class="v2-block-t" dir="auto">'+v2FieldText(l.recycle)+'</div></div>';
-  if(blocks)body+='<div class="v2-blocks">'+blocks+'</div>';
-  var res=v2Row('Vocabulary',l.vocabulary)+v2Row('Verbs',l.verbs)+v2Row('Grammar',l.grammar)+v2Row('Phrases',l.phrases)
-    +v2Row('Story',l.story)+v2Row('Conversa',l.conversa)+v2Row('Writing',l.writing)+v2Row('Practice',l.practice);
-  if(res)body+='<div class="v2-section"><div class="v2-section-h">In this lesson</div>'+res+'</div>';
-  if(v2FieldShown(l.outputTask))body+='<div class="v2-output"><div class="v2-output-h">Output task</div><div class="v2-output-t" dir="auto">'+v2FieldText(l.outputTask)+'</div></div>';
-  if(v2FieldShown(l.notes))body+='<div class="v2-notes"><div class="v2-notes-h">Notes</div><div class="v2-notes-t" dir="auto">'+v2FieldText(l.notes)+'</div></div>';
-  body+='</div>';
-  var nav='<div class="row spread" style="margin-top:16px"><span></span>'
-    +'<button class="btn sm" data-complete-lesson="'+l.id+'">'+(lessonDone(l.id)?'mark reviewed \u2713':'complete lesson \u2713')+'</button></div>';
-  return head+cta+body+nav;
-}
+function lessonViewV2(l,id){ return renderLessonHub(l, getLessonRunnerState(l.id)); }
 function vCourse(){
   if(route.item){return lessonView(+route.item);}
-  if(route.sub){return vChapterLessons(route.sub);}
-  return vChapterGrid();
+  return vCourseMap();
 }
-function vChapterGrid(){
-  var byLvl={A1:[],A2:[],B1:[],B2:[]};
-  CHAPTERS.forEach(function(c){byLvl[c.lvl].push(c);});
-  var lvlLabel={A1:'Foundation',A2:'Building',B1:'Intermediate',B2:'Advanced'};
-  var out='<div class="topbar"><h1>Course</h1>'+nikToggle()+'</div>';
-  ['A1','A2','B1','B2'].forEach(function(lvl){
-    var chs=byLvl[lvl];
-    out+='<div class="ch-level"><div class="ch-level-head">'+lvlBadge(lvl)+'<span style="font-size:16px;font-weight:600">'+lvlLabel[lvl]+'</span></div><div class="ch-grid">';
-    chs.forEach(function(c){
-      var locked=!chapterUnlocked(c.id);
-      var pct=chapterProgress(c.id);
-      var done=chapterDone(c.id);
-      var icon=done?'checkmark-circle':'locked';
-      out+='<div class="ch-card'+(locked?' locked':'')+(done?' done':'')+'"'+(locked?'':' data-go2="course||'+c.id+'"')+'>'
-        +'<div class="ch-card-top">'+(done?'✓':locked?'🔒':'◆')+'</div>'
-        +'<div class="ch-card-title">'+c.title+'</div>'
-        +'<div class="ch-card-sub">'+c.sub+'</div>'
-        +'<div class="ch-bar"><div class="ch-bar-fill" style="width:'+pct+'%"></div></div>'
-        +'<div class="ch-card-foot">'+chapterLessons(c.id).length+' lessons'+(pct>0&&!done?' · '+pct+'%':done?' · done':'')+'</div>'
-        +'</div>';
+/* R9 helper: isolate Hebrew runs inside English chrome with <bdi> so a mixed
+   Hebrew+English string does not flip. Input must already be HTML-escaped. */
+function _isoHeb(s){return String(s).replace(/[\u0590-\u05FF\u05B0-\u05C7]+(?:[ \u05BE.,!?'"\/\u2013-]+[\u0590-\u05FF\u05B0-\u05C7]+)*/g,function(m){return '<bdi>'+m+'</bdi>';});}
+/* Decorative lesson-type icon selector, derived from content fields. */
+function _lessonType(l){
+  var t=(l.title||'').toLowerCase();
+  if(/review|consolidat|milestone|capstone/.test(t))return 'checkpoint';
+  if(v2FieldShown(l.conversa))return 'dialogue';
+  if(v2FieldShown(l.story)&&!v2FieldShown(l.vocabulary))return 'story';
+  if(!v2FieldShown(l.vocabulary)&&v2FieldShown(l.grammar))return 'grammar';
+  return 'vocab';
+}
+/* Inline SVG icons for lesson rows. currentColor adapts to light/dark/active. */
+var COURSE_CHECK_SVG='<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><polyline points="2.5,7 5.5,10 11.5,4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+var COURSE_LOCK_SVG='<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="10" height="7" rx="1.5"/><path d="M5 7V5a3 3 0 0 1 6 0v2"/></svg>';
+function lessonSvg(type){
+  var icons={
+    vocab:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="1" width="9" height="13" rx="1.5"/><line x1="4.5" y1="5" x2="8.5" y2="5"/><line x1="4.5" y1="7.5" x2="8.5" y2="7.5"/><line x1="4.5" y1="10" x2="6.5" y2="10"/><path d="M11 3h1.5a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H11"/></svg>',
+    grammar:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/><line x1="8" y1="10" x2="8" y2="13"/><line x1="6" y1="13" x2="10" y2="13"/></svg>',
+    story:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="1" width="9" height="13" rx="1.5"/><line x1="4.5" y1="5" x2="8.5" y2="5"/><line x1="4.5" y1="7.5" x2="8.5" y2="7.5"/><polyline points="11,1 14,1 14,8 11.5,6 11,8 11,1" fill="currentColor" stroke="none" opacity="0.9"/></svg>',
+    practice:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 8A5 5 0 1 1 8 3"/><polyline points="11,1 14,4 11,4"/></svg>',
+    checkpoint:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><circle cx="8" cy="8" r="2" fill="currentColor" stroke="none"/></svg>',
+    dialogue:'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="2" width="9" height="6" rx="1.5"/><path d="M4 8 L4 10.5 L7 8"/><rect x="6" y="8" width="9" height="5" rx="1.5"/><path d="M12 13 L12 15.5 L9 13"/></svg>'
+  };
+  return icons[type]||'<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/></svg>';
+}
+/* Active chapter: route.sub if valid, else the chapter of the current lesson. */
+function _courseActiveCh(){
+  if(route.sub&&CHAPTERS.some(function(c){return c.id===route.sub;}))return route.sub;
+  var cl=currentLesson();return (cl&&cl.ch)||CHAPTERS[0].id;
+}
+/* Course map - Italian twin: linear chapter bar (full A1-B2 scope, locked-ahead
+   visible R21), a sticky chapter detail card, and the in-order lesson list.
+   Visiting never marks green; completion comes from real lesson-done state R15. */
+function vCourseMap(){
+  var activeId=_courseActiveCh();
+  var ch=CHAPTERS.find(function(c){return c.id===activeId;})||CHAPTERS[0];
+  var LV=['A1','A2','B1','B2'];
+  var LVNAME={A1:'A1 Foundation',A2:'A2 Building',B1:'B1 Intermediate',B2:'B2 Advanced'};
+  var bar='';
+  LV.forEach(function(lv){
+    var chs=CHAPTERS.filter(function(c){return c.lvl===lv;});
+    if(!chs.length)return;
+    bar+='<span class="chap-grouplabel">'+LVNAME[lv]+'</span>';
+    chs.forEach(function(c,i){
+      var cl=!chapterUnlocked(c.id);var cd=chapterDone(c.id);
+      var ttl=escHTML(c.title);ttl=ttl.length>26?ttl.slice(0,25)+'\u2026':ttl;
+      bar+='<button class="chap-pill'+(c.id===activeId?' active':'')+(cl?' locked':'')+'" data-go2="course||'+c.id+'" dir="ltr">'
+        +(cd?'<span class="chap-pill-dot"></span>':'')+(cl?COURSE_LOCK_SVG+' ':'')+'Ch. '+(i+1)+' \u00b7 '+_isoHeb(ttl)+'</button>';
     });
-    out+='</div></div>';
   });
-  return out;
-}
-function vChapterLessons(chId){
-  var ch=CHAPTERS.find(function(c){return c.id===chId;});
-  if(!ch)return vChapterGrid();
-  var lessons=chapterLessons(chId);
-  var out='<button class="back" data-go2="course">← all chapters</button>'
-    +'<div class="topbar"><div><h1>'+ch.title+'</h1><div class="lead">'+lvlBadge(ch.lvl)+' '+ch.sub+'</div></div>'+nikToggle()+'</div>'
-    +'<div class="lesson-list">';
-  lessons.forEach(function(l){
-    var done=lessonDone(l.id);
+  var lessons=chapterLessons(ch.id);
+  var doneN=lessons.filter(function(l){return lessonDone(l.id);}).length;
+  var pct=chapterProgress(ch.id);
+  var chLocked=!chapterUnlocked(ch.id);
+  var side='<div class="course-side"><div class="course-side-card">'
+    +'<div class="course-side-eyebrow">Chapter '+escHTML(ch.id)+' \u00b7 '+escHTML(ch.lvl)+'</div>'
+    +'<div class="course-side-title" dir="ltr">'+_isoHeb(escHTML(ch.title))+'</div>'
+    +'<div class="course-side-desc" dir="ltr">'+_isoHeb(escHTML(ch.sub))+'</div>'
+    +(chLocked?'<div class="course-side-note">Complete the previous chapter to unlock these lessons.</div>':'')
+    +'<div class="course-side-meta">'
+      +'<div class="course-side-meta-item"><span class="course-side-meta-num">'+doneN+'/'+lessons.length+'</span>Lessons done</div>'
+      +'<div class="course-side-meta-item"><span class="course-side-meta-num">'+pct+'%</span>Complete</div>'
+    +'</div></div></div>';
+  var _sess=getActiveSession();
+  var rows=lessons.map(function(l,i){
+    var completed=lessonDone(l.id);
     var locked=!lessonUnlocked(l.id);
-    out+='<div class="lesson-row'+(locked?' locked':'')+(done?' done':'')+'"'+(locked?'':' data-open-lesson="'+l.id+'"')+'>'
-      +'<span class="lesson-icon">'+(done?'✓':locked?'🔒':'▶')+'</span>'
-      +'<div class="lesson-row-info"><div class="lesson-row-title">'+l.title+'</div>'
-      +'<div class="lesson-row-sub muted">'+lessonSub(l)+'</div></div>'
-      +(locked?'':'<span class="chev">›</span>')
-      +'</div>';
-  });
-  out+='</div>';
-  return out;
+    var current=!completed&&!locked;
+    var marker=completed?COURSE_CHECK_SVG:(locked?COURSE_LOCK_SVG:(i+1));
+    /* R14: open straight into the guided flow (same launch logic as the Today
+       lesson step). Resume if this lesson is the active session, else start its
+       runner at the first incomplete step. No teacher-facing plan page. */
+    var _isThis=_sess&&String(_sess.lessonId)===String(l.id);
+    var openAttr=locked?'':(_isThis?' data-runner-resume="1"':' data-runner-start="'+l.id+'"');
+    return '<div class="lesson-row'+(completed?' completed':'')+(current?' current':'')+(locked?' locked':'')+'"'+openAttr+'>'
+      +'<div class="lesson-marker">'+marker+'</div>'
+      +'<div class="lesson-icon">'+lessonSvg(_lessonType(l))+'</div>'
+      +'<div class="lesson-body"><div class="lesson-title" dir="ltr">'+_isoHeb(escHTML(l.title))+'</div>'
+      +'<div class="lesson-sub" dir="ltr">'+_isoHeb(lessonSub(l))+'</div></div>'
+      +'<div class="lesson-meta">L'+l.id+'</div>'
+    +'</div>';
+  }).join('');
+  var listcol='<div><div class="section-sub">Lessons \u00b7 in order</div><div class="lesson-list">'+rows+'</div></div>';
+  return ''
+    +'<div class="t-eyebrow">Structured course \u00b7 Linear path</div>'
+    +'<div class="topbar"><div><h1 class="t-h1" style="margin-bottom:6px">Your route, step by step.</h1></div>'+nikToggle()+'</div>'
+    +'<p class="t-lede">A sequence you can follow. Each lesson unlocks the next. Today\u2019s session draws from this, and your free exploration in other tabs counts too.</p>'
+    +'<div class="chapter-bar">'+bar+'</div>'
+    +'<div class="course-layout">'+side+listcol+'</div>';
 }
 function lessonView(id){
   var l=COURSE.find(function(x){return x.id===id;});if(!l)return vCourse();
@@ -8952,6 +9118,8 @@ function bind(){
   document.querySelectorAll('[data-runner-done]').forEach(b=>b.onclick=()=>markCurrentLessonStepDone());
   document.querySelectorAll('[data-runner-undone]').forEach(b=>b.onclick=()=>markCurrentLessonStepUndone());
   document.querySelectorAll('[data-runner-finish]').forEach(b=>b.onclick=()=>finishLessonRunner(b.dataset.runnerFinish));
+  document.querySelectorAll('[data-runner-hub]').forEach(b=>b.onclick=()=>{var _id=b.dataset.runnerHub;setActiveSession(_id,'hub');go('runner',String(_id),'hub');});
+  document.querySelectorAll('[data-hub-step]').forEach(b=>b.onclick=()=>{var _id=route.item;var _i=+b.dataset.hubStep;setActiveSession(_id,_i);go('runner',String(_id),String(_i));});
   document.querySelectorAll('[data-runner-vocab]').forEach(b=>b.onclick=()=>runnerLaunchVocab());
   document.querySelectorAll('[data-runner-practice]').forEach(b=>b.onclick=()=>runnerLaunchPractice());
   document.querySelectorAll('[data-runner-grammar-practice]').forEach(b=>b.onclick=()=>runnerLaunchGrammarPractice());
@@ -9354,23 +9522,116 @@ function spokenAltCard(){
     +'</div>';
 }
 
+/* --- Verb resolver for the word popup: does this word belong to a VERB? --- */
+function _verbHasForm(v,bare){
+  var groups=[v.present,v.past,v.future,v.imperative];
+  for(var g=0;g<groups.length;g++){var arr=groups[g];if(!arr||!arr.length)continue;
+    for(var k=0;k<arr.length;k++){var f=arr[k];
+      if(Array.isArray(f)&&f.length===2&&Array.isArray(f[1])){
+        var vv=f[1][0],pp=f[1][1];
+        if((pp&&stripN(pp)===bare)||(vv&&stripN(vv)===bare))return true;
+      }
+    }
+  }
+  return false;
+}
+function _verbForWord(word){
+  try{
+    var bare=stripN(_stripWordPunct(word)||word); if(!bare)return null;
+    for(var i=0;i<VERBS.length;i++){var vb=VERBS[i];
+      if(vb.inf&&(stripN(vb.inf[0])===bare||(vb.inf[1]&&stripN(vb.inf[1])===bare)))return vb;
+    }
+    for(var j=0;j<VERBS.length;j++){if(_verbHasForm(VERBS[j],bare))return VERBS[j];}
+    return null;
+  }catch(e){return null;}
+}
+/* Direct LEX entry (base/exact form) so we can read the mastery key, level and
+   vowelled form. lexLookup only returns a gloss (tl/en), not these. */
+function _lexEntry(word){
+  try{
+    var vbare=_stripWordPunct(word)||word; var bare=stripN(vbare);
+    for(var i=0;i<LEX.length;i++){var it=LEX[i];
+      if(it.v===vbare||(it.p&&it.p===bare)||stripN(it.v)===bare)return it;
+    }
+  }catch(e){}
+  return null;
+}
+/* Confident part-of-speech only; omit when unknown rather than guessing "noun". */
+function _wordType(cat,verb){
+  if(verb)return 'verb';
+  if(cat){var c=(''+cat).toLowerCase();
+    if(/\bverb/.test(c))return 'verb';
+    if(/adjectiv|\badj\b/.test(c))return 'adjective';
+    if(/greeting|phrase|express|connector|idiom/.test(c))return 'expression';
+    if(/number/.test(c))return 'number';
+  }
+  return '';
+}
+/* Word popup - twin of the Italian dictionary popup (R10): dark card, structured
+   grid, meaning, spoken alternatives, verb conjugation link, fix-entry, and the
+   Don't know / Hazy / Got it self-rate that writes mastery (R11). Fields the
+   Hebrew data does not carry (gender, plural, IPA, example) are omitted, not faked. */
 function wordPopover(word,e){
   var pop=document.getElementById('wordpop');if(!pop)return;
   if(_wpState.open&&_wpState.word===word){closeWordPop();return;}
   closeWordPop();
   var clean=_stripWordPunct(word)||word;
+  var disp=H(clean,stripN(clean));
   var info=lexLookup(word);
-  var note=info?([info.parts,info.extra].filter(Boolean).join('  \u00b7  ')):'';
-  var meaning=info
-    ? '<div class="tl" style="margin-top:6px">'+(info.tl||'')+'</div><div class="en">'+(info.en||'')+'</div>'+(note?'<div class="faint" style="font-size:11px;margin-top:3px">'+note+'</div>':'')
-    : '<div class="muted" style="margin-top:6px;font-size:12px">Meaning not in the dictionary yet.</div>';
-  meaning+=_spokenAltLine(clean);
-  pop.innerHTML='<div class="row spread"><span class="hw">'+clean+'</span><button class="spk" id="popSpk" aria-label="Listen">\u266a</button></div>'+meaning;
-  var vw=window.innerWidth,vh=window.innerHeight,x=e.clientX,y=e.clientY+16;
-  if(x+280>vw)x=vw-285; if(y+160>vh)y=Math.max(8,e.clientY-170); if(x<5)x=5;
+  var entry=_lexEntry(word);
+  var key=entry?entry.key:null;
+  var verb=_verbForWord(clean);
+  var typ=_wordType(entry?entry.cat:'',verb);
+  var tl=(info&&info.tl)||(entry&&entry.tl)||'';
+  var en=(info&&info.en)||(entry&&entry.en)||'';
+  var lvl=(entry&&entry.lvl)||'';
+  var html='<div class="wp-head"><span class="wp-word" dir="rtl">'+disp+'</span>'
+    +'<button class="wp-audio" id="popSpk" aria-label="Listen">\u25b6</button></div>';
+  var rows='';
+  if(typ)rows+='<div class="wp-label">Type</div><div class="wp-val">'+typ+'</div>';
+  if(tl)rows+='<div class="wp-label">Sound</div><div class="wp-val">'+escHTML(tl)+'</div>';
+  if(lvl)rows+='<div class="wp-label">Level</div><div class="wp-val">'+escHTML(lvl)+'</div>';
+  if(rows)html+='<div class="wp-grid">'+rows+'</div>';
+  if(info||en){
+    html+='<div class="wp-trans">'+escHTML(en||'')+'</div>';
+    var note=info?[info.parts,info.extra].filter(Boolean).join('  \u00b7  '):'';
+    if(note)html+='<div class="wp-note">'+escHTML(note)+'</div>';
+  } else {
+    html+='<div class="wp-trans wp-muted">Meaning not in the dictionary yet.</div>';
+  }
+  html+=_spokenAltLine(clean);
+  if(verb)html+='<button class="wp-btn wp-accent" id="popVerb">See full conjugation \u2192</button>';
+  if(key&&entry&&entry.v)html+='<div class="wp-actions"><button class="wp-btn" id="popFix">\u270e Fix this entry</button></div>';
+  if(key){
+    var st=mState(key);
+    html+='<div class="wp-actions">'
+      +'<button class="wp-btn weak'+(st===0?' on':'')+'" id="popR0">Don\u2019t know</button>'
+      +'<button class="wp-btn'+(st===1?' on':'')+'" id="popR1">Hazy</button>'
+      +'<button class="wp-btn strong'+(st>=2?' on':'')+'" id="popR2">Got it</button>'
+      +'</div>';
+  }
+  pop.innerHTML=html;
+  pop.style.cssText='position:fixed;visibility:hidden;display:block;left:0px;top:0px';
+  var pw=pop.offsetWidth||300,ph=pop.offsetHeight||260;
+  var vw=window.innerWidth,vh=window.innerHeight;
+  var x=e.clientX,y=e.clientY+16;
+  if(x+pw>vw-6)x=vw-pw-6; if(x<6)x=6;
+  if(y+ph>vh-6)y=Math.max(6,e.clientY-ph-12); if(y<6)y=6;
   pop.style.cssText='position:fixed;display:block;left:'+x+'px;top:'+y+'px';
   pop.classList.add('show');
   var sp=document.getElementById('popSpk'); if(sp)sp.onclick=function(ev){ev.stopPropagation();speak(clean);};
+  if(verb){var vb=document.getElementById('popVerb'); if(vb)vb.onclick=function(ev){ev.stopPropagation();closeWordPop();go('verbs',verb.inf[0]);};}
+  if(key&&entry&&entry.v){var fx=document.getElementById('popFix'); if(fx)fx.onclick=function(ev){ev.stopPropagation();closeWordPop();showEditOverlay('vocab|'+key+'|v',entry.v,{label:'Hebrew (with nikud)'});};}
+  if(key){
+    var setRate=function(s){ mSetState(key,s); save();
+      [['popR0',0],['popR1',1],['popR2',2]].forEach(function(pair){var b=document.getElementById(pair[0]);if(!b)return;
+        var on=(pair[1]===0&&s===0)||(pair[1]===1&&s===1)||(pair[1]===2&&s>=2); b.classList.toggle('on',on);});
+      try{toast(s>=2?'Marked as known':(s===1?'Marked hazy':'Marked to review'));}catch(_){} };
+    var r0=document.getElementById('popR0'),r1=document.getElementById('popR1'),r2=document.getElementById('popR2');
+    if(r0)r0.onclick=function(ev){ev.stopPropagation();setRate(0);};
+    if(r1)r1.onclick=function(ev){ev.stopPropagation();setRate(1);};
+    if(r2)r2.onclick=function(ev){ev.stopPropagation();setRate(2);};
+  }
   _wpState.open=true;_wpState.word=word;
   _wpState.onDoc=function(ev){if(pop.contains(ev.target))return;closeWordPop();};
   _wpState.onScroll=function(){closeWordPop();};
