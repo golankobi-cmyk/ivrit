@@ -413,6 +413,8 @@ details.verb-group[open]>summary::after{transform:rotate(90deg);color:var(--acce
 .runner-nav-mid{flex:1;text-align:center}
 .runner-return{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--gold-wash);border:1px solid var(--gold);border-radius:12px;padding:10px 14px;margin-bottom:14px}
 .runner-return .rr-t{font-size:13px;color:var(--muted)}
+.runner-return{border-width:1.5px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.rr-back{border:1.5px solid var(--gold)!important;background:var(--gold-wash)!important;font-weight:600}
 .session-card{border-color:var(--gold)}
 .rstep-doneflag{color:var(--good);font-weight:600;font-size:13px}
 
@@ -6654,7 +6656,7 @@ if(typeof window!=='undefined'){window.__ivritResolverCoverage=__ivritResolverCo
    lessons are untouched: every pilot branch returns null and falls
    back to the existing renderer. Verified IDs only (no invented refs).
 =================================================================== */
-var PILOT_LESSONS=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,223,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78];
+var PILOT_LESSONS=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,223,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114];
 /* Display-only friendly labels for appended pilot lessons. The numeric COURSE id is an internal
    key (ids 1-222 were all taken, so the appended health lesson had to use id 223). Learner-facing
    labels route through these helpers so the appended lesson reads sensibly instead of "lesson 223".
@@ -6785,7 +6787,58 @@ var PILOT_VOCAB_PICK={
   75:[{cat:"Hobbies & leisure",idx:[10,8,6,5]},{cat:"Time & calendar",idx:[6,7]}],
   76:[{cat:"Celebrations",idx:[1,13,4,12,6]},{cat:"Family extended",idx:[16,17]}],
   77:[{cat:"Travel & places",idx:[1,2,4,11,15]},{cat:"Geography & travel",idx:[13]}],
-  78:[{cat:"Days & months",idx:[20,19]},{cat:"Time & calendar",idx:[11]},{cat:"Celebrations",idx:[0,16]}]
+  78:[{cat:"Days & months",idx:[20,19]},{cat:"Time & calendar",idx:[11]},{cat:"Celebrations",idx:[0,16]}],
+  /* A2d - questions chapter (79-84). Lesson 81's prose token ("Communication-related
+     A2 set") matches no category; the pick layer sources the Communication verbs
+     category directly, same treatment as lessons 67 and 76. */
+  79:[{cat:"Question & connecting words",idx:[0,1,2,3,5]}],
+  80:[{cat:"Pronouns & function",idx:[28,37,39,20]}],
+  81:[{cat:"Communication verbs",idx:[7,6,5,18]}],
+  82:[{cat:"Family extended",idx:[0,1,6,7]},{cat:"Professions",idx:[5,6,9]}],
+  83:[{cat:"Question & connecting words",idx:[4,8,13,14]},{cat:"Common adjectives",idx:[17,18,19]}],
+  84:[{cat:"Question words",idx:[10,11]},{cat:"Question & connecting words",idx:[10,12]}],
+  /* A2e - getting around (85-90). Location prepositions, directions, transport, trip story. */
+  85:[{cat:"Directions & places",idx:[9,10,11,13,14]}],
+  86:[{cat:"Transport & directions",idx:[20,11,13,15,14]}],
+  87:[{cat:"Transport types",idx:[13,12,10,18,19]}],
+  88:[{cat:"City & buildings",idx:[5,15,14]},{cat:"Directions & places",idx:[21,19,23]}],
+  89:[{cat:"Geography & travel",idx:[2,3,5,16,17]},{cat:"Travel & places",idx:[14]}],
+  90:[{cat:"Directions & places",idx:[3,4,22]},{cat:"Transport & directions",idx:[7,18,19]}],
+  /* A2f - transactions (91-96): cafe, prices, quantities, market, hairdresser. */
+  91:[{cat:"Restaurant & ordering",idx:[9,3,18,20,22]},{cat:"Drinks & beverages",idx:[8]}],
+  92:[{cat:"Numbers",idx:[20,21,22,23]},{cat:"Shopping & supermarket",idx:[4]}],
+  93:[{cat:"Ordinal & quantity",idx:[5,6,14,15,16,10]}],
+  94:[{cat:"Israeli food",idx:[5,6,13,14]},{cat:"Fruits & vegetables",idx:[3,4,6]}],
+  95:[{cat:"Daily care & hygiene",idx:[7,8,11]},{cat:"Common adjectives",idx:[8,9]}],
+  96:[{cat:"Restaurant & ordering",idx:[10,17,21]},{cat:"Shopping & supermarket",idx:[15,17]}],
+  /* A2g - schedule and work (97-102): time-telling, appointments, work day, messages.
+     September leads the months pick (the canon wedding month). */
+  97:[{cat:"Days & months",idx:[15,12,9,11]},{cat:"Time & calendar",idx:[3]}],
+  98:[{cat:"Office & study",idx:[6,8,18]},{cat:"Time expressions",idx:[9,24]}],
+  99:[{cat:"Time expressions",idx:[10,23]},{cat:"Time & calendar",idx:[20]},{cat:"Office & study",idx:[19]}],
+  100:[{cat:"Office & study",idx:[0,15,16,17]},{cat:"Professions",idx:[11]}],
+  101:[{cat:"Telephone & internet",idx:[4,2,5,6,10]}],
+  102:[{cat:"Office & study",idx:[13,14,9]},{cat:"Telephone & internet",idx:[0,1]}],
+  /* A2h - problems and help (103-108). Lessons 105/106's prose tokens ("Feelings-related /
+     Relationships-related A2-safe set") match no category; the pick layer sources the
+     everyday items from Feelings & emotions, Emotions & states, Relationships & social.
+     Those items are B1-tagged and gate to exposure at A2, which pilotBank allows. */
+  103:[{cat:"Tools & repair",idx:[18,15]},{cat:"Furniture & household",idx:[13,14,5]}],
+  104:[{cat:"Safety & emergency",idx:[7,18,19,10,12]}],
+  105:[{cat:"Relationships & social",idx:[12]},{cat:"Feelings & emotions",idx:[3,6,16]}],
+  106:[{cat:"Relationships & social",idx:[10,11,15]},{cat:"Emotions & states",idx:[3,5]}],
+  107:[{cat:"At the doctor",idx:[8,9,11,15]},{cat:"Body & health",idx:[7]}],
+  108:[{cat:"Tools & repair",idx:[14,13]},{cat:"Body & health",idx:[14,23]}],
+  /* A2i - integration milestone (109-114). These lessons revisit the level's functions,
+     so picks are deliberately small garnishes; the prerequisite pool (the whole A1+A2
+     allowed set) carries the review. Lesson 114's token ("mixed A2 categories across
+     the level") is the milestone itself - prerequisites ARE its bank. */
+  109:[{cat:"Connectors & discourse",idx:[26,12]},{cat:"Ordinal & quantity",idx:[9,8]}],
+  110:[{cat:"Days & months",idx:[13,14]},{cat:"Ordinal & quantity",idx:[19]},{cat:"Connectors & discourse",idx:[15]}],
+  111:[{cat:"Directions & places",idx:[17,18,25]},{cat:"Transport & directions",idx:[16,17]}],
+  112:[{cat:"Restaurant & ordering",idx:[4,5,6,8]},{cat:"Shopping & supermarket",idx:[1]}],
+  113:[{cat:"Telephone & internet",idx:[3,18,16,17]}],
+  114:[{cat:"Ordinal & quantity",idx:[7]},{cat:"Connectors & discourse",idx:[16,8]},{cat:"Celebrations",idx:[7]}]
 };
 /* Authored verb overlay: verified indices into VERBS only. A1c introduces לראות (to see)
    and לאהוב (to love/like) with את; both are A1 and gate to allow. Used by the level-scoped
@@ -6815,7 +6868,52 @@ var PILOT_VERB_PICK={
   75:[109,74,7,3],
   76:[42,7,43],
   77:[12,17,43,169],
-  78:[109,12,7,1]
+  78:[109,12,7,1],
+  /* A2d verbs, verified: 6 live, 18 understand, 19 know (person), 28 hear,
+     32 know (facts), 50 ask, 51 answer, 70 explain */
+  79:[50,51],
+  80:[50,51,32],
+  81:[18,28,54],
+  82:[6,19,11],
+  83:[70,50,51],
+  84:[50,51,18,32],
+  /* A2e verbs, verified: 41 wait, 48 be, 61 continue, 111 manage/get by,
+     124 turn (lifnot), 139 stop */
+  85:[48,71,72],
+  86:[3,124,43,61],
+  87:[12,10,41,43],
+  88:[3,72,43,111],
+  89:[12,17,43,5],
+  90:[3,12,43,54],
+  /* A2f verbs, verified: 4 want, 62 cost (la'alot), 76 receive, 88 choose, 144 request */
+  91:[4,76,42,2],
+  92:[62,60,10],
+  93:[10,60,134,88],
+  94:[10,15,75],
+  95:[144,70,18,4],
+  96:[10,60,42,134],
+  /* A2g verbs, verified: 9 write, 20 begin, 52 meet, 59 finish, 157 send */
+  97:[48,20,59],
+  98:[7,43,41],
+  99:[48,11,7],
+  100:[11,52,109,76],
+  101:[9,157,7],
+  102:[109,41,59,52],
+  /* A2h verbs, verified: 21 feel, 29 help, 56 forget, 58 agree, 69 be angry,
+     94 apologize, 98 be sorry, 100 calm down, 161 fix */
+  103:[11,48,161],
+  104:[29,144,161],
+  105:[94,98,56],
+  106:[69,100,58,18],
+  107:[134,21,144],
+  108:[29,144,161,21],
+  /* A2i verbs: mixed integration recycle across the level's verb set */
+  109:[1,3,11,2],
+  110:[109,74,7],
+  111:[3,124,43,61],
+  112:[4,76,60,10],
+  113:[9,157,70,29],
+  114:[50,51,109,1]
 };
 /* Lesson-specific exposure whitelist (vocab-integrity pass). Additive and reversible.
    Surfaces a few B1 words as controlled exposure inside a specific A1 lesson, keyed by the
@@ -6968,6 +7066,8 @@ function pilotEvidence(lessonId, stepKey){
   if(mid){ mid.innerHTML='<span class="rstep-doneflag">\u2713 done</span> <button class="btn sm ghost" data-runner-undone="1" title="undo this step">undo</button>';
     var u=mid.querySelector('[data-runner-undone]'); if(u)u.onclick=function(){markCurrentLessonStepUndone();}; }
   try{toast('Step complete \u2713');}catch(e){}
+  /* R1: evidence completion advances to the next step automatically */
+  try{ if(route.section==='runner') setTimeout(function(){ if(route.section==='runner') runnerGoNext(); },1400); }catch(e){}
 }
 /* Resolve the step the learner is currently on in the runner, so evidence
    from generic (non-pilot) activities can complete the right step. */
@@ -6982,9 +7082,27 @@ function runnerStepEvidence(){
 /* Honest skip (R4/R5): no self-attestation that work was done. Skipping marks
    the step done so the journey can advance, but the step's taught words are
    left un-promoted, so Knowledge stays honest and they return in warm-up. */
+function runnerGoNext(){
+  var st=getLessonRunnerState(route.item); if(!st){go('course');return;}
+  var idx=parseInt(route.sub,10); if(isNaN(idx))idx=0;
+  var steps=st.steps, nxt=idx+1;
+  if(nxt>=steps.length||steps[nxt].key==='done'){ setActiveSession(route.item,'hub'); go('runner',String(route.item),'hub'); return; }
+  setActiveSession(route.item,nxt); go('runner',String(route.item),String(nxt));
+}
 function skipCurrentLessonStep(){
+  /* R4: skip is a real signal. The step's taught words enter the seen/due pool so
+     warm-up and practice resurface them; skipping never claims knowledge. */
+  try{ var c=_runnerCtx();
+    if(c&&c.st&&typeof isPilotLesson==='function'&&isPilotLesson(c.id)){
+      var bk=pilotBank(c.st.lesson);
+      if(bk&&bk.allowed&&bk.allowed.vocab){ var n=0;
+        bk.allowed.vocab.forEach(function(it){ if(it.key&&typeof mState==='function'&&mState(it.key)<0){ mSeen(it.key); n++; } });
+        if(n) save(); }
+    }
+  }catch(e){}
   try{toast('Skipped for now - these come back in warm-up');}catch(e){}
   markCurrentLessonStepDone();
+  runnerGoNext();
 }
 function _pilotMeaningQuiz(pairs, lessonId, stepKey){
   /* pairs: [{v,p,en}] for vocab or [{he,plain,en}] for phrases */
@@ -7217,7 +7335,31 @@ function finishLessonRunner(lessonId){
   clearActiveSession();
   var l=_lessonById(id);
   toast(already?(pilotLessonLabel(id,true)+' reviewed'):(pilotLessonLabel(id,true)+' complete. +15 XP'+(_dailyAwarded?' \u00b7 Today done +10 XP':'')));
-  go('course','', l?String(l.ch):''+currentLesson().ch);
+  go('runner', String(id), 'summary');   /* R1+R6: completion screen, never a bare tab */
+}
+function renderLessonSummary(l, st){
+  st=st||getLessonRunnerState(l.id);
+  var dm=(st&&st.doneMap)||{};
+  var steps=(st&&st.steps||[]).filter(function(s){return s.key!=='done';});
+  var doneN=steps.filter(function(s){return !!dm[s.key];}).length;
+  var pct=steps.length?Math.round(100*doneN/steps.length):0;
+  var strong=0, weak=0, taught=0;
+  try{ var bk=pilotBank(l);
+    if(bk){ bk.allowed.vocab.forEach(function(it){ taught++; var ms=(typeof mState==='function')?mState(it.key):-1;
+      if(ms>=2)strong++; else if(ms>=0)weak++; }); }
+  }catch(e){}
+  var nxt=null;
+  try{ var pi=PILOT_LESSONS.indexOf(parseInt(l.id,10)); if(pi>=0&&pi+1<PILOT_LESSONS.length) nxt=_lessonById(PILOT_LESSONS[pi+1]); }catch(e){}
+  return '<button class="back" data-go2="dash">\u2190 dashboard</button>'
+    +'<div class="topbar"><div><h1>Lesson complete \u2713</h1><div class="lead">'+lvlBadge(l.lvl)+' \u00b7 '+escHTML(l.title)+'</div></div>'+nikToggle()+'</div>'
+    +'<div class="card runner-step">'
+    +'<div class="rstep-ok">'+pct+'% of sections completed ('+doneN+' / '+steps.length+')</div>'
+    +(taught?'<div class="rstep-t" style="margin-top:8px">'+taught+' words taught this lesson \u00b7 <b>'+strong+'</b> strong \u00b7 <b>'+weak+'</b> still settling. Weak words come back in warm-up and practice until they stick.</div>':'')
+    +'<div class="row" style="gap:10px;margin-top:16px;flex-wrap:wrap">'
+    +(nxt?'<button class="btn" data-runner-start="'+nxt.id+'" style="font-size:15px;padding:10px 18px">Next lesson \u2192 '+escHTML(nxt.title)+'</button>':'')
+    +'<button class="btn sm ghost" data-go2="dash">\u2190 back to dashboard</button>'
+    +'<button class="btn sm ghost" data-go2="course||'+escHTML(String(l.ch))+'">course map</button>'
+    +'</div></div>';
 }
 /* Phase 9B.4: warm-up content pool. Review-first from existing mastery
    (weak/due seen items); gentle starter from the lesson's own vocabulary
@@ -7260,6 +7402,16 @@ function returnToRunnerStep(markDone){
   var r=getRunnerReturn(); if(!r){go('course');return;}
   if(markDone&&r.stepKey) setLessonStepDone(r.lessonId, r.stepKey, true);
   clearRunnerReturn();
+  /* R1: end of a completed step advances to the next step, never just back */
+  if(markDone){
+    var st=getLessonRunnerState(r.lessonId);
+    var idx=parseInt(r.stepIndex,10); if(isNaN(idx))idx=0;
+    if(st&&st.steps){
+      var nxt=idx+1;
+      if(nxt<st.steps.length&&st.steps[nxt].key!=='done'){ setActiveSession(r.lessonId,nxt); go('runner',String(r.lessonId),String(nxt)); return; }
+      setActiveSession(r.lessonId,'hub'); go('runner',String(r.lessonId),'hub'); return;
+    }
+  }
   go('runner', String(r.lessonId), String(r.stepIndex));
 }
 /* Phase 9B.5: launch real activities from a runner step, scoped to the lesson's
@@ -7275,8 +7427,21 @@ function runnerLaunchVocab(){
   setRunnerReturn('vocab');
   startVocabDrill(items, {title:pilotLessonLabel(c.id,true)+' \u00b7 vocabulary', back:'runner', onDone:function(){returnToRunnerStep(true);}});
 }
+function runnerLaunchPilotPractice(){
+  var c=_runnerCtx(); if(!c.st) return false;
+  if(!isPilotLesson(c.id)) return false;
+  var bk=pilotBank(c.st.lesson); if(!bk) return false;
+  var gen=pilotPracticeGen(bk);
+  var items=gen.fresh.concat(gen.verbs);
+  if(items.length<4) items=items.concat(gen.review);
+  if(items.length<2) return false;
+  setRunnerReturn('practice');
+  startVocabDrill(shuffle(items.slice()),{title:pilotLessonLabel(c.id,true)+' \u00b7 practice',max:12,back:'runner',onDone:function(){returnToRunnerStep(true);}});
+  return true;
+}
 function runnerLaunchPractice(){
   var c=_runnerCtx(); if(!c.st) return;
+  if(runnerLaunchPilotPractice()) return;
   var step=c.st.steps[c.idx]; if(!step||!step.res||!step.res.resolved) return;
   var pr=PRACTICE.find(function(p){return p&&p.ch===step.res.ch;});
   if(!pr||!pr.items||!pr.items.length){ markCurrentLessonStepDone(); return; }
@@ -7311,6 +7476,13 @@ function runnerLaunchWriting(){
   if(!p){ markCurrentLessonStepDone(); return; }
   setRunnerReturn('writing');
   go('write', p.id);
+}
+function runnerBackOverride(stepKey,resId){
+  var rr=getRunnerReturn(); if(!rr||rr.stepKey!==stepKey) return '';
+  var l=_lessonById(rr.lessonId); if(!l) return '';
+  var rsc=resolveLessonResources(l)[stepKey];
+  if(!rsc||!rsc.resolved||String(rsc.id)!==String(resId)) return '';
+  return '<button class="back rr-back" data-runner-return="1">\u2190 back to lesson</button>';
 }
 function runnerReturnBanner(){
   var rr=getRunnerReturn(); if(!rr) return '';
@@ -7389,7 +7561,7 @@ function renderLessonStepPlaceholder(step, lesson, index, total){
     var nl=''+(lesson.newLanguage||'');
     b='<div class="rstep-h">New language</div>';
     var pts=nl.split(/;|\u2022|\n/).map(function(x){return x.trim();}).filter(Boolean);
-    if(pts.length>1) b+='<ul class="rstep-list">'+pts.map(function(p){return '<li dir="auto">'+v2FieldText(p)+'</li>';}).join('')+'</ul>';
+    if(pts.length>1) b+='<ul class="rstep-list">'+pts.map(function(p){return '<li><span dir="auto" style="unicode-bidi:plaintext;display:inline-block;max-width:100%">'+v2FieldText(p)+'</span></li>';}).join('')+'</ul>';
     else b+='<div class="rstep-t" dir="auto">'+(v2FieldShown(nl)?v2FieldText(nl):'This lesson introduces the day\u2019s new material. Work through the steps that follow.')+'</div>';
     var _first=null;
     if(isPilotLesson(lesson.id)){ var _bk=pilotBank(lesson); if(_bk&&_bk.allowed.vocab.length) _first=_bk.allowed.vocab[0]; }
@@ -7429,7 +7601,7 @@ function renderLessonStepPlaceholder(step, lesson, index, total){
         var _gc=(S.gconf&&S.gconf[r.id])||0;
         b+='<div class="rstep-h" style="margin-top:12px">How confident are you?</div>'
           +'<div class="chips" style="margin-bottom:6px">'+[['1','Still unsure'],['2','Getting it'],['3','Confident']].map(function(o){return '<button class="chip'+(_gc==o[0]?' on':'')+'" data-grate-set="'+r.id+'|'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div>';
-        b+='<div class="row" style="gap:8px;margin-top:8px"><button class="btn sm" data-runner-grammar-practice="1">Practice this \u2192</button><button class="btn sm ghost" data-go2="grammar|'+r.id+'">Open full topic</button></div>'; } }
+        b+='<div class="row" style="gap:8px;margin-top:8px"><button class="btn" data-runner-grammar-practice="1" style="font-size:15px;padding:10px 18px">Practice this grammar \u2192</button><button class="btn sm ghost" data-go2="grammar|'+r.id+'">Open full topic</button></div>'; } }
     else b+='<div class="rstep-fb">This lesson has grammar notes but no linked topic. '+escHTML(r.label||r.raw)+' Read them above, then continue or skip below.</div>';
     return b;
   }
@@ -7536,14 +7708,17 @@ function renderLessonRunner(lessonId, stepIndex){
   if(!st) return '<button class="back" data-go2="course">\u2190 course</button><div class="note">Lesson not found.</div>';
   var l=st.lesson, steps=st.steps, total=steps.length;
   if(String(stepIndex)==='hub') return renderLessonHub(l, st);
+  if(String(stepIndex)==='summary') return renderLessonSummary(l, st);
   var idx=parseInt(stepIndex,10); if(isNaN(idx))idx=0; idx=Math.max(0,Math.min(idx,total-1));
   var step=steps[idx], done=!!st.doneMap[step.key];
-  if(step.key==='done') return renderLessonHub(l, st);
+  if(step.key==='done') return renderLessonSummary(l, st);
   var head='<button class="back" data-runner-hub="'+l.id+'">\u2190 '+escHTML(l.title)+'</button>'
     +'<div class="topbar"><div><h1>'+escHTML(step.title)+'</h1><div class="lead">'+lvlBadge(l.lvl)+' \u00b7 '+escHTML(l.title)+'</div></div>'+nikToggle()+'</div>';
   var card='<div class="card runner-step"><div class="rstep-type">'+escHTML(step.title)+'</div>'+renderLessonStepPlaceholder(step,l,idx,total)+'</div>';
+  var isLastStep=(idx+1>=total)||(steps[idx+1]&&steps[idx+1].key==='done');
+  var nextLabel=isLastStep?'Finish \u00b7 back to lesson \u2192':'Next step \u2192';
   var nav='<div class="runner-nav"><button class="btn sm ghost" data-runner-hub="'+l.id+'">\u2190 back to lesson</button>';
-  nav+=(done?'<span class="runner-nav-mid"><span class="rstep-doneflag">✓ done</span> <button class="btn sm ghost" data-runner-undone="1" title="undo">undo</button></span><button class="btn sm" data-runner-hub="'+l.id+'">back to lesson \u2192</button>':'<span class="runner-nav-mid"></span><button class="btn sm ghost" data-runner-skip="1">Skip this step</button>');
+  nav+=(done?'<span class="runner-nav-mid"><span class="rstep-doneflag">✓ done</span> <button class="btn sm ghost" data-runner-undone="1" title="undo">undo</button></span><button class="btn sm" data-runner-next="1">'+nextLabel+'</button>':'<span class="runner-nav-mid"></span><button class="btn sm ghost" data-runner-skip="1">Skip \u00b7 '+(isLastStep?'finish \u2192':'next \u2192')+'</button>');
   nav+='</div>';
   return head+card+nav;
 }
@@ -9114,7 +9289,7 @@ function vStories(){
         +'<button class="spk" data-speak="'+encodeURIComponent(heVal)+'">\u266a</button>'
         +'</div>';
     }).join('');
-    return '<button class="back" data-back="stories">&#8592; stories</button>'
+    return (runnerBackOverride('story',st.id)||'<button class="back" data-back="stories">&#8592; stories</button>')
       +'<div class="topbar"><div>'
       +'<div style="display:flex;align-items:baseline;gap:8px"><h1>'+hebClick(titleHe,titleHePlain)+'</h1>'
       +'<button class="edit-btn" data-edit-key="story|'+st.id+'|title_he" data-edit-val="'+encodeURIComponent(titleHe)+'" data-edit-label="Hebrew title" title="Edit Hebrew title" style="opacity:.5;font-size:13px">\u270e</button>'
@@ -9161,7 +9336,7 @@ function typeBadge(t){const m={short:['Short','st-short'],long:['Long','st-long'
     +tabs+grid;
 }
 function storyQuiz(st){
-  return `<button class="back" data-back="stories">← stories</button>
+  return `${runnerBackOverride('story',st.id)||'<button class="back" data-back="stories">\u2190 stories</button>'}
    <h1>Quiz: ${st.en}</h1><div class="lead">Check what you understood.</div>
    <div class="card" style="margin-top:14px">${st.quiz.map((q,qi)=>`<div style="margin-bottom:18px"><h3>${qi+1}. ${q.q}</h3>
      <div class="row" style="gap:8px;margin-top:8px">${q.opts.map((o,oi)=>`<button class="btn ghost sm" data-quiz="${st.id}|${qi}|${oi}">${o}</button>`).join('')}</div>
@@ -9449,7 +9624,7 @@ function vWrite(){
 function writePromptView(id){
   const p=WRITEPROMPTS.find(x=>x.id===id);if(!p)return vWrite();
   if(!writeUnlocked(p))return `<button class="back" data-back="write">← prompts</button><div class="note">This prompt unlocks after lesson ${p.unlocksAfter}. Keep going in the Course.</div>`;
-  return `<button class="back" data-back="write">← prompts</button>
+  return `${runnerBackOverride('writing',p.id)||'<button class="back" data-back="write">← prompts</button>'}
    <div class="t-eyebrow">Write · ${p.category}</div><h1 class="heb" dir="rtl" style="font-weight:400;font-size:clamp(24px,5vw,30px);line-height:1.15;margin:2px 0 6px;color:var(--ink)">${H(p.heTitle[0],p.heTitle[1])}</h1><p class="t-lede" style="margin-bottom:0">${p.enTitle}</p>
      <div class="row" style="gap:7px;margin-top:8px">${lvlBadge(p.level)}<span class="tag">${p.category}</span><span class="tag">✎ ${p.sentences}</span></div>
    <div class="card"><h4>The task</h4><p>${p.task}</p>
@@ -10050,6 +10225,17 @@ function bind(){
   document.querySelectorAll('[data-runner-nav]').forEach(b=>b.onclick=()=>goLessonStep(b.dataset.runnerNav==='next'?1:-1));
   document.querySelectorAll('[data-runner-done]').forEach(b=>b.onclick=()=>markCurrentLessonStepDone());
   document.querySelectorAll('[data-runner-skip]').forEach(b=>b.onclick=()=>skipCurrentLessonStep());
+  document.querySelectorAll('[data-runner-next]').forEach(b=>b.onclick=()=>runnerGoNext());
+  /* R1/Italian model: a lesson opens an activity. The practice step launches its
+     session immediately, once per visit (exiting the drill early shows the page). */
+  if(route.section==='runner'){ try{
+    var _ast=getLessonRunnerState(route.item);
+    var _ai=parseInt(route.sub,10);
+    if(_ast&&!isNaN(_ai)&&_ast.steps[_ai]&&_ast.steps[_ai].type==='practiceDrill'&&!_ast.doneMap[_ast.steps[_ai].key]){
+      var _ak=route.item+'|'+_ai;
+      if(window._runnerAutoKey!==_ak){ window._runnerAutoKey=_ak; setTimeout(function(){ if(!runnerLaunchPilotPractice()) runnerLaunchPractice(); },60); }
+    }
+  }catch(e){} }
   document.querySelectorAll('[data-runner-undone]').forEach(b=>b.onclick=()=>markCurrentLessonStepUndone());
   document.querySelectorAll('[data-runner-finish]').forEach(b=>b.onclick=()=>finishLessonRunner(b.dataset.runnerFinish));
   document.querySelectorAll('[data-runner-hub]').forEach(b=>b.onclick=()=>{var _id=b.dataset.runnerHub;setActiveSession(_id,'hub');go('runner',String(_id),'hub');});
@@ -10171,7 +10357,7 @@ function bind(){
   const ra=document.querySelector('[data-readall]');if(ra)ra.onclick=()=>{const st=STORIES.find(s=>s.id===ra.dataset.readall);speakSeq(st.s.map(x=>x[0][0]));};
   const sr=document.querySelector('[data-stopread]');if(sr)sr.onclick=()=>{queue=[];_stopAudio();if('speechSynthesis'in window)speechSynthesis.cancel();};
   document.querySelectorAll('[data-quiz]').forEach(b=>b.onclick=()=>{const[sid,qi,oi]=b.dataset.quiz.split('|');const st=STORIES.find(s=>s.id===sid);const q=st.quiz[+qi];const fb=document.getElementById('qf-'+qi);
-    if(+oi===q.a){fb.innerHTML='<span class="ans-ok">Correct ✓</span>';addXP(2);save();}else{fb.innerHTML='<span class="ans-bad">Not quite. Answer: '+q.opts[q.a]+'</span>';}});
+    if(+oi===q.a){fb.innerHTML='<span class="ans-ok">Correct ✓</span>';addXP(2);save();}else{fb.innerHTML='<span class="ans-bad">Not quite. Answer: '+q.opts[q.a]+'</span>';};(function(){var fbs=[].slice.call(document.querySelectorAll('[id^="qf-"]'));if(fbs.length&&fbs.every(function(f){return f.innerHTML&&f.innerHTML.length;})){var ov=runnerBackOverride('story',sid);if(ov){try{toast('Story quiz complete \u2713');}catch(e){}setTimeout(function(){returnToRunnerStep(true);},1200);}}})()});
 
   // practice modes
   document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{const mode=b.dataset.mode;
@@ -10299,7 +10485,10 @@ function norm(s){return translitNorm(stripN(s).replace(/[\u2013\u2014'"`.,!?]/g,
 function bindDrill(){
   if(route.section!=='drill'||!drill)return;
   const d=drill;
-  document.querySelectorAll('[data-drill-exit]').forEach(b=>b.onclick=()=>{const back=d.back||'practice';drill=null;go(back);});
+  document.querySelectorAll('[data-drill-exit]').forEach(b=>b.onclick=()=>{
+    const remaining=d.items.length-d.i-(d.answered!=null?1:0);
+    if(remaining>0&&!b.dataset.confirmExit){ b.dataset.confirmExit='1'; b.textContent=remaining+' unanswered \u00b7 tap again to leave'; return; }
+    const back=d.back||'practice';drill=null;go(back);});
   document.querySelectorAll('[data-drill-pick]').forEach(b=>b.onclick=()=>{if(d.answered)return;const chosen=decodeURIComponent(b.dataset.drillPick);const it=d.items[d.i];const ok=chosen===it.en;mAnswer(it.key,ok);if(ok)d.score++;else d.wrong.push(it);d.answered={chosen,ok};save();render();});
   const ck=document.querySelector('[data-drill-check]');if(ck)ck.onclick=drillCheck;
   /* gx (grammar exercise) wiring */
