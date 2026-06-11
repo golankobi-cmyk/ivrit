@@ -8,7 +8,7 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-title" content="ivrit" />
-<link rel="apple-touch-icon" href="./icon-192.png" />
+<link rel="apple-touch-icon" href="./icon192.png" />
 <title>עברית · Vincenzo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -8629,7 +8629,11 @@ function renderMini(lid){
       gq=gxPick(gref.id,6).filter(x=>'FMCTK'.indexOf(x.e.t)>=0).slice(0,2);
     }
   }catch(e){gq=[];}
-  const pool=catItems(l.vocab);
+  /* AUDIT FIX: structural A1 lessons have an empty l.vocab but DO carry pilot-bank words.
+     Fall back to the pilot bank so the mini-quiz works on every lesson that teaches words. */
+  let pool=catItems(l.vocab);
+  if(pool.length<2){ try{ if(typeof isPilotLesson==='function'&&isPilotLesson(l.id)){ var _pb=pilotBank(l);
+    if(_pb&&_pb.allowed&&_pb.allowed.vocab&&_pb.allowed.vocab.length>=2) pool=_pb.allowed.vocab.slice(); } }catch(e){} }
   if(pool.length<2&&!gq.length){host.innerHTML='<div class="note">Not enough words for a quiz here. Move on.</div>';return;}
   const picks=pool.length<2?[]:shuffle(pool.slice()).slice(0,Math.min(3,pool.length));
   const qs=picks.map((it,i)=>{
