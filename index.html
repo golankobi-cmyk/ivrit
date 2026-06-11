@@ -828,7 +828,7 @@ let _PLAINMAP=null;
    say the letter name "alef". The vowelled key is kept vowelled so the plain-map
    down-conversion never re-introduces the ambiguous plain form. Voice quality
    still varies by device. */
-const TTS_OVERRIDE={ '\u05D0\u05DC\u05E3':'\u05D0\u05B8\u05DC\u05B6\u05E3', '\u05D0\u05B8\u05DC\u05B6\u05E3':'\u05D0\u05B8\u05DC\u05B6\u05E3' };
+const TTS_OVERRIDE={ '\u05d7\u05d1\u05e8\u05d4':'\u05d7\u05b6\u05d1\u05b0\u05e8\u05b8\u05d4', '\u05d7\u05b6\u05d1\u05b0\u05e8\u05b8\u05d4':'\u05d7\u05b6\u05d1\u05b0\u05e8\u05b8\u05d4', '\u05d0\u05ea':'\u05d0\u05b6\u05ea', '\u05d0\u05b6\u05ea':'\u05d0\u05b6\u05ea', '\u05e9\u05d1\u05e2':'\u05e9\u05b6\u05c1\u05d1\u05b7\u05e2', '\u05e9\u05b6\u05c1\u05d1\u05b7\u05e2':'\u05e9\u05b6\u05c1\u05d1\u05b7\u05e2', '\u05d1\u05d9\u05ea':'\u05d1\u05b7\u05bc\u05d9\u05b4\u05ea', '\u05d1\u05b7\u05bc\u05d9\u05b4\u05ea':'\u05d1\u05b7\u05bc\u05d9\u05b4\u05ea', '\u05d3\u05dc\u05ea':'\u05d3\u05b6\u05bc\u05dc\u05b6\u05ea', '\u05d3\u05b6\u05bc\u05dc\u05b6\u05ea':'\u05d3\u05b6\u05bc\u05dc\u05b6\u05ea', '\u05d7\u05d5\u05dd':'\u05d7\u05b9\u05dd', '\u05d7\u05b9\u05dd':'\u05d7\u05b9\u05dd', '\u05de\u05dc\u05d0':'\u05de\u05b8\u05dc\u05b5\u05d0', '\u05de\u05b8\u05dc\u05b5\u05d0':'\u05de\u05b8\u05dc\u05b5\u05d0', '\u05d4\u05e4\u05e1\u05d3':'\u05d4\u05b6\u05e4\u05b0\u05e1\u05b5\u05d3', '\u05d4\u05b6\u05e4\u05b0\u05e1\u05b5\u05d3':'\u05d4\u05b6\u05e4\u05b0\u05e1\u05b5\u05d3', '\u05d7\u05d1\u05dc':'\u05d7\u05b8\u05d1\u05b8\u05dc', '\u05d7\u05b8\u05d1\u05b8\u05dc':'\u05d7\u05b8\u05d1\u05b8\u05dc', '\u05de\u05d8\u05e2\u05df':'\u05de\u05b7\u05d8\u05b0\u05e2\u05b5\u05df', '\u05de\u05b7\u05d8\u05b0\u05e2\u05b5\u05df':'\u05de\u05b7\u05d8\u05b0\u05e2\u05b5\u05df', '\u05e9\u05e7\u05d8':'\u05e9\u05b6\u05c1\u05e7\u05b6\u05d8', '\u05e9\u05b6\u05c1\u05e7\u05b6\u05d8':'\u05e9\u05b6\u05c1\u05e7\u05b6\u05d8', '\u05e4\u05d5\u05e2\u05dc':'\u05e4\u05bc\u05d5\u05b9\u05e2\u05b5\u05dc', '\u05e4\u05bc\u05d5\u05b9\u05e2\u05b5\u05dc':'\u05e4\u05bc\u05d5\u05b9\u05e2\u05b5\u05dc', '\u05e4\u05e1\u05dc':'\u05e4\u05b6\u05bc\u05e1\u05b6\u05dc', '\u05e4\u05b6\u05bc\u05e1\u05b6\u05dc':'\u05e4\u05b6\u05bc\u05e1\u05b6\u05dc', '\u05d1\u05d9\u05ea \u05de\u05e8\u05e7\u05d7\u05ea':'\u05d1\u05b5\u05bc\u05d9\u05ea \u05de\u05b4\u05e8\u05b0\u05e7\u05b7\u05d7\u05b7\u05ea', '\u05d1\u05b5\u05bc\u05d9\u05ea \u05de\u05b4\u05e8\u05b0\u05e7\u05b7\u05d7\u05b7\u05ea':'\u05d1\u05b5\u05bc\u05d9\u05ea \u05de\u05b4\u05e8\u05b0\u05e7\u05b7\u05d7\u05b7\u05ea', '\u05d1\u05d9\u05ea \u05db\u05e0\u05e1\u05ea':'\u05d1\u05b5\u05bc\u05d9\u05ea \u05db\u05b0\u05bc\u05e0\u05b6\u05e1\u05b6\u05ea', '\u05d1\u05b5\u05bc\u05d9\u05ea \u05db\u05b0\u05bc\u05e0\u05b6\u05e1\u05b6\u05ea':'\u05d1\u05b5\u05bc\u05d9\u05ea \u05db\u05b0\u05bc\u05e0\u05b6\u05e1\u05b6\u05ea', '\u05d0\u05dc\u05e3':'\u05d0\u05b8\u05dc\u05b6\u05e3', '\u05d0\u05b8\u05dc\u05b6\u05e3':'\u05d0\u05b8\u05dc\u05b6\u05e3' };
 function _ttsHasNik(s){return typeof s==='string'&&/[\u0591-\u05C7]/.test(s);}
 function _ttsWalk(node,map){
   if(Array.isArray(node)){
@@ -6104,15 +6104,51 @@ function stripLessonAnnotation(text){
   return t;
 }
 function _refEmpty(text){var t=(text==null?'':(''+text)).trim();return t===''||/^none\b/i.test(t);}
+/* Map standard grammar phrases used in B1/B2 lesson prose to their GRAMMAR topic id.
+   Additive only: the strict "Topic #N" parse is tried first and always wins; this fallback
+   fires only when no explicit number is present, so a lesson that names a topic in words
+   ("\u05e9-clauses and connectors") still resolves to the right teaching page and exercises.
+   Order matters: more specific phrases are listed before broader ones. */
+var GRAMMAR_PHRASE_MAP=[
+  [/hitpa'?el|\u05d4\u05ea\u05e4\u05e2\u05dc/i,16],
+  [/hif'?il|\u05d4\u05e4\u05e2\u05d9\u05dc/i,15],
+  [/nif'?al|\u05e0\u05e4\u05e2\u05dc/i,17],
+  [/pi'?el|\u05e4\u05d9\u05e2\u05dc/i,14],
+  [/comparativ|superlativ/i,22],
+  [/conditional|\bwould\b/i,23],
+  [/subordinate|\u05e9-?clause|\u05e9\u05be?\u05db\u05dc\u05dc|relative clause/i,21],
+  [/connector|discourse|cause link|contrast connector|linking word/i,25],
+  [/\bquestion/i,12],
+  [/preposition/i,18],
+  [/possess|smichut|\u05e9\u05dc |yesh\b/i,11],
+  [/past tense|narrative review/i,8],
+  [/future tense/i,9],
+  [/present tense/i,3],
+  [/binyan/i,13],
+  [/shem peula|gerund|noun of action/i,20],
+  [/demonstrativ/i,24],
+  [/adjective/i,6]
+];
+function _grammarPhraseId(raw){
+  for(var i=0;i<GRAMMAR_PHRASE_MAP.length;i++){ if(GRAMMAR_PHRASE_MAP[i][0].test(raw)) return GRAMMAR_PHRASE_MAP[i][1]; }
+  return null;
+}
 function resolveGrammarRef(text){
   if(_refEmpty(text)) return null;
   var raw=''+text, label=stripLessonAnnotation(raw);
   var m=raw.match(/Topic\s*#\s*(\d+)/i);
-  if(!m) return {type:'grammar',raw:raw,label:label,resolved:false,reason:'no Topic # in text'};
-  var id=parseInt(m[1],10);
+  var id=null, via='';
+  if(m){ id=parseInt(m[1],10); via='number'; }
+  else {
+    /* multi-topic integration prose: "Topics #15, #16, #17 ..." -> first named topic */
+    var mm=raw.match(/Topics?\s*#\s*(\d+)/i);
+    if(mm){ id=parseInt(mm[1],10); via='first-of-many'; }
+    else { id=_grammarPhraseId(raw); via='phrase'; }
+  }
+  if(id==null) return {type:'grammar',raw:raw,label:label,resolved:false,reason:'no Topic # in text'};
   var g=GRAMMAR.find(function(x){return x.id===id;});
   if(!g) return {type:'grammar',raw:raw,label:label,resolved:false,id:id,reason:'no GRAMMAR topic '+id};
-  return {type:'grammar',raw:raw,label:g.t,resolved:true,id:id};
+  return {type:'grammar',raw:raw,label:g.t,resolved:true,id:id,via:via};
 }
 function resolvePracticeRef(text){
   if(_refEmpty(text)) return null;
@@ -6656,7 +6692,7 @@ if(typeof window!=='undefined'){window.__ivritResolverCoverage=__ivritResolverCo
    lessons are untouched: every pilot branch returns null and falls
    back to the existing renderer. Verified IDs only (no invented refs).
 =================================================================== */
-var PILOT_LESSONS=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,223,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114];
+var PILOT_LESSONS=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,223,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222];
 /* Display-only friendly labels for appended pilot lessons. The numeric COURSE id is an internal
    key (ids 1-222 were all taken, so the appended health lesson had to use id 223). Learner-facing
    labels route through these helpers so the appended lesson reads sensibly instead of "lesson 223".
@@ -6838,7 +6874,161 @@ var PILOT_VOCAB_PICK={
   111:[{cat:"Directions & places",idx:[17,18,25]},{cat:"Transport & directions",idx:[16,17]}],
   112:[{cat:"Restaurant & ordering",idx:[4,5,6,8]},{cat:"Shopping & supermarket",idx:[1]}],
   113:[{cat:"Telephone & internet",idx:[3,18,16,17]}],
-  114:[{cat:"Ordinal & quantity",idx:[7]},{cat:"Connectors & discourse",idx:[16,8]},{cat:"Celebrations",idx:[7]}]
+  114:[{cat:"Ordinal & quantity",idx:[7]},{cat:"Connectors & discourse",idx:[16,8]},{cat:"Celebrations",idx:[7]}],
+  /* ===== B1a - narrative chapter (115-121): connectors, thinking/feeling vocab, longer past stories ===== */
+  115:[{cat:"Connectors & discourse",idx:[9,10,11]},{cat:"Verbs of thinking",idx:[3,4]}],
+  116:[{cat:"Connectors & discourse",idx:[2,3,4,22]},{cat:"Verbs of thinking",idx:[5,0]}],
+  117:[{cat:"Verbs of thinking",idx:[7,8,1]},{cat:"Relationships & social",idx:[5,8]}],
+  118:[{cat:"Emotions & states",idx:[4,6,7,8]},{cat:"Connectors & discourse",idx:[27,1]}],
+  119:[{cat:"Verbs of thinking",idx:[6,13]},{cat:"Relationships & social",idx:[6,13,20]}],
+  120:[{cat:"Connectors & discourse",idx:[17,18,23]},{cat:"Emotions & states",idx:[9,15]}],
+  121:[{cat:"Verbs of thinking",idx:[11,16,19]},{cat:"Connectors & discourse",idx:[6,36]}],
+  /* ===== B1b - opinion and comparison chapter (122-128) ===== */
+  122:[{cat:"Verbs of thinking",idx:[9,14]},{cat:"Connectors & discourse",idx:[30,38]}],
+  123:[{cat:"Personality traits",idx:[10,13,5]},{cat:"Connectors & discourse",idx:[7,37]}],
+  124:[{cat:"Common adjectives",idx:[12,13,52,51]},{cat:"Personality traits",idx:[14,17]}],
+  125:[{cat:"Verbs of thinking",idx:[10,18]},{cat:"Connectors & discourse",idx:[31,41]}],
+  126:[{cat:"Communication verbs",idx:[10,11,13]},{cat:"Connectors & discourse",idx:[5,40]}],
+  127:[{cat:"Personality traits",idx:[3,4,11,12]},{cat:"Verbs of thinking",idx:[15]}],
+  128:[{cat:"Personality traits",idx:[0,16,18,19]},{cat:"Connectors & discourse",idx:[34,39]}],
+  /* ===== B1c - professional / workplace chapter (129-135). Work & business and
+     Office & business overlap heavily; concepts are split so none is taught twice. ===== */
+  129:[{cat:"Work & business",idx:[5,12,18,22]},{cat:"Office & business",idx:[17]}],
+  130:[{cat:"Verbs of work & effort",idx:[13,14,16]},{cat:"Work & business",idx:[23]}],
+  131:[{cat:"Work & business",idx:[3,4,9,20]},{cat:"Office & business",idx:[9]}],
+  132:[{cat:"Office & business",idx:[4,5,6]},{cat:"Connectors & discourse",idx:[28,33]}],
+  133:[{cat:"Telephone & internet",idx:[8,9,12]},{cat:"Work & business",idx:[13,15]}],
+  134:[{cat:"Verbs of work & effort",idx:[15,17,19]},{cat:"Personality traits",idx:[15,21]}],
+  135:[{cat:"Work & business",idx:[16,21,24]},{cat:"Office & business",idx:[14,18]}],
+  /* ===== B1d - inner life: emotions, mind, health chapter (136-142). Health & medical
+     here is distinct from health lesson 223 (which used Body & health / At the doctor). ===== */
+  136:[{cat:"Feelings & emotions",idx:[9,7,19]},{cat:"Emotions & states",idx:[17,18]}],
+  137:[{cat:"Verbs of feeling & mind",idx:[5,15]},{cat:"Emotions & states",idx:[0,1]}],
+  138:[{cat:"Verbs of feeling & mind",idx:[18,19]},{cat:"Senses & perception",idx:[9,10,11]}],
+  139:[{cat:"Health & medical",idx:[4,5,14,15]},{cat:"The face & expressions",idx:[2,7]}],
+  140:[{cat:"Emotions & states",idx:[11,13]},{cat:"Connectors & discourse",idx:[24,25]}],
+  141:[{cat:"Feelings & emotions",idx:[11,12,20]},{cat:"Senses & perception",idx:[14,15]}],
+  142:[{cat:"Health & medical",idx:[16,18,19]},{cat:"The face & expressions",idx:[12,13,14]}],
+  /* ===== B1e - social repair / conflict chapter (143-149). Communication verbs and
+     Relationships categories are the spine; some pools thinning, picks sized accordingly. ===== */
+  143:[{cat:"Communication verbs",idx:[12,16,17]},{cat:"Connectors & discourse",idx:[19,32]}],
+  144:[{cat:"Communication verbs",idx:[14,19]},{cat:"Relationships & social",idx:[0,9]}],
+  145:[{cat:"Relationships & social",idx:[1,7,19]},{cat:"Connectors & discourse",idx:[20,29]}],
+  146:[{cat:"Relationships & social",idx:[3,17]},{cat:"Personality traits",idx:[6,9]}],
+  147:[{cat:"Communication verbs",idx:[2,15]},{cat:"Connectors & discourse",idx:[21,35]}],
+  148:[{cat:"Communication verbs",idx:[1,8]},{cat:"Relationships & social",idx:[4,18]}],
+  149:[{cat:"Communication verbs",idx:[0,9,20]},{cat:"Personality traits",idx:[2,20]}],
+  /* ===== B1f - verb families / binyanim-by-meaning chapter (150-156). Vocab drawn from
+     the verb-concept categories (to build, to break, to become), which fit this chapter. ===== */
+  150:[{cat:"Verbs of making & creating",idx:[1,2,15]},{cat:"Communication verbs",idx:[3,4]}],
+  151:[{cat:"Verbs of feeling & mind",idx:[1,3]},{cat:"Emotions & states",idx:[2,16]}],
+  152:[{cat:"Verbs of state & change",idx:[7,8,12,13]},{cat:"Tools & repair",idx:[6,10]}],
+  153:[{cat:"Verbs of work & effort",idx:[1,2,5]},{cat:"Verbs of making & creating",idx:[9,16]}],
+  154:[{cat:"Verbs of state & change",idx:[1,3,15]},{cat:"Verbs of making & creating",idx:[3,17]}],
+  155:[{cat:"Verbs of thinking",idx:[17]},{cat:"Verbs of feeling & mind",idx:[13,7]}],
+  156:[{cat:"Verbs of making & creating",idx:[10,11,19]},{cat:"Verbs of state & change",idx:[9,10]}],
+  /* ===== B1g - culture and comparison chapter (157-163). Connectors & Relationships
+     categories are exhausted; vocab drawn from the rich culture/arts pools. Jewish
+     calendar & culture overlaps Religious & tradition; concepts split so none repeats. ===== */
+  157:[{cat:"Jewish calendar & culture",idx:[2,3,4,17]},{cat:"Celebrations",idx:[19]}],
+  158:[{cat:"Music & arts",idx:[8,9,13,15]},{cat:"Personality traits",idx:[8,22]}],
+  159:[{cat:"Music & arts",idx:[10,11,14,18]},{cat:"Celebrations",idx:[14,15]}],
+  160:[{cat:"Religious & tradition",idx:[2,3,12,14]},{cat:"Music & arts",idx:[17]}],
+  161:[{cat:"Israeli food",idx:[7,8,12,18]},{cat:"Jewish calendar & culture",idx:[7,19]}],
+  162:[{cat:"Music & arts",idx:[2,3,21]},{cat:"Religious & tradition",idx:[16,18]}],
+  163:[{cat:"Jewish calendar & culture",idx:[5,6,8]},{cat:"Religious & tradition",idx:[17,19,20]}],
+  /* ===== B1h - bureaucracy / problem-solving chapter (164-170). Building & construction
+     and Banking & money are completely fresh. Connectors exhausted; not used here. ===== */
+  164:[{cat:"Building & construction",idx:[9,10,11,14]},{cat:"Tools & repair",idx:[7,11]}],
+  165:[{cat:"Telephone & internet",idx:[7,11,19]},{cat:"Tools & repair",idx:[8,9]}],
+  166:[{cat:"Banking & money",idx:[1,4,7,9]},{cat:"Office & business",idx:[3]}],
+  167:[{cat:"Office & business",idx:[0,1,8]},{cat:"Building & construction",idx:[15,16]}],
+  168:[{cat:"Office & business",idx:[7,12,19]},{cat:"Telephone & internet",idx:[13,14]}],
+  169:[{cat:"Banking & money",idx:[6,8,10,11]},{cat:"Office & business",idx:[15]}],
+  170:[{cat:"Banking & money",idx:[2,3,12,13]},{cat:"Building & construction",idx:[1,2]}],
+  /* ===== B1i - B1 integration milestone (171-177). Revisits the level's functions;
+     several categories exhausted, so picks are small garnishes from remaining pools.
+     The prerequisite pool (770+ words) carries the review. Lesson 177's "mixed B1
+     categories" token IS the milestone - prerequisites ARE its bank. ===== */
+  171:[{cat:"Work & business",idx:[10,11]},{cat:"Verbs of work & effort",idx:[6,18]}],
+  172:[{cat:"Feelings & emotions",idx:[4,10]},{cat:"Verbs of feeling & mind",idx:[16,17]}],
+  173:[{cat:"Office & business",idx:[2,11]},{cat:"Verbs of feeling & mind",idx:[8,9]}],
+  174:[{cat:"Work & business",idx:[14,17,19]},{cat:"Office & business",idx:[16]}],
+  175:[{cat:"Feelings & emotions",idx:[13,14,15]},{cat:"Health & medical",idx:[2,3]}],
+  176:[{cat:"Health & medical",idx:[6,7,8]},{cat:"Telephone & internet",idx:[15]}],
+  177:[{cat:"Feelings & emotions",idx:[17,18]},{cat:"Work & business",idx:[0,6]}],
+  /* ===== B2a - reading comprehension chapter (178-182). B2 bands are 5 lessons.
+     Abstract & B2 and Abstract concepts are fresh but overlap (freedom, identity,
+     meaning, change, thought, idea); concepts split so none repeats. ===== */
+  178:[{cat:"Abstract & B2",idx:[0,1,2,3]}],
+  179:[{cat:"Abstract concepts",idx:[1,2,5,8]}],
+  180:[{cat:"Abstract & B2",idx:[4,6,7,8]}],
+  181:[{cat:"Abstract concepts",idx:[9,10,14,15]}],
+  182:[{cat:"Abstract & B2",idx:[5,9,10,15]}],
+  /* ===== B2b - register and hedging chapter (183-187), conditional for softening.
+     Abstract & B2 nearly exhausted; draws from Abstract concepts + facial-expression
+     vocabulary (fits "what a speaker really means"). ===== */
+  183:[{cat:"Abstract & B2",idx:[11,12,13,14]}],
+  184:[{cat:"Abstract concepts",idx:[3,4,11,12]}],
+  185:[{cat:"Abstract concepts",idx:[6,7,16,18]}],
+  186:[{cat:"The face & expressions",idx:[1,3,15,16]}],
+  187:[{cat:"Abstract concepts",idx:[0,13,17,19]}],
+  /* ===== B2c - argumentation chapter (188-192). Abstract & B2 and Abstract concepts
+     are exhausted; Politics & society (fresh, 21 items) supplies the argument substance
+     people actually debate (rights, democracy, equality, discourse). ===== */
+  188:[{cat:"Politics & society",idx:[4,5,6,19]}],
+  189:[{cat:"Politics & society",idx:[0,1,2,8]}],
+  190:[{cat:"Politics & society",idx:[13,14,16,20]}],
+  191:[{cat:"Politics & society",idx:[9,10,11,12]}],
+  192:[{cat:"Politics & society",idx:[3,7,15,18]}],
+  /* ===== B2d - professional judgment chapter (193-197). Work & business nearly
+     exhausted (4 free); draw from Verbs of work & effort and Measurements & sizes
+     (dimensions/weight/distance fit "comparing options" exactly). ===== */
+  193:[{cat:"Work & business",idx:[1,2,7,8]}],
+  194:[{cat:"Verbs of work & effort",idx:[3,4,12]},{cat:"Measurements & sizes",idx:[18]}],
+  195:[{cat:"Measurements & sizes",idx:[4,5,6,10]}],
+  196:[{cat:"Verbs of work & effort",idx:[7,8,10]},{cat:"Measurements & sizes",idx:[19]}],
+  197:[{cat:"Measurements & sizes",idx:[2,3,8,9]}],
+  /* ===== B2e - formal register chapter (198-202). Law & society fresh (20 items)
+     supplies the formal/legal vocabulary (judge, lawyer, court, witness, contract). ===== */
+  198:[{cat:"Law & society",idx:[0,2,3,12]}],
+  199:[{cat:"Law & society",idx:[1,7,8,11]}],
+  200:[{cat:"Law & society",idx:[10,13,18,19]}],
+  201:[{cat:"Law & society",idx:[4,5,6,9]}],
+  202:[{cat:"Law & society",idx:[14,15,16,17]}],
+  /* ===== B2f - identity and belonging chapter (203-207). Countries & nationalities
+     (fresh, 18 items) is the natural spine: Italian, German, Sicilian, Jewish, European,
+     Danish, foreigner - the languages of Vincenzo's own life across cultures. ===== */
+  203:[{cat:"Countries & nationalities",idx:[10,11,15]},{cat:"Politics & society",idx:[17]}],
+  204:[{cat:"Countries & nationalities",idx:[12,13,17]},{cat:"School & education",idx:[11]}],
+  205:[{cat:"Countries & nationalities",idx:[14,16,19]},{cat:"School & education",idx:[13]}],
+  206:[{cat:"Countries & nationalities",idx:[3,4,18]},{cat:"School & education",idx:[10]}],
+  207:[{cat:"Countries & nationalities",idx:[5,8,20]},{cat:"School & education",idx:[12]}],
+  /* ===== B2g - media literacy chapter (208-212). Newspaper & media fresh (20 items):
+     article, headline, journalist, source, rumour, fact, falsehood. Technology & digital
+     (fresh, 23) supplies online vocabulary for "public vs private language". ===== */
+  208:[{cat:"Newspaper & media",idx:[0,2,3,4]}],
+  209:[{cat:"Newspaper & media",idx:[6,7,14,16]}],
+  210:[{cat:"Newspaper & media",idx:[8,13,15,17]}],
+  211:[{cat:"Technology & digital",idx:[15,16,18,19]}],
+  212:[{cat:"Newspaper & media",idx:[1,5,9,12]}],
+  /* ===== B2h - writing craft chapter (213-217). Connectors and abstract categories
+     exhausted; Grammar terms (fresh, 20 items) fits a chapter about sentence structure:
+     noun, verb, sentence, clause, root, word, vowel marks. ===== */
+  213:[{cat:"Grammar terms",idx:[0,1,2,13]}],
+  214:[{cat:"Grammar terms",idx:[11,12,14,17]}],
+  215:[{cat:"Grammar terms",idx:[3,8,9,10]}],
+  216:[{cat:"Grammar terms",idx:[4,5,6,7]}],
+  217:[{cat:"Grammar terms",idx:[15,16,18,19]}],
+  /* ===== B2i - B2 capstone integration (218-222), the FINAL band. Revisits every B2
+     function; most thematic categories exhausted, so picks are small garnishes from
+     remaining everyday pools (Technology, School, Adjectives). The prerequisite pool
+     (915+ words) carries all review. Lesson 222 is the whole-course capstone. ===== */
+  218:[{cat:"Technology & digital",idx:[0,21]},{cat:"Newspaper & media",idx:[18,19]}],
+  219:[{cat:"School & education",idx:[3,4]},{cat:"Technology & digital",idx:[1,2]}],
+  220:[{cat:"Newspaper & media",idx:[10,11]},{cat:"Technology & digital",idx:[5,6]}],
+  221:[{cat:"School & education",idx:[8,9]},{cat:"Technology & digital",idx:[7,8]}],
+  222:[{cat:"Technology & digital",idx:[9,10]},{cat:"School & education",idx:[0,7]}]
 };
 /* Authored verb overlay: verified indices into VERBS only. A1c introduces לראות (to see)
    and לאהוב (to love/like) with את; both are A1 and gate to allow. Used by the level-scoped
@@ -6913,7 +7103,145 @@ var PILOT_VERB_PICK={
   111:[3,124,43,61],
   112:[4,76,60,10],
   113:[9,157,70,29],
-  114:[50,51,109,1]
+  114:[50,51,109,1],
+  /* B1a verbs, verified: 16 tell, 54 return, 56 forget, 57 remember, 61 continue,
+     74 decide, 86 leave, 88 choose, 113 influence, 133 happen, 137 recount, 141 change */
+  115:[54,86,61],
+  116:[74,88,2],
+  117:[74,113,7],
+  118:[141,61,2],
+  119:[137,57,56],
+  120:[16,54,74],
+  121:[16,74,61],
+  /* B1b verbs, verified: 58 agree, 74 decide, 88 choose, 90 argue, 93 refuse,
+     103 compare, 116 justify, 121 claim */
+  122:[103,74,7],
+  123:[103,88,0],
+  124:[103,88,74],
+  125:[121,116,7],
+  126:[58,93,116],
+  127:[88,74,103],
+  128:[103,58,121],
+  /* B1c verbs, verified: 61 continue, 87 suggest, 108 manage, 109 plan, 110 invest,
+     119 distinguish, 156 succeed */
+  129:[108,109,110],
+  130:[87,61,119],
+  131:[87,52,109],
+  132:[50,119,7],
+  133:[51,61,87],
+  134:[87,116,119],
+  135:[108,87,110],
+  /* B1d verbs, verified: 21 feel, 85 lie down, 99 suffer, 101 ponder, 112 cope,
+     117 strengthen/recover */
+  136:[21,99,2],
+  137:[112,117,61],
+  138:[101,7,57],
+  139:[21,99,85],
+  140:[112,61,74],
+  141:[21,101,7],
+  142:[21,117,112],
+  /* B1e verbs, verified: 70 explain, 87 suggest, 93 refuse, 94 apologize,
+     116 justify, 119 distinguish/notice */
+  143:[93,116,51],
+  144:[94,116,87],
+  145:[87,58,74],
+  146:[119,112,70],
+  147:[70,119,93],
+  148:[94,87,116],
+  149:[93,116,70],
+  /* B1f verbs, verified binyan families: 42 invite, 113 influence (Hif'il);
+     112 cope, 117 strengthen, 141 change-self (Hitpa'el); 183 break, 31 open,
+     149 disappear, 142 become (Nif'al/change); 75 prepare (making) */
+  150:[42,113,70],
+  151:[112,117,141],
+  152:[183,31,149],
+  153:[87,112,75],
+  154:[183,142,31],
+  155:[70,112,87],
+  156:[42,183,141],
+  /* B1g verbs, verified: 15 cook, 42 invite, 103 compare, 119 distinguish,
+     121 claim, 163 believe */
+  157:[42,103,119],
+  158:[103,119,121],
+  159:[121,103,163],
+  160:[103,93,58],
+  161:[15,42,103],
+  162:[103,119,121],
+  163:[42,103,163],
+  /* B1h verbs, verified: 54 return, 60 pay, 61 continue, 73 request, 119 distinguish,
+     125 submit, 144 ask for, 161 fix */
+  164:[161,119,112],
+  165:[51,161,87],
+  166:[125,144,54],
+  167:[70,119,7],
+  168:[54,73,61],
+  169:[144,125,60],
+  170:[60,125,161],
+  /* B1i milestone verbs: mixed across all functions from the whole B1 level */
+  171:[16,54,61],
+  172:[103,121,70],
+  173:[93,116,58],
+  174:[161,87,125],
+  175:[21,117,112],
+  176:[51,73,61],
+  177:[16,103,21],
+  /* B2a verbs, verified: 101 ponder, 119 distinguish, 121 claim, 122 assume;
+     plus recycled comprehension verbs */
+  178:[119,101,121],
+  179:[119,122,101],
+  180:[121,119,103],
+  181:[122,101,121],
+  182:[119,121,101],
+  /* B2b verbs, verified: 87 suggest, 101 ponder, 119 distinguish, 122 assume,
+     129 be-of-opinion, 151 hold */
+  183:[87,129,101],
+  184:[129,151,101],
+  185:[122,119,129],
+  186:[119,101,129],
+  187:[129,87,122],
+  /* B2c verbs, verified: 58 agree, 90 argue/debate, 116 justify, 121 claim, 122 assume */
+  188:[121,90,116],
+  189:[90,121,122],
+  190:[58,116,121],
+  191:[122,116,90],
+  192:[121,90,58],
+  /* B2d verbs, verified: 74 decide, 87 suggest, 103 compare, 116 justify, 127 improve */
+  193:[103,116,87],
+  194:[74,103,87],
+  195:[103,87,74],
+  196:[127,87,116],
+  197:[103,74,127],
+  /* B2e verbs, verified: 70 explain, 73 request, 119 distinguish, 124 approach,
+     125 submit, 126 clarify */
+  198:[73,124,87],
+  199:[126,70,87],
+  200:[126,119,70],
+  201:[73,124,125],
+  202:[126,73,124],
+  /* B2f verbs, verified: 21 feel, 101 ponder, 102 appreciate, 103 compare, 112 cope */
+  203:[21,101,102],
+  204:[103,119,102],
+  205:[21,101,112],
+  206:[103,112,102],
+  207:[21,103,101],
+  /* B2g verbs, verified: 58 agree, 90 argue, 116 justify, 119 distinguish, 121 claim, 126 clarify */
+  208:[119,121,116],
+  209:[121,119,90],
+  210:[116,58,121],
+  211:[119,126,90],
+  212:[121,90,116],
+  /* B2h verbs, verified: 74 decide, 87 suggest, 88 choose, 119 distinguish, 126 clarify, 127 improve */
+  213:[87,119,126],
+  214:[127,88,126],
+  215:[119,87,126],
+  216:[88,119,74],
+  217:[127,87,119],
+  /* B2i capstone verbs: mixed across all functions from the whole B2 level */
+  218:[119,101,103],
+  219:[121,90,116],
+  220:[126,73,124],
+  221:[127,88,119],
+  222:[121,103,21]
 };
 /* Lesson-specific exposure whitelist (vocab-integrity pass). Additive and reversible.
    Surfaces a few B1 words as controlled exposure inside a specific A1 lesson, keyed by the
@@ -7563,10 +7891,11 @@ function renderLessonStepPlaceholder(step, lesson, index, total){
     var pts=nl.split(/;|\u2022|\n/).map(function(x){return x.trim();}).filter(Boolean);
     if(pts.length>1) b+='<ul class="rstep-list">'+pts.map(function(p){return '<li><span dir="auto" style="unicode-bidi:plaintext;display:inline-block;max-width:100%">'+v2FieldText(p)+'</span></li>';}).join('')+'</ul>';
     else b+='<div class="rstep-t" dir="auto">'+(v2FieldShown(nl)?v2FieldText(nl):'This lesson introduces the day\u2019s new material. Work through the steps that follow.')+'</div>';
-    var _first=null;
-    if(isPilotLesson(lesson.id)){ var _bk=pilotBank(lesson); if(_bk&&_bk.allowed.vocab.length) _first=_bk.allowed.vocab[0]; }
-    if(!_first){ var _vr=resolveVocabRefs(lesson.vocabulary); _first=(_vr&&_vr.matched&&_vr.matched.length)?catItems(_vr.matched[0].cat)[0]:null; }
-    if(_first){ b+='<div class="rstep-h" style="margin-top:12px">Try it</div><div class="rstep-t">Here is one word you will use today. Tap to hear, flip for the meaning.</div><div class="wcards">'+_warmupCard(_first,false)+'</div>'; }
+    /* C.0: thicken What-is-new with up to three preview cards instead of one */
+    var _preview=[];
+    if(isPilotLesson(lesson.id)){ var _bk=pilotBank(lesson); if(_bk&&_bk.allowed.vocab.length) _preview=_bk.allowed.vocab.slice(0,3); }
+    if(!_preview.length){ var _vr=resolveVocabRefs(lesson.vocabulary); if(_vr&&_vr.matched&&_vr.matched.length){ var _ci=catItems(_vr.matched[0].cat); _preview=(_ci||[]).slice(0,3); } }
+    if(_preview.length){ b+='<div class="rstep-h" style="margin-top:12px">Try it</div><div class="rstep-t">'+(_preview.length>1?'Here are a few words':'Here is one word')+' you will use today. Tap to hear, flip for the meaning.</div><div class="wcards">'+_preview.map(function(w){return _warmupCard(w,false);}).join('')+'</div>'; }
     return b;
   }
   if(step.type==='outputTask'){
@@ -7675,6 +8004,29 @@ function _hubSectionMeta(key){
   };
   return M[key]||{name:key,desc:'',icon:'vocab'};
 }
+/* Honest per-lesson time estimate from actual content, not steps x 3.
+   Each step type costs realistic minutes based on how much it actually contains. */
+function estimateLessonMinutes(l, steps){
+  var total=0;
+  var bk=null; try{ if(typeof pilotBank==='function'&&typeof isPilotLesson==='function'&&isPilotLesson(l.id)) bk=pilotBank(l); }catch(e){}
+  steps.forEach(function(s){
+    switch(s.key){
+      case 'warmup': total+=3; break;
+      case 'newlang': total+=2; break;
+      case 'vocab': { var n=bk?bk.allowed.vocab.length:5; total+=Math.max(3,Math.round(n*0.8)); break; }
+      case 'grammar': total+=5; break;
+      case 'verbs': { var v=bk?bk.allowed.verbs.length:3; total+=Math.max(2,v); break; }
+      case 'phrases': total+=3; break;
+      case 'practice': total+=6; break;
+      case 'story': { var st2=null; try{ var r=resolveLessonResources(l); st2=(r.story&&r.story.resolved)?r.story:null; }catch(e){}
+                      total+=st2?6:3; break; }
+      case 'conversa': total+=5; break;
+      case 'writing': total+=6; break;
+      default: total+=3;
+    }
+  });
+  return Math.max(8, total);
+}
 function renderLessonHub(l, st){
   if(!l) return '<button class="back" data-go2="course">\u2190 course</button><div class="note">Lesson not found.</div>';
   st=st||getLessonRunnerState(l.id);
@@ -7682,7 +8034,7 @@ function renderLessonHub(l, st){
   var steps=allSteps.filter(function(s){return s.key!=='overview'&&s.key!=='done';});
   var dm=(st&&st.doneMap)||{};
   var chName=chTitle(l.ch);
-  var mins=Math.max(8,steps.length*3);
+  var mins=estimateLessonMinutes(l, steps);
   var head='<button class="back" data-go2="course||'+l.ch+'">\u2190 '+escHTML(chName)+'</button>'
     +'<div class="topbar"><div><h1>'+escHTML(l.title)+'</h1><div class="lead">'+lvlBadge(l.lvl)+' \u00b7 '+escHTML(chName)+' \u00b7 ~'+mins+' min</div></div>'+nikToggle()+'</div>';
   var goal=(typeof v2FieldShown==='function'&&v2FieldShown(l.communicationGoal))?'<div class="lhub-goal" dir="auto">'+v2FieldText(l.communicationGoal)+'</div>':'';
