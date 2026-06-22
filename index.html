@@ -740,6 +740,7 @@ function migrateProgress(s, savedBlob){
     /* archive old course progress untouched; it is never copied by lesson number */
     s.courseLegacy={course:savedBlob.course, archivedAt:Date.now(), fromVersion:(savedBlob.courseVersion||'pre-v2')};
   }
+  try{evlog('migrate RESET course.done (prev '+((savedBlob&&savedBlob.course&&savedBlob.course.done)?Object.keys(savedBlob.course.done).length:0)+' done, prev ver '+((savedBlob&&savedBlob.courseVersion)||'none')+')');}catch(e){}
   s.course={done:{}, lesson:1, steps:{}};   /* Course V2 starts fresh from Lesson 1 (incl per-step map) */
   s.session=null;                  /* no active guided session after a fresh-start migration */
   s.courseVersion=COURSE_VERSION;  /* mark migrated (makes this idempotent) */
@@ -1112,24 +1113,30 @@ function markOfflineVoice(voice,total){try{var m=offlineVoices();m[voice]={total
 function countCachedForVoice(voice){return _audioDB().then(function(db){return new Promise(function(res){try{var tx=db.transaction('clips','readonly');var st=tx.objectStore('clips');var pre=voice+'|';var nn=0;var rq=st.openKeyCursor();rq.onsuccess=function(e){var cur=e.target.result;if(!cur){res(nn);return;}if((''+cur.key).indexOf(pre)===0)nn++;cur.continue();};rq.onerror=function(){res(nn);};}catch(e){res(0);}});});}
 /* ---------- Supabase sync ---------- */
 var lastSyncInfo='';
+var cloudReadOK=null, cloudWriteOK=null, cloudReadInfo='', cloudWriteInfo='';
+function evlog(msg){try{var K='ivrit_evlog';var a=JSON.parse(localStorage.getItem(K)||'[]');a.push(new Date().toISOString().slice(11,19)+' '+msg);while(a.length>14)a.shift();localStorage.setItem(K,JSON.stringify(a));}catch(e){}}
+function evlogText(){try{var a=JSON.parse(localStorage.getItem('ivrit_evlog')||'[]');return a.length?a.join('\n'):'(no sync events recorded yet)';}catch(e){return'';}}
 function _progScore(s){try{var d=(s&&s.course&&s.course.done)?Object.keys(s.course.done).length:0;var m=0;try{var mm=(s&&s.mastery)||{};for(var k in mm){if(mm[k]&&mm[k].s>=2)m++;}}catch(e){}return d*1000+m;}catch(e){return 0;}}
-async function syncUp(){if(!SUPA_URL||!SUPA_KEY){lastSyncInfo='no Supabase config';setSync(false);return;}
+async function syncUp(){if(!SUPA_URL||!SUPA_KEY){cloudWriteOK=false;cloudWriteInfo='no Supabase config';lastSyncInfo=cloudWriteInfo;paintSync();return;}
   try{const r=await fetch(SUPA_URL+'/rest/v1/progress?on_conflict=user_id',{method:'POST',
     headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},
     body:JSON.stringify([{user_id:USER_ID,state:S,updated_at:new Date(S.updated).toISOString()}])});
-    if(!r.ok){var _t='';try{_t=await r.text();}catch(e){}lastSyncInfo='push HTTP '+r.status+(_t?' '+_t.slice(0,140):'');}else lastSyncInfo='';
-    setSync(r.ok);}catch(e){lastSyncInfo='push failed: '+((e&&e.message)||e);setSync(false)}}
-async function syncDown(){if(!SUPA_URL||!SUPA_KEY){lastSyncInfo='no Supabase config';setSync(false);return;}
+    if(!r.ok){var _t='';try{_t=await r.text();}catch(e){}cloudWriteOK=false;cloudWriteInfo='push HTTP '+r.status+(_t?' '+_t.slice(0,160):'');evlog('push FAIL '+cloudWriteInfo);}else{cloudWriteOK=true;cloudWriteInfo='';evlog('push OK (score '+_progScore(S)+')');}
+    lastSyncInfo=cloudWriteInfo;paintSync();}catch(e){cloudWriteOK=false;cloudWriteInfo='push failed: '+((e&&e.message)||e);lastSyncInfo=cloudWriteInfo;evlog('push ERR '+cloudWriteInfo);paintSync()}}
+async function syncDown(){if(!SUPA_URL||!SUPA_KEY){cloudReadOK=false;cloudReadInfo='no Supabase config';lastSyncInfo=cloudReadInfo;paintSync();return;}
   try{const r=await fetch(SUPA_URL+'/rest/v1/progress?user_id=eq.'+USER_ID+'&select=state,updated_at',{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
-    if(r.ok){const rows=await r.json();var _rs=(rows&&rows[0]&&rows[0].state)?rows[0].state:null;
+    if(r.ok){const rows=await r.json();var _rs=(rows&&rows[0]&&rows[0].state)?rows[0].state:null;var _ls=_progScore(S);
       /* accept remote only when it is newer AND it would not wipe real local progress: an empty or lesser-progress remote never overwrites a device that already has progress */
-      if(_rs&&(_rs.updated||0)>(S.updated||0)&&!(_progScore(S)>0&&_progScore(_rs)<_progScore(S))){
+      if(_rs&&(_rs.updated||0)>(S.updated||0)&&!(_ls>0&&_progScore(_rs)<_ls)){
+        evlog('pull ACCEPTED remote (remote '+_progScore(_rs)+' vs local '+_ls+')');
         S=deepMerge(structuredClone(defaultState),_rs);migrateProgress(S,_rs);
         try{if(S&&S.cfg&&!S.cfg.gttsKey){var _lk=localStorage.getItem(GTTS_KEY_LS);if(_lk)S.cfg.gttsKey=_lk;}}catch(e){}
         try{if(S&&S.cfg&&!S.cfg.anthropicKey){var _ak=localStorage.getItem(ANTHRO_KEY_LS);if(_ak)S.cfg.anthropicKey=_ak;}}catch(e){}
         localStorage.setItem(LS,JSON.stringify(S));render();}
-      lastSyncInfo='';setSync(true);}else{var _t='';try{_t=await r.text();}catch(e){}lastSyncInfo='pull HTTP '+r.status+(_t?' '+_t.slice(0,140):'');setSync(false);}}catch(e){lastSyncInfo='pull failed: '+((e&&e.message)||e);setSync(false)}}
-function setSync(ok){const d=document.getElementById('syncDot'),t=document.getElementById('syncTxt');var t2=document.getElementById('syncTxt2');var detail=ok?'synced across devices':('offline'+(lastSyncInfo?(' \u00b7 '+lastSyncInfo):' (saved on device)'));if(t2)t2.textContent=detail;if(!d)return;d.className='dot'+(ok?' ok':'');t.textContent=ok?'synced across devices':'offline (saved on device)';}
+      else if(_rs){evlog('pull kept local (remote '+_progScore(_rs)+' vs local '+_ls+', remote newer='+(((_rs.updated||0)>(S.updated||0))?'yes':'no')+')');}
+      else{evlog('pull found no cloud row');}
+      cloudReadOK=true;cloudReadInfo='';lastSyncInfo='';paintSync();}else{var _t='';try{_t=await r.text();}catch(e){}cloudReadOK=false;cloudReadInfo='pull HTTP '+r.status+(_t?' '+_t.slice(0,160):'');lastSyncInfo=cloudReadInfo;evlog('pull FAIL '+cloudReadInfo);paintSync();}}catch(e){cloudReadOK=false;cloudReadInfo='pull failed: '+((e&&e.message)||e);lastSyncInfo=cloudReadInfo;evlog('pull ERR '+cloudReadInfo);paintSync()}}
+function paintSync(){var ok,msg;if(cloudWriteOK===true){ok=true;msg='saved to cloud and synced across devices';}else if(cloudWriteOK===false){ok=false;msg='NOT saved to cloud · '+(cloudWriteInfo||'unknown error');}else if(cloudReadOK===true){ok=false;msg='cloud is reachable, but saving was not tested yet on this device · tap "push to cloud now"';}else if(cloudReadOK===false){ok=false;msg='offline · '+(cloudReadInfo||'saved on device');}else{ok=false;msg='offline (saved on device)';}var d=document.getElementById('syncDot'),t=document.getElementById('syncTxt'),t2=document.getElementById('syncTxt2');if(t2)t2.textContent=msg;if(d)d.className='dot'+(ok?' ok':'');if(t)t.textContent=ok?'synced across devices':'offline (saved on device)';var eb=document.getElementById('evlogBox');if(eb)eb.textContent=evlogText();}function setSync(){paintSync();}
 
 /* ---------- Backup ---------- */
 function backupJSON(){const name='ivrit-backup-'+new Date().toISOString().slice(0,10)+'.json';const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();toast('Backup downloaded: '+name);}
@@ -6087,7 +6094,7 @@ const COURSE=[
 function lessonDone(id){return !!S.course.done[id];}
 function lessonUnlocked(id){return id===1||lessonDone(id-1);}
 function currentLesson(){for(const l of COURSE)if(!lessonDone(l.id))return l;return COURSE[COURSE.length-1];}
-function completeLesson(id){S.course.done[id]=true;const nx=COURSE.find(l=>!lessonDone(l.id));S.course.lesson=nx?nx.id:id;touchDay();addXP(15);save();}
+function completeLesson(id){S.course.done[id]=true;const nx=COURSE.find(l=>!lessonDone(l.id));S.course.lesson=nx?nx.id:id;touchDay();addXP(15);try{evlog('completed lesson '+id+' (total done '+Object.keys(S.course.done).length+')');}catch(e){}save();}
 /* ===== Phase 9B.1: guided-session state helpers (additive; not wired to the visible
    flow yet). Per-step completion lives in S.course.steps[lessonId][stepKey]; the
    active/resumable session lives in S.session. Read helpers are pure; setters persist
@@ -10498,7 +10505,9 @@ function vSettings(){const c=S.cfg||{};const vlist=voices.filter(v=>v.lang&&v.la
      <button class="btn sm ghost" id="saveKey" style="margin-top:8px">Save key</button> <span class="muted" id="keyMsg" style="font-size:12.5px"></span></div>
    <div class="card" style="margin-top:14px"><h3>Sync <span class="info">i<span class="tip">Keeps your streak, learned words and progress identical on Mac and iPhone, and safe if a browser clears its cache. Pre-connected to your private "ivrit" Supabase project.</span></span></h3>
      <p class="muted" style="font-size:13px">Pre-connected to your private Supabase project "ivrit". Nothing to enter. Status: <span id="syncTxt2">…</span></p>
-     <button class="btn sm ghost" id="pullCloud">pull latest from cloud</button></div>
+     <p class="muted" style="font-size:12px;margin-top:6px">Tip: a green status only means the cloud can be read. Tap "push to cloud now" to confirm your progress actually saves to the cloud.</p>
+     <div class="row" style="margin-top:8px;gap:8px"><button class="btn sm ghost" id="pullCloud">pull latest from cloud</button><button class="btn sm" id="pushCloud">push to cloud now</button></div>
+     <pre id="evlogBox" style="margin-top:10px;font-size:11px;line-height:1.5;white-space:pre-wrap;color:var(--muted);background:var(--card);border:1px solid var(--line);border-radius:9px;padding:8px;max-height:170px;overflow:auto"></pre></div>
    <div class="card" style="margin-top:14px"><h3>Backup</h3>
      <p class="muted" style="font-size:13px">Download a snapshot (ivrit-backup-YYYY-MM-DD.json) for the shared Drive back-ups folder. Restore any time.</p>
      <div class="row" style="margin-top:10px"><button class="btn sm" id="doBackup">download backup</button>
@@ -10832,9 +10841,10 @@ function bind(){
     });
   }
   const pc=document.getElementById('pullCloud');if(pc)pc.onclick=()=>{syncDown();toast('Pulling from cloud…');};
+  const pu=document.getElementById('pushCloud');if(pu)pu.onclick=()=>{toast('Saving to cloud…');syncUp();};
   const db=document.getElementById('doBackup');if(db)db.onclick=backupJSON;
   const dr=document.getElementById('doRestore');if(dr)dr.onchange=e=>{if(e.target.files[0])importJSON(e.target.files[0]);};
-  const st2=document.getElementById('syncTxt2');if(st2)st2.textContent=document.getElementById('syncTxt').textContent;
+  paintSync();
   const rp=document.getElementById('resetProg');if(rp)rp.onclick=()=>{if(confirm('Reset all progress?')){S.mastery={};S.grammar={};S.course={done:{},lesson:1,steps:{}};S.session=null;S.streak=0;S.xp=0;S.stories={};save();toast('Progress reset');go('dash');}};
   const se=document.getElementById('setEdit');if(se)se.onchange=()=>{S.editMode=se.checked;save();toast(se.checked?'Editing on':'Editing off');render();};
   const ex=document.getElementById('eoExport');if(ex)ex.onclick=()=>{const ta=document.getElementById('eoExportTa');if(ta){ta.value=eoExportBlock();ta.style.display='block';ta.focus();ta.select();}const m=document.getElementById('eoMsg');if(m)m.textContent='Copy this block into index.html between the editorial markers, then commit.';};
