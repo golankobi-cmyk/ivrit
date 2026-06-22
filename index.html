@@ -744,7 +744,7 @@ function migrateProgress(s, savedBlob){
   s.course={done:{}, lesson:1, steps:{}};   /* Course V2 starts fresh from Lesson 1 (incl per-step map) */
   s.session=null;                  /* no active guided session after a fresh-start migration */
   s.courseVersion=COURSE_VERSION;  /* mark migrated (makes this idempotent) */
-  s.updated=Date.now();            /* bump so migrated state wins sync vs older blobs */
+  s.updated=0;                     /* empty/migrated state must NOT win a sync race against real cloud progress */
   return s;
 }
 let S=load();
@@ -1113,12 +1113,27 @@ function markOfflineVoice(voice,total){try{var m=offlineVoices();m[voice]={total
 function countCachedForVoice(voice){return _audioDB().then(function(db){return new Promise(function(res){try{var tx=db.transaction('clips','readonly');var st=tx.objectStore('clips');var pre=voice+'|';var nn=0;var rq=st.openKeyCursor();rq.onsuccess=function(e){var cur=e.target.result;if(!cur){res(nn);return;}if((''+cur.key).indexOf(pre)===0)nn++;cur.continue();};rq.onerror=function(){res(nn);};}catch(e){res(0);}});});}
 /* ---------- Supabase sync ---------- */
 var lastSyncInfo='';
+var forcePush=false;
 var cloudReadOK=null, cloudWriteOK=null, cloudReadInfo='', cloudWriteInfo='';
 function evlog(msg){try{var K='ivrit_evlog';var a=JSON.parse(localStorage.getItem(K)||'[]');a.push(new Date().toISOString().slice(11,19)+' '+msg);while(a.length>14)a.shift();localStorage.setItem(K,JSON.stringify(a));}catch(e){}}
 function evlogText(){try{var a=JSON.parse(localStorage.getItem('ivrit_evlog')||'[]');return a.length?a.join('\n'):'(no sync events recorded yet)';}catch(e){return'';}}
 function _progScore(s){try{var d=(s&&s.course&&s.course.done)?Object.keys(s.course.done).length:0;var m=0;try{var mm=(s&&s.mastery)||{};for(var k in mm){if(mm[k]&&mm[k].s>=2)m++;}}catch(e){}return d*1000+m;}catch(e){return 0;}}
 async function syncUp(){if(!SUPA_URL||!SUPA_KEY){cloudWriteOK=false;cloudWriteInfo='no Supabase config';lastSyncInfo=cloudWriteInfo;paintSync();return;}
-  try{const r=await fetch(SUPA_URL+'/rest/v1/progress?on_conflict=user_id',{method:'POST',
+  var _force=forcePush;forcePush=false;
+  try{
+    if(!_force){try{
+      var _localDone=(S&&S.course&&S.course.done)?Object.keys(S.course.done).length:0;
+      var rg=await fetch(SUPA_URL+'/rest/v1/progress?user_id=eq.'+USER_ID+'&select=state',{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+      if(rg.ok){var _rows=await rg.json();var _cs=(_rows&&_rows[0]&&_rows[0].state)?_rows[0].state:null;var _cloudDone=(_cs&&_cs.course&&_cs.course.done)?Object.keys(_cs.course.done).length:0;
+        if(_cs&&_cloudDone>_localDone){
+          evlog('push BLOCKED, cloud ahead ('+_cloudDone+' lessons) > local ('+_localDone+'); adopting cloud');
+          S=deepMerge(structuredClone(defaultState),_cs);migrateProgress(S,_cs);
+          try{if(S&&S.cfg&&!S.cfg.gttsKey){var _lk=localStorage.getItem(GTTS_KEY_LS);if(_lk)S.cfg.gttsKey=_lk;}}catch(e){}
+          try{if(S&&S.cfg&&!S.cfg.anthropicKey){var _ak=localStorage.getItem(ANTHRO_KEY_LS);if(_ak)S.cfg.anthropicKey=_ak;}}catch(e){}
+          localStorage.setItem(LS,JSON.stringify(S));cloudReadOK=true;cloudWriteOK=true;cloudWriteInfo='';lastSyncInfo='';render();paintSync();return;}
+      }
+    }catch(e){/* guard read failed (offline): fall through to a normal push */}}
+    const r=await fetch(SUPA_URL+'/rest/v1/progress?on_conflict=user_id',{method:'POST',
     headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},
     body:JSON.stringify([{user_id:USER_ID,state:S,updated_at:new Date(S.updated).toISOString()}])});
     if(!r.ok){var _t='';try{_t=await r.text();}catch(e){}cloudWriteOK=false;cloudWriteInfo='push HTTP '+r.status+(_t?' '+_t.slice(0,160):'');evlog('push FAIL '+cloudWriteInfo);}else{cloudWriteOK=true;cloudWriteInfo='';evlog('push OK (score '+_progScore(S)+')');}
@@ -10845,7 +10860,7 @@ function bind(){
   const db=document.getElementById('doBackup');if(db)db.onclick=backupJSON;
   const dr=document.getElementById('doRestore');if(dr)dr.onchange=e=>{if(e.target.files[0])importJSON(e.target.files[0]);};
   paintSync();
-  const rp=document.getElementById('resetProg');if(rp)rp.onclick=()=>{if(confirm('Reset all progress?')){S.mastery={};S.grammar={};S.course={done:{},lesson:1,steps:{}};S.session=null;S.streak=0;S.xp=0;S.stories={};save();toast('Progress reset');go('dash');}};
+  const rp=document.getElementById('resetProg');if(rp)rp.onclick=()=>{if(confirm('Reset all progress?')){S.mastery={};S.grammar={};S.course={done:{},lesson:1,steps:{}};S.session=null;S.streak=0;S.xp=0;S.stories={};try{evlog('user RESET progress (force push to cloud)');}catch(e){}forcePush=true;save();toast('Progress reset');go('dash');}};
   const se=document.getElementById('setEdit');if(se)se.onchange=()=>{S.editMode=se.checked;save();toast(se.checked?'Editing on':'Editing off');render();};
   const ex=document.getElementById('eoExport');if(ex)ex.onclick=()=>{const ta=document.getElementById('eoExportTa');if(ta){ta.value=eoExportBlock();ta.style.display='block';ta.focus();ta.select();}const m=document.getElementById('eoMsg');if(m)m.textContent='Copy this block into index.html between the editorial markers, then commit.';};
   const ec=document.getElementById('eoClear');if(ec)ec.onclick=()=>{if(confirm('Clear local draft corrections on this device? Corrections already committed into the app file are not affected.')){clearLocalEditorialOverrides();toast('Local drafts cleared');render();}};
