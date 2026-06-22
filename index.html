@@ -27,7 +27,7 @@
   --hover:rgba(120,100,60,.06); --track:rgba(120,100,60,.13);
   --good:#3A7D5C; --good-wash:rgba(58,125,92,.13); --bad:#C0492E; --bad-wash:rgba(192,73,46,.10); --info:#3A6E8C;
   --shadow:0 10px 30px -16px rgba(60,45,20,.22); --shadow-sm:0 2px 10px rgba(60,45,20,.07);
-  --serif:'Fraunces',Georgia,serif; --sans:'Inter',system-ui,sans-serif; --heb:'Heebo','Assistant',sans-serif;
+  --serif:'Fraunces',Georgia,serif; --sans:'Inter',system-ui,sans-serif; --heb:'Arial','Arial Hebrew','Heebo','Assistant',sans-serif;
   --r:14px; --ease:cubic-bezier(.32,.72,0,1);
 }
 @media (prefers-color-scheme: dark){
@@ -966,6 +966,9 @@ function speakLiteral(t){if(!('speechSynthesis'in window))return;speechSynthesis
 var GTTS_KEY_LS='ivrit_gtts_key';
 var GTTS_DEFAULT_VOICE='he-IL-Standard-A';
 function gttsKey(){ try{ if(S&&S.cfg&&S.cfg.gttsKey) return S.cfg.gttsKey; }catch(e){} try{ var k=localStorage.getItem(GTTS_KEY_LS); return k||''; }catch(e){ return ''; } }
+var ANTHRO_KEY_LS='ivrit_anthropic_key';
+function anthropicKey(){ try{ if(S&&S.cfg&&S.cfg.anthropicKey) return S.cfg.anthropicKey; }catch(e){} try{ var k=localStorage.getItem(ANTHRO_KEY_LS); return k||''; }catch(e){ return ''; } }
+function setAnthropicKeyTo(k){ try{ if(!S.cfg)S.cfg={}; S.cfg.anthropicKey=k||''; }catch(e){} try{ if(k)localStorage.setItem(ANTHRO_KEY_LS,k); else localStorage.removeItem(ANTHRO_KEY_LS); }catch(e){} }
 function setGttsKey(k){ try{ if(!S.cfg)S.cfg={}; S.cfg.gttsKey=k||''; }catch(e){} try{ if(k)localStorage.setItem(GTTS_KEY_LS,k); else localStorage.removeItem(GTTS_KEY_LS); }catch(e){} try{ if(typeof save==='function')save(); }catch(e){} }
 function gttsVoice(){return (S&&S.ttsVoice)||GTTS_DEFAULT_VOICE;}
 function audioEngine(){ if(S&&S.audioEngine==='device')return 'device'; return gttsKey()?'google':'device'; }
@@ -1108,14 +1111,25 @@ function offlineVoices(){try{return JSON.parse(localStorage.getItem('ivrit_offli
 function markOfflineVoice(voice,total){try{var m=offlineVoices();m[voice]={total:total,at:Date.now()};localStorage.setItem('ivrit_offline_voices',JSON.stringify(m));}catch(e){}}
 function countCachedForVoice(voice){return _audioDB().then(function(db){return new Promise(function(res){try{var tx=db.transaction('clips','readonly');var st=tx.objectStore('clips');var pre=voice+'|';var nn=0;var rq=st.openKeyCursor();rq.onsuccess=function(e){var cur=e.target.result;if(!cur){res(nn);return;}if((''+cur.key).indexOf(pre)===0)nn++;cur.continue();};rq.onerror=function(){res(nn);};}catch(e){res(0);}});});}
 /* ---------- Supabase sync ---------- */
-async function syncUp(){if(!SUPA_URL||!SUPA_KEY){setSync(false);return;}
+var lastSyncInfo='';
+function _progScore(s){try{var d=(s&&s.course&&s.course.done)?Object.keys(s.course.done).length:0;var m=0;try{var mm=(s&&s.mastery)||{};for(var k in mm){if(mm[k]&&mm[k].s>=2)m++;}}catch(e){}return d*1000+m;}catch(e){return 0;}}
+async function syncUp(){if(!SUPA_URL||!SUPA_KEY){lastSyncInfo='no Supabase config';setSync(false);return;}
   try{const r=await fetch(SUPA_URL+'/rest/v1/progress?on_conflict=user_id',{method:'POST',
     headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},
-    body:JSON.stringify([{user_id:USER_ID,state:S,updated_at:new Date(S.updated).toISOString()}])});setSync(r.ok);}catch(e){setSync(false)}}
-async function syncDown(){if(!SUPA_URL||!SUPA_KEY){setSync(false);return;}
+    body:JSON.stringify([{user_id:USER_ID,state:S,updated_at:new Date(S.updated).toISOString()}])});
+    if(!r.ok){var _t='';try{_t=await r.text();}catch(e){}lastSyncInfo='push HTTP '+r.status+(_t?' '+_t.slice(0,140):'');}else lastSyncInfo='';
+    setSync(r.ok);}catch(e){lastSyncInfo='push failed: '+((e&&e.message)||e);setSync(false)}}
+async function syncDown(){if(!SUPA_URL||!SUPA_KEY){lastSyncInfo='no Supabase config';setSync(false);return;}
   try{const r=await fetch(SUPA_URL+'/rest/v1/progress?user_id=eq.'+USER_ID+'&select=state,updated_at',{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
-    if(r.ok){const rows=await r.json();if(rows&&rows[0]&&rows[0].state&&(rows[0].state.updated||0)>(S.updated||0)){S=deepMerge(structuredClone(defaultState),rows[0].state);migrateProgress(S,rows[0].state);try{if(S&&S.cfg&&!S.cfg.gttsKey){var _lk=localStorage.getItem(GTTS_KEY_LS);if(_lk)S.cfg.gttsKey=_lk;}}catch(e){}/* gate: a pre-V2 remote blob is migrated, never trusted over a V2 state */localStorage.setItem(LS,JSON.stringify(S));render();}setSync(true);}else setSync(false);}catch(e){setSync(false)}}
-function setSync(ok){const d=document.getElementById('syncDot'),t=document.getElementById('syncTxt');if(!d)return;d.className='dot'+(ok?' ok':'');t.textContent=ok?'synced across devices':'offline (saved on device)';}
+    if(r.ok){const rows=await r.json();var _rs=(rows&&rows[0]&&rows[0].state)?rows[0].state:null;
+      /* accept remote only when it is newer AND it would not wipe real local progress: an empty or lesser-progress remote never overwrites a device that already has progress */
+      if(_rs&&(_rs.updated||0)>(S.updated||0)&&!(_progScore(S)>0&&_progScore(_rs)<_progScore(S))){
+        S=deepMerge(structuredClone(defaultState),_rs);migrateProgress(S,_rs);
+        try{if(S&&S.cfg&&!S.cfg.gttsKey){var _lk=localStorage.getItem(GTTS_KEY_LS);if(_lk)S.cfg.gttsKey=_lk;}}catch(e){}
+        try{if(S&&S.cfg&&!S.cfg.anthropicKey){var _ak=localStorage.getItem(ANTHRO_KEY_LS);if(_ak)S.cfg.anthropicKey=_ak;}}catch(e){}
+        localStorage.setItem(LS,JSON.stringify(S));render();}
+      lastSyncInfo='';setSync(true);}else{var _t='';try{_t=await r.text();}catch(e){}lastSyncInfo='pull HTTP '+r.status+(_t?' '+_t.slice(0,140):'');setSync(false);}}catch(e){lastSyncInfo='pull failed: '+((e&&e.message)||e);setSync(false)}}
+function setSync(ok){const d=document.getElementById('syncDot'),t=document.getElementById('syncTxt');var t2=document.getElementById('syncTxt2');var detail=ok?'synced across devices':('offline'+(lastSyncInfo?(' \u00b7 '+lastSyncInfo):' (saved on device)'));if(t2)t2.textContent=detail;if(!d)return;d.className='dot'+(ok?' ok':'');t.textContent=ok?'synced across devices':'offline (saved on device)';}
 
 /* ---------- Backup ---------- */
 function backupJSON(){const name='ivrit-backup-'+new Date().toISOString().slice(0,10)+'.json';const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();toast('Backup downloaded: '+name);}
@@ -7606,7 +7620,7 @@ function buildLessonSteps(lesson){
   if(res.story) steps.push({key:'story',type:'storyReading',title:'Reading',res:res.story});
   if(res.conversa) steps.push({key:'conversa',type:'conversaScenario',title:'Conversa',res:res.conversa});
   if(res.writing) steps.push({key:'writing',type:'writingPrompt',title:'Writing',res:res.writing});
-  if(!_refEmpty(lesson.outputTask)) steps.push({key:'output',type:'outputTask',title:'Output task'});
+  /* Output task removed: self-report 'say it aloud / I did this' steps the app cannot verify are no longer part of the journey. */
   steps.push({key:'done',type:'completionSummary',title:'Complete'});
   return steps;
 }
@@ -9935,7 +9949,7 @@ function renderMatch(){const host=document.getElementById('matHost');if(!host)re
 let chat=[];let busy=false;
 function vConversa(){
   if(route.item){const sc=CONVERSA.find(c=>c.id===route.item);if(!sc)return conversaList();
-    const hasKey=!!(S.cfg&&S.cfg.anthropicKey);
+    const hasKey=!!anthropicKey();
     return `<button class="back" data-go2="conversa">&#8592; conversations</button>
      <div class="t-eyebrow">Conversa · ${sc.free?'open chat':sc.lvl+' · roleplay'}</div><h1 class="t-h1" style="margin-bottom:6px">${sc.t}</h1><p class="t-lede">${sc.free?'Open chat. The tutor adapts to your level.':'Roleplay this scene. Reply in Hebrew, and tap a chip if you get stuck.'}</p>
      <div class="card"><div class="chat" id="chat"></div>
@@ -10797,12 +10811,12 @@ function bind(){
   const mtb=document.getElementById('micTestBtn');if(mtb)mtb.onclick=()=>plMicTest();
   const plb=document.getElementById('plStartBtn');if(plb)plb.onclick=()=>plOpen();
   const plv=document.getElementById('plViewLast');if(plv)plv.onclick=()=>plViewLast();
-  const sk=document.getElementById('saveKey');if(sk)sk.onclick=()=>{S.cfg.anthropicKey=val('setKey');save();document.getElementById('keyMsg').innerHTML='<span class="ans-ok">Saved &#10003;</span>';toast('API key saved');};
+  const sk=document.getElementById('saveKey');if(sk)sk.onclick=()=>{setAnthropicKeyTo(val('setKey'));save();document.getElementById('keyMsg').innerHTML='<span class="ans-ok">Saved &#10003;</span>';toast('API key saved');};
   const setKeyEl=document.getElementById('setKey');
   if(setKeyEl){
     setKeyEl.addEventListener('blur',function(){
       var v=setKeyEl.value.trim();
-      if(v&&v!==S.cfg.anthropicKey){S.cfg.anthropicKey=v;save();
+      if(v&&v!==anthropicKey()){setAnthropicKeyTo(v);save();
         var msg=document.getElementById('keyMsg');if(msg)msg.innerHTML='<span class="ans-ok">Saved &#10003;</span>';
       }
     });
@@ -10811,7 +10825,7 @@ function bind(){
       if(setKeyEl._t)clearTimeout(setKeyEl._t);
       setKeyEl._t=setTimeout(function(){
         var v=setKeyEl.value.trim();
-        if(v.startsWith('sk-ant-')&&v!==S.cfg.anthropicKey){S.cfg.anthropicKey=v;save();
+        if(v.startsWith('sk-ant-')&&v!==anthropicKey()){setAnthropicKeyTo(v);save();
           var msg=document.getElementById('keyMsg');if(msg)msg.innerHTML='<span class="ans-ok">Auto-saved &#10003;</span>';
         }
       },1500);
@@ -11151,16 +11165,18 @@ function renderChat(){const c=document.getElementById('chat');if(!c)return;
   c.scrollTop=c.scrollHeight;}
 async function sendChat(){const inp=document.getElementById('cIn');const text=inp.value.trim();if(!text||busy)return;
   inp.value='';chat.push({role:'user',content:text});touchDay();addXP(2);save();renderChat();
-  const sc=CONVERSA.find(c=>c.id===route.item);const key=S.cfg&&S.cfg.anthropicKey;
+  const sc=CONVERSA.find(c=>c.id===route.item);const key=anthropicKey();
   if(!key){chat.push({role:'assistant',content:'(הוֹסֵף מַפְתֵּחַ בְּהַגְדָּרוֹת)',display:'Add your Anthropic key in Settings for live replies.'});renderChat();return;}
   busy=true;renderChat();
   const sys=`${sc.char} You are speaking with Vincenzo. Reply ONLY in modern spoken Hebrew${sc.free?'':' at '+sc.lvl+' level'}, short and natural (1-2 sentences). Address him with masculine forms. If he makes a clear mistake, model the correct form briefly. Do not translate unless asked.`;
   try{const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
     headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
     body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,system:sys,messages:chat.filter(m=>m.role==='user'||m.role==='assistant').map(m=>({role:m.role,content:m.content}))})});
-    const d=await r.json();busy=false;const txt=(d.content&&d.content.filter(x=>x.type==='text').map(x=>x.text).join(' '))||'(...)';
-    chat.push({role:'assistant',content:txt});renderChat();}catch(e){busy=false;chat.push({role:'assistant',content:'(שְׁגִיאָה)',display:'Connection error. Check your key and network.'});renderChat();}}
-async function writeFeedback(text){const fb=document.getElementById('wFb');const key=S.cfg&&S.cfg.anthropicKey;
+    const d=await r.json();busy=false;
+    if(!r.ok||(d&&d.error)){var em=(d&&d.error&&d.error.message)?d.error.message:('HTTP '+r.status);chat.push({role:'assistant',content:'(שְׁגִיאָה)',display:'API error: '+em});renderChat();return;}
+    const txt=(d.content&&d.content.filter(x=>x.type==='text').map(x=>x.text).join(' '))||'(...)';
+    chat.push({role:'assistant',content:txt});renderChat();}catch(e){busy=false;chat.push({role:'assistant',content:'(שְׁגִיאָה)',display:'Connection error: '+((e&&e.message)||e)});renderChat();}}
+async function writeFeedback(text){const fb=document.getElementById('wFb');const key=anthropicKey();
   if(!text.trim()){fb.textContent='Write something first.';return;}
   if(!key){fb.innerHTML='<span class="muted">Add your Anthropic key in Settings to get AI feedback. You can still save your entry.</span>';return;}
   fb.textContent='Reading your text…';
