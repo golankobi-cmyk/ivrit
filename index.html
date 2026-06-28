@@ -954,6 +954,8 @@ function load(){
 }
 function deepMerge(a,b){for(const k in b){if(b[k]&&typeof b[k]==='object'&&!Array.isArray(b[k])){a[k]=deepMerge(a[k]||{},b[k])}else{a[k]=b[k]}}return a}
 function save(){S.updated=Date.now();localStorage.setItem(LS,JSON.stringify(S));syncUp();}
+function stripSecrets(st){var c;try{c=structuredClone(st);}catch(e){c=JSON.parse(JSON.stringify(st));}if(c&&c.cfg&&typeof c.cfg==='object'){c.cfg.anthropicKey='';c.cfg.gttsKey='';}return c;}
+function khTL(tl,heb){if(typeof tl!=='string'||tl.indexOf('ch')<0)return tl;var h=''+(heb||'');if(/[חכך]/.test(h)){return tl.replace(/ch/g,'kh').replace(/Ch/g,'Kh');}return tl;}
 /* saveNikud: writes ONLY the display pref (never calls syncUp, never touches progress) */
 function saveNikud(){try{localStorage.setItem(LS+'_nik',S.nikud?'1':'0');}catch(e){}}
 function touchDay(){const d=new Date().toDateString();if(S.lastDay!==d){const gap=S.lastDay?(new Date(d)-new Date(S.lastDay)):0;S.streak=(S.lastDay&&gap<=864e5*1.6)?S.streak+1:1;S.lastDay=d;}}
@@ -1324,7 +1326,7 @@ async function syncUp(){if(!SUPA_URL||!SUPA_KEY){cloudWriteOK=false;cloudWriteIn
     }catch(e){/* guard read failed (offline): fall through to a normal push */}}
     const r=await fetch(SUPA_URL+'/rest/v1/progress?on_conflict=user_id',{method:'POST',
     headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},
-    body:JSON.stringify([{user_id:USER_ID,state:S,updated_at:new Date(S.updated).toISOString()}])});
+    body:JSON.stringify([{user_id:USER_ID,state:stripSecrets(S),updated_at:new Date(S.updated).toISOString()}])});
     if(!r.ok){var _t='';try{_t=await r.text();}catch(e){}cloudWriteOK=false;cloudWriteInfo='push HTTP '+r.status+(_t?' '+_t.slice(0,160):'');evlog('push FAIL '+cloudWriteInfo);}else{cloudWriteOK=true;cloudWriteInfo='';evlog('push OK (score '+_progScore(S)+')');}
     lastSyncInfo=cloudWriteInfo;paintSync();}catch(e){cloudWriteOK=false;cloudWriteInfo='push failed: '+((e&&e.message)||e);lastSyncInfo=cloudWriteInfo;evlog('push ERR '+cloudWriteInfo);paintSync()}}
 async function syncDown(){if(!SUPA_URL||!SUPA_KEY){cloudReadOK=false;cloudReadInfo='no Supabase config';lastSyncInfo=cloudReadInfo;paintSync();return;}
@@ -1343,7 +1345,7 @@ async function syncDown(){if(!SUPA_URL||!SUPA_KEY){cloudReadOK=false;cloudReadIn
 function paintSync(){var ok,msg;if(cloudWriteOK===true){ok=true;msg='saved to cloud and synced across devices';}else if(cloudWriteOK===false){ok=false;msg='NOT saved to cloud · '+(cloudWriteInfo||'unknown error');}else if(cloudReadOK===true){ok=false;msg='cloud is reachable, but saving was not tested yet on this device · tap "push to cloud now"';}else if(cloudReadOK===false){ok=false;msg='offline · '+(cloudReadInfo||'saved on device');}else{ok=false;msg='offline (saved on device)';}var d=document.getElementById('syncDot'),t=document.getElementById('syncTxt'),t2=document.getElementById('syncTxt2');if(t2)t2.textContent=msg;if(d)d.className='dot'+(ok?' ok':'');if(t)t.textContent=ok?'synced across devices':'offline (saved on device)';var eb=document.getElementById('evlogBox');if(eb)eb.textContent=evlogText();}function setSync(){paintSync();}
 
 /* ---------- Backup ---------- */
-function backupJSON(){const name='ivrit-backup-'+new Date().toISOString().slice(0,10)+'.json';const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();toast('Backup downloaded: '+name);}
+function backupJSON(){const name='ivrit-backup-'+new Date().toISOString().slice(0,10)+'.json';const blob=new Blob([JSON.stringify(stripSecrets(S),null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();toast('Backup downloaded: '+name);}
 function importJSON(file){const r=new FileReader();r.onload=e=>{try{const imp=JSON.parse(e.target.result);S=deepMerge(structuredClone(defaultState),imp);migrateProgress(S,imp);/* a restored pre-V2 backup is migrated, not trusted, so old completion cannot leak */save();render();toast('Backup restored')}catch(_){toast('Invalid file')}};r.readAsText(file);}
 
 /* ---------- toast ---------- */
@@ -1353,8 +1355,8 @@ let toastT;function toast(msg){const t=document.getElementById('toast');t.textCo
 const ALEFBET=[
  ["א","alef","silent / vowel carrier",""],["ב","bet","b (בּ) / v (ב)",""],["ג","gimel","g (as in go)",""],
  ["ד","dalet","d",""],["ה","he","h",""],["ו","vav","v / o / u",""],["ז","zayin","z",""],
- ["ח","chet","ch (throat)",""],["ט","tet","t",""],["י","yod","y / i",""],["כ","kaf","k (כּ) / kh (כ)","ך"],
- ["ל","lamed","l",""],["מ","mem","m","ם"],["נ","nun","n","ן"],["ס","samech","s",""],
+ ["ח","khet","kh (throat)",""],["ט","tet","t",""],["י","yod","y / i",""],["כ","kaf","k (כּ) / kh (כ)","ך"],
+ ["ל","lamed","l",""],["מ","mem","m","ם"],["נ","nun","n","ן"],["ס","samekh","s",""],
  ["ע","ayin","silent / guttural carrier",""],["פ","pe","p (פּ) / f (פ)","ף"],["צ","tzadi","tz","ץ"],
  ["ק","kuf","k",""],["ר","resh","r (French-like)",""],["ש","shin (שׁ) / sin (שׂ)","sh / s",""],["ת","tav","t",""]
 ];
@@ -5952,9 +5954,9 @@ const IDIOMS=[
 const LEX=[];
 function buildLex(){
   LEX.length=0;
-  VOCAB.forEach(c=>c.words.forEach((w,i)=>LEX.push({key:'v|'+c.cat+'|'+i,v:w[0][0],p:w[0][1],tl:w[1],en:w[2],it:w[3],cat:c.cat,lvl:c.lvl})));
-  (S.customVocab||[]).forEach((w,i)=>LEX.push({key:'cv|'+i,v:w.v,p:w.p||'',tl:w.tl,en:w.en,it:w.it||'',cat:'My words',lvl:''}));
-  try{(typeof STORY_VOCAB!=='undefined'?STORY_VOCAB:[]).forEach((w,i)=>LEX.push({key:'sv|'+i,v:w.v,p:w.p||'',tl:w.tl,en:w.en,it:w.it||'',cat:w.cat||'Common words',lvl:w.lvl||''}));}catch(e){}
+  VOCAB.forEach(c=>c.words.forEach((w,i)=>LEX.push({key:'v|'+c.cat+'|'+i,v:w[0][0],p:w[0][1],tl:khTL(w[1],w[0][0]),en:w[2],it:w[3],cat:c.cat,lvl:c.lvl})));
+  (S.customVocab||[]).forEach((w,i)=>LEX.push({key:'cv|'+i,v:w.v,p:w.p||'',tl:khTL(w.tl,w.v||w.p),en:w.en,it:w.it||'',cat:'My words',lvl:''}));
+  try{(typeof STORY_VOCAB!=='undefined'?STORY_VOCAB:[]).forEach((w,i)=>LEX.push({key:'sv|'+i,v:w.v,p:w.p||'',tl:khTL(w.tl,w.v||w.p),en:w.en,it:w.it||'',cat:w.cat||'Common words',lvl:w.lvl||''}));}catch(e){}
 }
 function catItems(name){return LEX.filter(it=>it.cat===name);}
 
@@ -6863,6 +6865,7 @@ function resolvePhraseRefs(text){
     if(!o.en&&typeof DICT_PHRASES!=='undefined'&&DICT_PHRASES){ var dp=DICT_PHRASES.find(function(d){return d&&d[0]&&(d[0][0]===he||d[0][1]===bare||stripN(d[0][0])===bare);}); if(dp){o.en=dp[1];} }
     if(!o.en&&typeof IDIOMS!=='undefined'&&IDIOMS){ var idm=IDIOMS.find(function(x){return x&&x.he&&(x.he[0]===he||x.he[1]===bare||stripN(x.he[0])===bare);}); if(idm){o.tl=o.tl||idm.tl;o.en=idm.mean;o.lit=idm.lit;} }
     if(!o.en){var sg=_SET_GLOSS[bare];if(sg){o.en=sg.en;o.tl=o.tl||sg.tl;}}
+    if(o.tl)o.tl=khTL(o.tl,o.he);
     return o;
   });
   return {type:'phrases',raw:raw,label:stripLessonAnnotation(raw),resolved:items.length>0,items:items};
@@ -7768,7 +7771,7 @@ function pilotRenderStory(lesson){
     b+='<div class="rstep-h" style="margin-top:10px">Words you already know in this text</div><div class="rstep-heb" dir="rtl">'+sp.preTaught.map(function(w){return '<span data-speak="'+encodeURIComponent(w)+'" style="cursor:pointer">'+escHTML(w)+'</span>';}).join(' \u00b7 ')+'</div>';
   }
   b+='<div class="rstep-h" style="margin-top:10px">Listen and follow</div>';
-  b+='<div class="rstep-t" dir="auto" style="line-height:1.7">'+sp.exposure.map(function(e){return '<div dir="rtl" data-speak="'+encodeURIComponent(e.he)+'" style="cursor:pointer">'+escHTML(e.he)+'</div><div dir="ltr" style="opacity:.8">'+escHTML(e.tl)+'</div><div dir="ltr" style="opacity:.7">'+escHTML(e.en)+'</div>';}).join('<div style="height:8px"></div>')+'</div>';
+  b+='<div class="rstep-t" dir="auto" style="line-height:1.7">'+sp.exposure.map(function(e){return '<div dir="rtl" data-speak="'+encodeURIComponent(e.he)+'" style="cursor:pointer">'+escHTML(e.he)+'</div><div dir="ltr" style="opacity:.8">'+escHTML(khTL(e.tl,e.he))+'</div><div dir="ltr" style="opacity:.7">'+escHTML(e.en)+'</div>';}).join('<div style="height:8px"></div>')+'</div>';
   if(sp.cloze){
     var cz=sp.cloze, he=''+cz.display.he, pos=he.indexOf(cz.blankToken);
     /* Blank only the word (particle included). Any punctuation attached to the token by the
@@ -8114,7 +8117,7 @@ function _phraseCard(p,i){
   var en=ovEn||p.en||p.lit;
   var back, missing=false;
   if(en){ back=escHTML(en); }
-  else if(p.tl){ back='<span style="opacity:.85">'+escHTML(p.tl)+'</span>'; }
+  else if(p.tl){ back='<span style="opacity:.85">'+escHTML(khTL(p.tl,(p.he&&p.he[0])||''))+'</span>'; }
   else { missing=true; back='<span class="wc-missing">tap to hear it</span>'; if(key&&_PHRASE_MISSING.indexOf(key)<0)_PHRASE_MISSING.push(key); }
   var tlLine=p.tl?'<div class="t">'+escHTML(p.tl)+'</div>':'';
   var litLine=(p.lit&&p.lit!==en)?'<div class="t" style="opacity:.7">lit. '+escHTML(p.lit)+'</div>':'';
@@ -8238,7 +8241,7 @@ function renderLessonStepPlaceholder(step, lesson, index, total){
   if(step.type==='storyReading'){
     if(isPilotLesson(lesson.id)){var _ps=pilotRenderStory(lesson); if(_ps!=null) return _ps;}
     if(r.resolved&&r.mode==='excerpt'&&r.excerpt&&r.excerpt.length){ b+='<div class="rstep-ok">Short excerpt from: '+escHTML(r.label||'')+'</div>';
-      b+='<div class="rstep-t" dir="auto" style="line-height:1.7">'+r.excerpt.map(function(e){return '<div dir="rtl">'+escHTML(e.he)+'</div><div dir="ltr" style="opacity:.8">'+escHTML(e.tl)+'</div><div dir="ltr" style="opacity:.7">'+escHTML(e.en)+'</div>';}).join('<div style="height:8px"></div>')+'</div>';
+      b+='<div class="rstep-t" dir="auto" style="line-height:1.7">'+r.excerpt.map(function(e){return '<div dir="rtl">'+escHTML(e.he)+'</div><div dir="ltr" style="opacity:.8">'+escHTML(khTL(e.tl,e.he))+'</div><div dir="ltr" style="opacity:.7">'+escHTML(e.en)+'</div>';}).join('<div style="height:8px"></div>')+'</div>';
       b+='<div class="rstep-fb">A few sentences for listening exposure. The full text is more advanced and stays in the Stories library.</div>'; }
     else if(r.resolved){ b+='<div class="rstep-ok">Reading text: '+escHTML(r.label||r.id)+'</div>';
       b+='<button class="btn sm" data-runner-story="1">Open and read \u2192</button>'; }
@@ -11140,7 +11143,7 @@ function bind(){
   const sv=document.getElementById('setVoice');if(sv)sv.onchange=()=>{S.voiceURI=sv.value;save();};
   const srng=document.getElementById('setRate');if(srng)srng.oninput=()=>{S.rate=+srng.value;document.getElementById('rateVal').textContent=(+srng.value).toFixed(2)+'x';save();};
   const tv=document.getElementById('testVoice');if(tv)tv.onclick=()=>speak('שלום, מה שלומך?');
-  var gk=document.getElementById('setGttsKey'); if(gk){var _gkT=null;gk.oninput=function(){var v=gk.value.trim();if(!S.cfg)S.cfg={};S.cfg.gttsKey=v;try{if(v)localStorage.setItem(GTTS_KEY_LS,v);else localStorage.removeItem(GTTS_KEY_LS);}catch(e){}if(_gkT)clearTimeout(_gkT);_gkT=setTimeout(function(){if(typeof save==='function')save();var m=document.getElementById('gttsMsg');if(m)m.textContent=(S.cfg&&S.cfg.gttsKey)?'Key saved and synced to your devices.':'Key cleared.';},600);};gk.onblur=function(){if(_gkT){clearTimeout(_gkT);_gkT=null;}if(typeof save==='function')save();var m=document.getElementById('gttsMsg');if(m)m.textContent=(S.cfg&&S.cfg.gttsKey)?'Key saved and synced to your devices.':'Key cleared.';};}
+  var gk=document.getElementById('setGttsKey'); if(gk){var _gkT=null;gk.oninput=function(){var v=gk.value.trim();if(!S.cfg)S.cfg={};S.cfg.gttsKey=v;try{if(v)localStorage.setItem(GTTS_KEY_LS,v);else localStorage.removeItem(GTTS_KEY_LS);}catch(e){}if(_gkT)clearTimeout(_gkT);_gkT=setTimeout(function(){if(typeof save==='function')save();var m=document.getElementById('gttsMsg');if(m)m.textContent=(S.cfg&&S.cfg.gttsKey)?'Key saved on this device.':'Key cleared.';},600);};gk.onblur=function(){if(_gkT){clearTimeout(_gkT);_gkT=null;}if(typeof save==='function')save();var m=document.getElementById('gttsMsg');if(m)m.textContent=(S.cfg&&S.cfg.gttsKey)?'Key saved on this device.':'Key cleared.';};}
   var glv=document.getElementById('gttsLoadVoices'); if(glv)glv.onclick=function(){var m=document.getElementById('gttsMsg');if(m)m.textContent='Loading voices...';gttsListVoices().then(function(list){var sel=document.getElementById('setGttsVoice');if(!sel){return;}if(!list.length){if(m)m.textContent='No voices loaded. Check the key in this field, then try again.';return;}var _ov=offlineVoices();var _names=list.map(function(v){return v.name;});if(_names.indexOf(gttsVoice())<0){S.ttsVoice=_names[0];save();}sel.innerHTML=list.map(function(v){var sv=_ov[v.name]?'  \u2713 saved offline':'';return '<option value="'+v.name+'" '+(v.name===gttsVoice()?'selected':'')+'>'+v.name+' ('+(v.ssmlGender||'')+')'+sv+'</option>';}).join('');try{paintVoiceOffline(list);}catch(e){}if(m)m.textContent=list.length+' Standard Hebrew voices loaded. Pick one, then test.';try{refreshOfflineStatus();}catch(e){}});};
   var gsv=document.getElementById('setGttsVoice'); if(gsv)gsv.onchange=function(){S.ttsVoice=gsv.value;save();};
   try{ if(gsv && gttsKey() && gsv.options.length<=1 && !window._voicesAutoLoaded){ window._voicesAutoLoaded=true; var _glv=document.getElementById('gttsLoadVoices'); if(_glv) _glv.click(); } }catch(e){}
@@ -11209,8 +11212,8 @@ function val(id){const el=document.getElementById(id);return el?el.value.trim():
 function translitNorm(s){return (''+(s||'')).toLowerCase().replace(/kh/g,'ch').replace(/ts/g,'tz');}
 function translitNoteCard(){
   return '<div class="card" style="margin-top:14px"><h3>Transliteration</h3>'
-    +'<p class="muted" style="font-size:12.5px">Transliteration uses <b>ch</b> for the guttural /x/ sound (as in Bach), and <b>tz</b> for the tsade. When you type an answer or search, <b>ch and kh</b> are treated the same, and <b>ts and tz</b> are treated the same, so either spelling is accepted.</p>'
-    +'<p class="muted" style="font-size:12px;margin-top:4px">A learner-friendly kh display option is under review and not switched on yet, to avoid mis-converting loanwords where ch is a real /tsh/ sound.</p>'
+    +'<p class="muted" style="font-size:12.5px">Transliteration uses <b>kh</b> for the guttural /x/ sound (as in Bach or loch), and <b>tz</b> for the tsade. The rare loanword sound /tsh/ (as in chips) stays <b>ch</b>. When you type an answer or search, <b>kh and ch</b> are treated the same, and <b>tz and ts</b> are treated the same, so either spelling is accepted.</p>'
+    +'<p class="muted" style="font-size:12px;margin-top:4px">Vowels follow the Italian a e i o u (casa, bene, vino, sole, luna), so a Hebrew word reads the way an Italian speaker expects.</p>'
     +'</div>';
 }
 function norm(s){return translitNorm(stripN(s).replace(/[\u2013\u2014'"`.,!?]/g,'')).replace(/\s+/g,' ').trim();}
