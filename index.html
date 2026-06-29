@@ -8,7 +8,7 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-title" content="ivrit" />
-<link rel="apple-touch-icon" href="./icon192.png" />
+<link rel="apple-touch-icon" href="./icon-192.png" />
 <title>עברית · Vincenzo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -876,6 +876,7 @@ table.gtable td.say{font-style:italic;color:var(--muted)}
    Teaching engine: Course path · feedback drills · mastery + weak-spots
 =================================================================== */
 const USER_ID='vincenzo';
+const BUILD="pass28";   /* greppable internal build marker; HaMhandes bumps this every build */
 const DRIVE_FOLDER='1jqZwxO-5IhaiMxn7WkS0_EDadN_4VQlr';
 const SUPA_URL='https://ygstriddcprzalnisbql.supabase.co';
 const SUPA_KEY='sb_publishable_QbkZ3-OMXm-LiIoZw3lApA_BzhOUtlS';
@@ -913,6 +914,9 @@ function ensureCourseState(s){
   if(!s.course.done||typeof s.course.done!=='object'||Array.isArray(s.course.done)) s.course.done={};
   if(typeof s.course.lesson!=='number'||!isFinite(s.course.lesson)) s.course.lesson=1;
   if(!s.course.steps||typeof s.course.steps!=='object'||Array.isArray(s.course.steps)) s.course.steps={};
+  /* pass28 minimum-production gate: per-lesson count of completed production items
+     (typed recall, typed conjugation, typed writing/conversa, completed Say-it). */
+  if(!s.course.prod||typeof s.course.prod!=='object'||Array.isArray(s.course.prod)) s.course.prod={};
   if(!('session'in s)||(s.session!==null&&(typeof s.session!=='object'||Array.isArray(s.session)))) s.session=null;
   return s;
 }
@@ -1055,7 +1059,7 @@ function ttsText(t){
   return stripN(t);
 }
 /* ===IVRIT-EDITORIAL-OVERRIDES v1 START - do not edit outside these markers=== */
-const EDITORIAL_OVERRIDES = { sent:{}, vocab:{}, phrase:{}, story:{}, storyMetrics:{}, course:{"13":{"story":"s90"},"15":{"story":"s90"},"18":{"story":"s98"}}, alt:{}, tts:{}, translit:{}, spelling:{"סתו":"סתיו","הסתו":"הסתיו","בסתו":"בסתיו","מלים":"מילים","המלים":"המילים","ידים":"ידיים","הידים":"הידיים","שיך":"שייך","מחיך":"מחייך","גנה":"גינה","בגנה":"בגינה","תרביות":"תרבויות","התרביות":"התרבויות","ספור":"סיפור","הספור":"הסיפור","ספורים":"סיפורים","הספורים":"הסיפורים","מנקדת":"מנקודת","מרתא":"מרתה","התיקיה":"התיקייה","בתיקיה":"בתיקייה","ואפלו":"ואפילו","אמתית":"אמיתית","ומחיך":"ומחייך","והגנה":"והגינה"} };
+const EDITORIAL_OVERRIDES = { sent:{}, vocab:{}, phrase:{}, story:{}, storyMetrics:{}, course:{"3":{"chunks":[{"f":"מָה שְׁלוֹמְךָ","n":"Fixed greeting for now. The ־ךָ (your) possessive suffix is analysed in a later lesson."}]},"7":{"chunks":[{"f":"בְּבֶּרְלִין","n":"Fixed form for now: attached בְּ means in. The attached-preposition rule is taught in Lesson 15."}]},"9":{"chunks":[{"f":"גָּר / עוֹבֵד","n":"Fixed present-tense forms for now. The Pa'al present pattern is taught in Lesson 19."}]},"13":{"story":"s90","chunks":[{"f":"יֵשׁ לִי","n":"Fixed expression for now: I have. The לִי dative ending is analysed in a later lesson."}]},"15":{"story":"s90"},"16":{"chunks":[{"f":"רוֹאֶה / אוֹהֵב / שׁוֹתֶה","n":"Fixed present-tense forms for now. The Pa'al present pattern is taught in Lesson 19."}]},"18":{"story":"s98"},"20":{"chunks":[{"f":"בְּשֶׁבַע","n":"At seven (the time). שֶׁבַע is the number seven, taught fully in Lesson 29; for now learn this as a fixed time phrase."}]},"21":{"chunks":[{"f":"מְדַבֵּר","n":"Learned as a chunk for now. This is the Pi'el binyan, explained at A2 (grammar Topic 13)."}]}}, alt:{}, tts:{}, translit:{}, spelling:{"סתו":"סתיו","הסתו":"הסתיו","בסתו":"בסתיו","מלים":"מילים","המלים":"המילים","ידים":"ידיים","הידים":"הידיים","שיך":"שייך","מחיך":"מחייך","גנה":"גינה","בגנה":"בגינה","תרביות":"תרבויות","התרביות":"התרבויות","ספור":"סיפור","הספור":"הסיפור","ספורים":"סיפורים","הספורים":"הסיפורים","מנקדת":"מנקודת","מרתא":"מרתה","התיקיה":"התיקייה","בתיקיה":"בתיקייה","ואפלו":"ואפילו","אמתית":"אמיתית","ומחיך":"ומחייך","והגנה":"והגינה"} };
 /* ===IVRIT-EDITORIAL-OVERRIDES v1 END=== */
 /* ---------- Editorial override engine (additive, render-time, durable) ----------
    Canonical committed corrections live in the fenced EDITORIAL_OVERRIDES block above.
@@ -5965,13 +5969,38 @@ function catItems(name){return LEX.filter(it=>it.cat===name);}
 =================================================================== */
 function mState(k){const m=S.mastery[k];return m?m.s:-1;}
 function mSeen(k){if(!S.mastery[k])S.mastery[k]={s:0,n:0,c:0,due:Date.now()};}
-function mAnswer(k,ok){let m=S.mastery[k]||{s:0,n:0,c:0,due:Date.now()};m.n++;
-  if(ok){m.c++;m.s=m.c>=4?3:m.c>=2?2:Math.max(m.s,1);m.due=Date.now()+(m.s===3?7:m.s===2?2:1)*864e5;}
-  else{m.c=0;m.s=1;m.due=Date.now()+6e5;}
+/* pass28 promotion rule (locked two-meter model, HaPedagog cycle 2): the ladder
+   crosses into familiar (2) / mastered (3) on RETRIEVAL/PRODUCTION correctness only.
+   kind: 'retrieval' (produced from memory: typed recall, typed conjugation, typed
+   grammar, dictation) | 'recognition' (chose among options or self-reported: every
+   MCQ pick, match, listen-and-choose, story cloze/gist, flashcard "got it").
+   Default 'recognition', so anything unlabelled stays conservative. Recognition
+   confirms 'seen' and reschedules but can never lift to familiar; c increments only
+   on retrieval; any wrong demotes to weak. */
+function mAnswer(k,ok,kind){let m=S.mastery[k]||{s:0,n:0,c:0,due:Date.now()};m.n++;
+  if(ok){
+    if(kind==='retrieval'){
+      m.c++;                                   /* only retrieval counts as recall */
+      m.s=m.c>=4?3:m.c>=2?2:Math.max(m.s,1);
+      m.due=Date.now()+(m.s===3?7:m.s===2?2:1)*864e5;
+    } else {                                   /* recognition correct = exposure only */
+      m.s=Math.max(m.s,0);                     /* can confirm seen, never familiar */
+      if(m.s<2)m.due=Date.now()+1*864e5;       /* light reschedule for not-yet-owned words */
+      /* c is NOT incremented; recognition never counts toward familiar/mastered */
+    }
+  } else {                                     /* wrong, either kind: honest demotion */
+    m.c=0;m.s=1;m.due=Date.now()+6e5;
+  }
   S.mastery[k]=m;}
-/* explicit self-rating from word cards: knew=familiar, sort-of=weak, new=seen */
-function mSetState(k,s){let m=S.mastery[k]||{s:0,n:0,c:0,due:Date.now()};m.s=s;m.n=(m.n||0)+1;
-  if(s>=2){m.c=Math.max(m.c||0,2);m.due=Date.now()+2*864e5;}else if(s===1){m.c=0;m.due=Date.now()+6e5;}else{m.c=0;m.due=Date.now();}
+/* explicit self-rating from word cards: a scheduling/awareness signal, never a
+   knowledge claim. Capped below familiar so "knew it" alone can no longer paint a
+   word familiar (pass28: familiar is earned only by producing it, twice). */
+function mSetState(k,reqS){let m=S.mastery[k]||{s:0,n:0,c:0,due:Date.now()};m.n=(m.n||0)+1;
+  if(reqS>=2){                 /* "knew it": self-report only */
+    if(m.s<2){m.s=Math.max(m.s,0);m.due=Date.now()+2*864e5;}   /* caps at seen */
+    else{m.due=Date.now()+(m.s===3?7:2)*864e5;}                /* already earned: just reschedule */
+  } else if(reqS===1){m.s=Math.min(m.s,1);m.c=0;m.due=Date.now()+6e5;}  /* "sort-of" -> weak */
+  else {m.s=0;m.c=0;m.due=Date.now();}                                  /* "new" -> seen, due now */
   S.mastery[k]=m;}
 function lessonKnown(l){const items=catItems(l.vocab);const known=items.filter(it=>mState(it.key)>=2).length;return {known,total:items.length};}
 function masteryCounts(){const c={enc:0,weak:0,fam:0,mas:0};for(const k in S.mastery){const s=S.mastery[k].s;if(s===0)c.enc++;else if(s===1)c.weak++;else if(s===2)c.fam++;else if(s>=3)c.mas++;}return c;}
@@ -6316,6 +6345,12 @@ function completeLesson(id){S.course.done[id]=true;const nx=COURSE.find(l=>!less
 function getLessonStepState(lessonId, stepKey){var m=S.course&&S.course.steps&&S.course.steps[lessonId];return !!(m&&m[stepKey]);}
 function setLessonStepDone(lessonId, stepKey, val){ensureCourseState(S);if(!S.course.steps[lessonId])S.course.steps[lessonId]={};if(val===false)delete S.course.steps[lessonId][stepKey];else S.course.steps[lessonId][stepKey]=true;save();}
 function lessonStepsDone(lessonId){var m=S.course&&S.course.steps&&S.course.steps[lessonId];return m?Object.keys(m).filter(function(k){return m[k];}).length:0;}
+/* pass28 minimum-production gate helpers. bumpProd records one completed production
+   item for a lesson (typed recall, typed conjugation, typed writing/conversa reply, or
+   a completed Say-it loop). lessonProdCount reads it. Additive on S.course; serializes
+   and syncs with the rest of S.course; never promotes a word by itself. */
+function bumpProd(lessonId, n){ if(lessonId==null) return; ensureCourseState(S); S.course.prod[lessonId]=(S.course.prod[lessonId]||0)+(n||1); save(); }
+function lessonProdCount(lessonId){ try{ return (S.course&&S.course.prod&&S.course.prod[lessonId])||0; }catch(e){ return 0; } }
 function getActiveSession(){return (S.session&&typeof S.session==='object'&&!Array.isArray(S.session))?S.session:null;}
 function setActiveSession(lessonId, stepIndex){ensureCourseState(S);S.session={lessonId:lessonId, stepIndex:(stepIndex==='hub'?'hub':(typeof stepIndex==='number'?stepIndex:0)), startedAt:Date.now()};save();}
 function clearActiveSession(){S.session=null;save();}
@@ -7866,8 +7901,15 @@ function pilotRenderPractice(lesson){
   b+='<div class="rstep-t">These drills use only what this lesson taught ('+gen.fresh.length+' word'+(gen.fresh.length===1?'':'s')
     +(gen.verbs.length?' + '+gen.verbs.length+' verb form'+(gen.verbs.length===1?'':'s'):'')
     +') plus '+gen.review.length+' carried over from earlier lessons. Nothing above your level appears here.</div>';
-  b+='<div class="rstep-h" style="margin-top:12px">Choose the meaning</div>';
-  b+=_pilotMeaningQuiz(quizPool, lesson.id, 'practice');
+  /* pass28: production-primary. The drill itself (auto-launched, typed recall interleaved
+     with MCQ scaffold) is the step. The step is completed only by producing at least one
+     typed answer, not by recognising. No step-completing MCQ here (that inflated Knowledge). */
+  var prod=lessonProdCount(lesson.id);
+  b+='<div class="rstep-h" style="margin-top:12px">Type it from memory</div>';
+  b+='<div class="rstep-t">You will be shown the English and type the Hebrew. Producing a word from memory is what moves it toward familiar; choosing from options does not.</div>';
+  b+='<div class="row" style="gap:10px;margin-top:12px;flex-wrap:wrap"><button class="btn" data-runner-pilot-practice="1" style="font-size:15px;padding:10px 18px">'+(prod>0?'Practice again \u2192':'Start typed practice \u2192')+'</button></div>';
+  b+=(prod>0?'<div class="rstep-ok" style="margin-top:10px">\u2713 You produced '+prod+' item'+(prod===1?'':'s')+' this lesson. This step is complete.</div>'
+            :'<div class="rstep-meta">Produce at least one item to complete this step, or Skip below.</div>');
   return b;
 }
 /* ===== END PILOT MINI-BANK (B1) ===== */
@@ -7881,6 +7923,17 @@ function pilotRenderPractice(lesson){
    the runner never double-awards XP). Real activity engines are wired in
    a later phase; steps render as placeholders for now. ============== */
 function _lessonById(id){return COURSE.find(function(l){return l.id==id;});}
+/* pass28 content scaffolding (additive, editorial-overrides only): a "fixed form for now"
+   chunk-badge for forms a lesson uses before their rule is taught (HaTalmid section 2), and
+   the be-sheva gloss at L20. Reads getOverride('course',id,'chunks'); mutates no base array. */
+function chunkBadges(lesson){
+  if(!lesson) return '';
+  var ch=getOverride('course',String(lesson.id),'chunks');
+  if(!ch||!ch.length) return '';
+  return '<div class="rstep-fb" style="margin-top:10px"><b>Fixed forms for now</b> (you will analyse the rule later):<ul class="rstep-list" style="margin-top:6px">'
+    +ch.map(function(c){return '<li><span dir="rtl" data-speak="'+encodeURIComponent(c.f)+'" style="cursor:pointer">'+escHTML(c.f)+'</span> · '+escHTML(c.n||'')+'</li>';}).join('')
+    +'</ul></div>';
+}
 function buildLessonSteps(lesson){
   if(!lesson||typeof lesson!=='object') return [];
   var res=resolveLessonResources(lesson);
@@ -7896,7 +7949,11 @@ function buildLessonSteps(lesson){
   if(res.story) steps.push({key:'story',type:'storyReading',title:'Reading',res:res.story});
   if(res.conversa) steps.push({key:'conversa',type:'conversaScenario',title:'Conversa',res:res.conversa});
   if(res.writing) steps.push({key:'writing',type:'writingPrompt',title:'Writing',res:res.writing});
-  /* Output task removed: self-report 'say it aloud / I did this' steps the app cannot verify are no longer part of the journey. */
+  /* pass28: Say-it is the universal spoken home. Required for Journey and the production gate,
+     inert-to-neutral for Knowledge (self-report never promotes a word). Present on every lesson
+     that carries an outputTask (all do). It reveals the model only after the learner commits a
+     spoken attempt (records it on-device first), then plays the model and lets him compare. */
+  if(!_refEmpty(lesson.outputTask)) steps.push({key:'sayit',type:'sayItProduce',title:'Say it'});
   steps.push({key:'done',type:'completionSummary',title:'Complete'});
   return steps;
 }
@@ -7968,11 +8025,16 @@ function renderLessonSummary(l, st){
   }catch(e){}
   var nxt=null;
   try{ var pi=PILOT_LESSONS.indexOf(parseInt(l.id,10)); if(pi>=0&&pi+1<PILOT_LESSONS.length) nxt=_lessonById(PILOT_LESSONS[pi+1]); }catch(e){}
+  /* pass28 honest summary: branch on the minimum-production counter. */
+  var prodN=lessonProdCount(l.id);
+  var prodLine= prodN>0
+    ? '<div class="rstep-t" style="margin-top:8px"><b>Completed with production.</b>'+(taught?' '+taught+' words taught this lesson \u00b7 <b>'+strong+'</b> strong \u00b7 <b>'+weak+'</b> still settling. Weak words come back in warm-up and practice until they stick.':'')+'</div>'
+    : '<div class="rstep-fb" style="margin-top:8px"><b>Completed without production</b> \u00b7 no words were added to Knowledge this lesson. Produce in the practice or Say-it step to make these words stick.</div>';
   return '<button class="back" data-go2="dash">\u2190 dashboard</button>'
     +'<div class="topbar"><div><h1>Lesson complete \u2713</h1><div class="lead">'+lvlBadge(l.lvl)+' \u00b7 '+escHTML(l.title)+'</div></div>'+nikToggle()+'</div>'
     +'<div class="card runner-step">'
     +'<div class="rstep-ok">'+pct+'% of sections completed ('+doneN+' / '+steps.length+')</div>'
-    +(taught?'<div class="rstep-t" style="margin-top:8px">'+taught+' words taught this lesson \u00b7 <b>'+strong+'</b> strong \u00b7 <b>'+weak+'</b> still settling. Weak words come back in warm-up and practice until they stick.</div>':'')
+    +prodLine
     +'<div class="row" style="gap:10px;margin-top:16px;flex-wrap:wrap">'
     +(nxt?'<button class="btn" data-runner-start="'+nxt.id+'" style="font-size:15px;padding:10px 18px">Next lesson \u2192 '+escHTML(nxt.title)+'</button>':'')
     +'<button class="btn sm ghost" data-go2="dash">\u2190 back to dashboard</button>'
@@ -8032,6 +8094,16 @@ function returnToRunnerStep(markDone){
   }
   go('runner', String(r.lessonId), String(r.stepIndex));
 }
+/* pass28 production gate: a production step (practice, verbs) is granted its done state
+   only when the learner actually produced at least one item this session. If they finished
+   the drill with zero production (e.g. only ever saw scaffold MCQs or skipped the typed
+   items), the step stays incomplete and they can produce or Skip. Journey is never blocked
+   (Skip still advances); Knowledge stays honest (no word promoted without retrieval). */
+function returnToRunnerStepProd(){
+  var produced=window._lastDrillProduced||0;
+  if(produced>0){ returnToRunnerStep(true); }
+  else { try{toast('Produce at least one item to complete this step, or Skip to move on');}catch(e){} returnToRunnerStep(false); }
+}
 /* Phase 9B.5: launch real activities from a runner step, scoped to the lesson's
    resolved resources, reusing the existing drill engines. Finishing the drill
    calls returnToRunnerStep(true) (mark done + back to the step); exiting uses
@@ -8045,6 +8117,31 @@ function runnerLaunchVocab(){
   setRunnerReturn('vocab');
   startVocabDrill(items, {title:pilotLessonLabel(c.id,true)+' \u00b7 vocabulary', back:'runner', onDone:function(){returnToRunnerStep(true);}});
 }
+/* pass28 Verbs step: launch typed conjugation production for the lesson's banked verbs.
+   Resolves the runner step's matched {inf,en} back to full VERBS objects (which carry the
+   present/past/future tables startVerbDrill needs), scopes the drill to them, and gates the
+   step's done state on producing at least one conjugation (returnToRunnerStepProd). */
+/* pass28 spaced reuse: retrieve due familiar+ words by typed recall (forceTyped), not
+   self-rating. Review only, so it does not set prodLesson (does not count toward the gate);
+   completing it marks the warm-up step done. */
+function runnerLaunchWarmupRetrieve(){
+  var c=_runnerCtx(); if(!c.st) return;
+  var wp=warmupPool(c.st.lesson,8);
+  var items=(wp.items||[]).filter(function(it){return it&&it.key&&mState(it.key)>=2;});
+  if(!items.length){ markCurrentLessonStepDone(); return; }
+  setRunnerReturn('warmup');
+  startVocabDrill(items,{title:pilotLessonLabel(c.id,true)+' · review from memory',forceTyped:true,back:'runner',onDone:function(){returnToRunnerStep(true);}});
+}
+function runnerLaunchVerbDrill(){
+  var c=_runnerCtx(); if(!c.st) return false;
+  var step=c.st.steps[c.idx]; if(!step||step.type!=='verbs'||!step.res) return false;
+  var infs=(step.res.matched||[]).map(function(m){return m.inf;});
+  var verbs=infs.map(function(inf){return VERBS.find(function(x){return x&&x.inf&&x.inf[1]===inf;});}).filter(Boolean);
+  if(!verbs.length) return false;
+  setRunnerReturn('verbs');
+  startVerbDrill(verbs,{title:pilotLessonLabel(c.id,true)+' · conjugation',tenses:['present'],max:12,back:'runner',prodLesson:c.id,onDone:function(){returnToRunnerStepProd();}});
+  return true;
+}
 function runnerLaunchPilotPractice(){
   var c=_runnerCtx(); if(!c.st) return false;
   if(!isPilotLesson(c.id)) return false;
@@ -8054,7 +8151,9 @@ function runnerLaunchPilotPractice(){
   if(items.length<4) items=items.concat(gen.review);
   if(items.length<2) return false;
   setRunnerReturn('practice');
-  startVocabDrill(shuffle(items.slice()),{title:pilotLessonLabel(c.id,true)+' \u00b7 practice',max:12,back:'runner',onDone:function(){returnToRunnerStep(true);}});
+  /* pass28: production-primary. prodLesson makes the drill interleave typed recall
+     (retrieval) and gates the step's done state on at least one produced item. */
+  startVocabDrill(shuffle(items.slice()),{title:pilotLessonLabel(c.id,true)+' \u00b7 practice',max:12,back:'runner',prodLesson:c.id,onDone:function(){returnToRunnerStepProd();}});
   return true;
 }
 function runnerLaunchPractice(){
@@ -8167,8 +8266,22 @@ function renderLessonStepPlaceholder(step, lesson, index, total){
   if(step.type==='warmupReview'){
     var wp=warmupPool(lesson,8);
     if(wp.mode==='review'){
-      b='<div class="rstep-t">Quick review of '+wp.items.length+' word'+(wp.items.length===1?'':'s')+' due or still shaky. Tap to hear, flip for the meaning, then rate yourself. This prepares you for the new material.</div>';
-      b+='<div class="wcards">'+wp.items.map(function(it){return _warmupCard(it,true);}).join('')+'</div>';
+      /* pass28 spaced reuse: a due word you have already earned (familiar or mastered) must
+         be RE-RETRIEVED, not flipped and self-rated, or "review" becomes self-report. Split:
+         familiar+ due words go through a typed retrieval micro-check; new/seen/weak starter
+         words keep flip + self-rate exposure. */
+      var _due=wp.items.filter(function(it){return it&&it.key&&mState(it.key)>=2;});
+      var _flip=wp.items.filter(function(it){return !(it&&it.key&&mState(it.key)>=2);});
+      b='';
+      if(_due.length){
+        b+='<div class="rstep-h">Bring back what you have learned</div><div class="rstep-t">'+_due.length+' word'+(_due.length===1?'':'s')+' you already own are due for review. Retrieve them from memory (type the Hebrew); recognising them is not enough to keep them.</div>';
+        b+='<div class="row" style="gap:10px;margin-top:10px;flex-wrap:wrap"><button class="btn" data-runner-warmup-retrieve="1" style="font-size:15px;padding:10px 18px">Retrieve '+_due.length+' due word'+(_due.length===1?'':'s')+' →</button></div>';
+      }
+      if(_flip.length){
+        b+='<div class="rstep-t"'+(_due.length?' style="margin-top:14px"':'')+'>Quick review of '+_flip.length+' word'+(_flip.length===1?'':'s')+' still settling. Tap to hear, flip for the meaning, then rate yourself.</div>';
+        b+='<div class="wcards">'+_flip.map(function(it){return _warmupCard(it,true);}).join('')+'</div>';
+      }
+      if(!_due.length&&!_flip.length) b='<div class="rstep-ok">Nothing due right now</div><div class="rstep-t">Continue to the new material.</div>';
     } else {
       b='<div class="rstep-ok">No review due yet</div><div class="rstep-t">First time through, so here are a few words from today\u2019s lesson to ease in. Tap to hear and flip to see the meaning.</div>';
       b+='<div class="wcards">'+wp.items.map(function(it){return _warmupCard(it,false);}).join('')+'</div>';
@@ -8186,6 +8299,7 @@ function renderLessonStepPlaceholder(step, lesson, index, total){
     if(isPilotLesson(lesson.id)){ var _bk=pilotBank(lesson); if(_bk&&_bk.allowed.vocab.length) _preview=_bk.allowed.vocab.slice(0,3); }
     if(!_preview.length){ var _vr=resolveVocabRefs(lesson.vocabulary); if(_vr&&_vr.matched&&_vr.matched.length){ var _ci=catItems(_vr.matched[0].cat); _preview=(_ci||[]).slice(0,3); } }
     if(_preview.length){ b+='<div class="rstep-h" style="margin-top:12px">Try it</div><div class="rstep-t">'+(_preview.length>1?'Here are a few words':'Here is one word')+' you will use today. Tap to hear, flip for the meaning.</div><div class="wcards">'+_preview.map(function(w){return _warmupCard(w,false);}).join('')+'</div>'; }
+    b+=chunkBadges(lesson);
     return b;
   }
   /* output-task step permanently removed (unverifiable self-report exercise). */
@@ -8213,10 +8327,21 @@ function renderLessonStepPlaceholder(step, lesson, index, total){
     return b;
   }
   if(step.type==='verbs'){
-    if(r.matched.length) b+='<div class="rstep-h">Verbs in this lesson</div><div class="rstep-t">Reference. Tap each one to hear it.</div><div class="rstep-heb" dir="rtl">'+r.matched.map(function(v){return '<span data-speak="'+encodeURIComponent(v.inf)+'" style="cursor:pointer">'+escHTML(H(v.inf,stripN(v.inf)))+'</span>';}).join(' \u00b7 ')+'</div>';
+    /* pass28: the Verbs step now requires typed conjugation production for any lesson with
+       banked verbs. The reference list stays as a warm-in scaffold; the step is completed by
+       conjugating (typed), which promotes the verb's mastery on retrieval-correct. */
+    var _vbList=(r.matched||[]).map(function(m){return m.inf;}).map(function(inf){return VERBS.find(function(x){return x&&x.inf&&x.inf[1]===inf;});}).filter(Boolean);
+    if(r.matched.length) b+='<div class="rstep-h">Verbs in this lesson</div><div class="rstep-t">Hear each one, then conjugate them from memory below. Typing a form yourself is what moves the verb toward mastery.</div><div class="rstep-heb" dir="rtl">'+r.matched.map(function(v){return '<span data-speak="'+encodeURIComponent(v.inf)+'" style="cursor:pointer">'+escHTML(H(v.inf,stripN(v.inf)))+'</span>';}).join(' \u00b7 ')+'</div>';
     if(r.unmatched.length) b+='<div class="rstep-fb">Mentioned but not in the verb bank yet: <span dir="rtl">'+r.unmatched.map(escHTML).join(' \u00b7 ')+'</span></div>';
     if(!r.matched.length&&!r.unmatched.length) b+='<div class="rstep-fb">No verbs flagged for this lesson.</div>';
-    b+='<div class="rstep-meta">Optional reference. Conjugation practice lives in the Verbs tab. Skip below if you are not ready.</div>';
+    if(_vbList.length){
+      var _vprod=lessonProdCount(lesson.id);
+      b+='<div class="row" style="gap:10px;margin-top:14px;flex-wrap:wrap"><button class="btn" data-runner-verbdrill="1" style="font-size:15px;padding:10px 18px">'+(_vprod>0?'Conjugate again \u2192':'Conjugate these verbs \u2192')+'</button></div>';
+      b+=(_vprod>0?'<div class="rstep-ok" style="margin-top:10px">\u2713 You produced '+_vprod+' item'+(_vprod===1?'':'s')+' this lesson. This step is complete.</div>'
+                  :'<div class="rstep-meta">Conjugate at least one form to complete this step, or Skip below.</div>');
+    } else {
+      b+='<div class="rstep-meta">Reference only for this lesson (no conjugation bank yet). Skip below when ready.</div>';
+    }
     return b;
   }
   if(step.type==='phraseExposure'){
@@ -8260,7 +8385,119 @@ function renderLessonStepPlaceholder(step, lesson, index, total){
     else b+='<div class="rstep-fb">'+escHTML(r.label||r.raw)+' Skip below if you are not ready.</div>';
     return b;
   }
+  if(step.type==='sayItProduce'){ return sayItRender(lesson); }
   return '<div class="rstep-t">'+escHTML(step.title)+'</div>'+note;
+}
+/* ===================================================================
+   pass28 SAY-IT self-check loop (universal spoken production home).
+   Sequence: show the outputTask + goal -> opt-in hint -> the learner says it
+   aloud and (optionally) records on-device -> commits, which reveals the model
+   Hebrew with TTS -> plays back his own recording to compare -> self-rates.
+   The recording lives only in memory (object URL); it is NEVER written to S,
+   Supabase, or the audio bucket. Mic denied/unavailable falls back to a
+   record-free attempt-then-self-rate so the step never breaks.
+   Journey: completing the loop grants the step and counts one production item.
+   Knowledge: self-rate never promotes; "fully"/"partly" only marks unseen goal
+   words seen, "not yet" demotes goal words to weak. =================== */
+function _heRuns(s){
+  var m=(''+(s||'')).match(/[\u0590-\u05ff][\u0590-\u05ff0-9\s.,:;!?'"\u05be\u05f3\u05f4-]*[\u0590-\u05ff]/g);
+  return (m||[]).map(function(x){return x.trim();}).filter(function(x){return x.length>1;});
+}
+function sayItModel(lesson){
+  var goal=(typeof v2FieldShown==='function'&&v2FieldShown(lesson.communicationGoal))?v2FieldText(lesson.communicationGoal):escHTML(lesson.communicationGoal||'');
+  var govr=getOverride('course',String(lesson.id),'goal'); if(govr) goal=escHTML(govr);
+  var prompt=_sanitizeOutputTask(lesson);
+  var models=[], seen={};
+  function add(he,p,tl,en){ if(!he)return; var key=stripN(he); if(seen[key])return; seen[key]=1; models.push({he:he,p:p||stripN(he),tl:tl||'',en:en||''}); }
+  try{ var bk=pilotBank(lesson); if(bk){ (bk.allowed.phrases||[]).slice(0,3).forEach(function(ph){ add(ph.he||ph.plain, ph.plain, '', ph.en||''); }); } }catch(e){}
+  _heRuns(prompt).slice(0,3).forEach(function(h){ add(h,'','',''); });
+  if(!models.length){ try{ var bk2=pilotBank(lesson); if(bk2){ (bk2.allowed.vocab||[]).slice(0,4).forEach(function(it){ add(it.v,it.p,it.tl,it.en); }); } }catch(e){} }
+  var goalKeys=[]; try{ var bk3=pilotBank(lesson); if(bk3){ (bk3.allowed.vocab||[]).forEach(function(it){ if(it.key)goalKeys.push(it.key); }); (bk3.allowed.verbs||[]).forEach(function(v){ if(v&&v.inf&&v.inf[1])goalKeys.push('vb|'+v.inf[1]); }); } }catch(e){}
+  if(!goalKeys.length){ try{ goalKeys=_lessonWordKeys(lesson)||[]; }catch(e){} }
+  return {goal:goal, prompt:prompt, models:models.slice(0,3), goalKeys:goalKeys};
+}
+function sayItRender(lesson){
+  var mdl=sayItModel(lesson);
+  var alreadyDone=getLessonStepState(lesson.id,'sayit');
+  var hint=pilotOutputHint(lesson);
+  var modelHTML=mdl.models.map(function(m){
+    return '<div class="rstep-heb" dir="rtl" style="margin:6px 0"><span data-speak="'+encodeURIComponent(m.he)+'" style="cursor:pointer">'+H(m.he,m.p)+'</span> <button class="spk" data-speak="'+encodeURIComponent(m.he)+'">\u266a</button></div>'
+      +(m.tl?'<div dir="ltr" style="opacity:.8;font-size:13px">'+escHTML(khTL(m.tl,m.he))+'</div>':'')
+      +(m.en?'<div dir="ltr" style="opacity:.7;font-size:13px">'+escHTML(m.en)+'</div>':'');
+  }).join('<div style="height:8px"></div>') || '<div class="rstep-meta">Build your answer from the words and phrases this lesson taught.</div>';
+  var b='<div class="sayit" data-sayit="'+lesson.id+'">';
+  if(mdl.goal) b+='<div class="rstep-h">Goal</div><div class="rstep-t" dir="auto">'+mdl.goal+'</div>';
+  b+='<div class="rstep-h" style="margin-top:12px">Say it</div><div class="rstep-t" dir="auto">'+escHTML(mdl.prompt)+'</div>';
+  if(hint) b+='<div style="margin-top:10px"><button class="btn ghost sm" data-sayit-hint="1">need a word? (hint)</button><div id="sayit-hintbody" style="display:none;margin-top:8px">'+hint+'</div></div>';
+  b+='<div id="sayit-rec" style="margin-top:14px"><div class="rstep-meta" id="sayit-recstatus">Say your answer aloud. You can record yourself first to play back and compare, or just say it.</div>'
+    +'<div class="row" style="gap:10px;margin-top:8px;flex-wrap:wrap"><button class="btn ghost sm" data-sayit-rec="1">\u25cf Record my attempt</button></div></div>';
+  b+='<div class="row" style="gap:10px;margin-top:14px;flex-wrap:wrap"><button class="btn" data-sayit-commit="1" style="font-size:15px;padding:10px 18px">I have said it \u00b7 show the model</button></div>';
+  b+='<div id="sayit-model" style="display:none;margin-top:16px"><div class="rstep-h">Model answer \u00b7 listen and compare</div>'+modelHTML
+    +'<div class="row" style="gap:10px;margin-top:10px;flex-wrap:wrap"><button class="btn ghost sm" data-sayit-play="1" style="display:none">\u25b6 play my recording</button></div></div>';
+  b+='<div id="sayit-rate" style="display:none;margin-top:16px"><div class="rstep-h">How did it go?</div>'
+    +'<div class="row" style="gap:8px;margin-top:6px;flex-wrap:wrap"><button class="btn sm" data-sayit-rate="full">I said it fully</button><button class="btn sm ghost" data-sayit-rate="part">partly</button><button class="btn sm ghost" data-sayit-rate="no">not yet</button></div>'
+    +'<div class="rstep-meta" style="margin-top:8px">This is an honest self-check. It completes the step and counts as production; it never marks a word known on its own.</div></div>';
+  if(alreadyDone) b+='<div class="rstep-ok" style="margin-top:12px">\u2713 You completed Say-it for this lesson.</div>';
+  b+='</div>';
+  return b;
+}
+/* Stop any live mic stream and release the in-memory recording. Called when leaving
+   the Say-it step or before starting a new recording, so the mic is never held open
+   and the audio never persists. */
+function _sayitCleanup(){
+  try{ if(window._sayitStream){ window._sayitStream.getTracks().forEach(function(t){t.stop();}); window._sayitStream=null; } }catch(e){}
+  if(window._sayitURL){ try{URL.revokeObjectURL(window._sayitURL);}catch(e){} window._sayitURL=null; }
+}
+function bindSayIt(){
+  var box=document.querySelector('[data-sayit]'); if(!box) return;
+  var lessonId=box.dataset.sayit;
+  var lesson=_lessonById(lessonId);
+  var mdl=lesson?sayItModel(lesson):{goalKeys:[]};
+  _sayitCleanup();
+  var recorder=null, chunks=[], recording=false;
+  var hintBtn=box.querySelector('[data-sayit-hint]');
+  if(hintBtn) hintBtn.onclick=function(){ var hb=document.getElementById('sayit-hintbody'); if(hb) hb.style.display=(hb.style.display==='none'?'block':'none'); };
+  var recBtn=box.querySelector('[data-sayit-rec]');
+  var status=document.getElementById('sayit-recstatus');
+  var playBtn=box.querySelector('[data-sayit-play]');
+  var micOK=!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia&&typeof MediaRecorder!=='undefined');
+  if(!micOK&&recBtn){ recBtn.style.display='none'; if(status) status.textContent='Microphone is not available here. Say your answer aloud, then commit and compare with the model.'; }
+  if(micOK&&recBtn) recBtn.onclick=function(){
+    if(recording){ try{recorder&&recorder.stop();}catch(e){} return; }
+    navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+      window._sayitStream=stream; chunks=[];
+      try{ recorder=new MediaRecorder(stream); }catch(e){ if(status)status.textContent='Recording is not supported here. Just say it aloud and commit.'; recBtn.style.display='none'; try{stream.getTracks().forEach(function(t){t.stop();});}catch(_e){} window._sayitStream=null; return; }
+      recorder.ondataavailable=function(ev){ if(ev.data&&ev.data.size)chunks.push(ev.data); };
+      recorder.onstop=function(){
+        try{ var blob=new Blob(chunks,{type:(chunks[0]&&chunks[0].type)||'audio/webm'}); if(window._sayitURL)URL.revokeObjectURL(window._sayitURL); window._sayitURL=URL.createObjectURL(blob); if(playBtn)playBtn.style.display=''; }catch(e){}
+        recording=false; recBtn.textContent='\u25cf Record again'; if(status)status.textContent='Recorded on this device only (never uploaded). Commit, then play it back next to the model.';
+        try{ if(window._sayitStream){window._sayitStream.getTracks().forEach(function(t){t.stop();});window._sayitStream=null;} }catch(e){}
+      };
+      recorder.start(); recording=true; recBtn.textContent='\u25a0 Stop recording'; if(status)status.textContent='Recording on this device... say your full answer, then tap Stop. Nothing leaves your device.';
+    }).catch(function(){ if(status)status.textContent='Microphone permission was declined. Say your answer aloud, then commit and compare with the model.'; recBtn.style.display='none'; });
+  };
+  var commit=box.querySelector('[data-sayit-commit]');
+  if(commit) commit.onclick=function(){
+    if(recording){ try{recorder&&recorder.stop();}catch(e){} }
+    var mb=document.getElementById('sayit-model'); if(mb)mb.style.display='';
+    var rt=document.getElementById('sayit-rate'); if(rt)rt.style.display='';
+    commit.disabled=true; commit.textContent='Model shown \u00b7 compare and self-rate';
+    box.querySelectorAll('#sayit-model [data-speak]').forEach(function(s){ s.onclick=function(e){ e.stopPropagation(); speak(decodeURIComponent(s.dataset.speak)); }; });
+  };
+  if(playBtn) playBtn.onclick=function(){ if(window._sayitURL){ try{ new Audio(window._sayitURL).play(); }catch(e){} } };
+  box.querySelectorAll('[data-sayit-rate]').forEach(function(rb){ rb.onclick=function(){
+    var v=rb.dataset.sayitRate;
+    /* Knowledge: self-report never promotes. fully/partly -> expose unseen goal words as
+       seen (floor only); not yet -> demote goal words to weak so they resurface in warm-up. */
+    (mdl.goalKeys||[]).forEach(function(k){ try{ if(v==='no'){ mSetState(k,1); } else { if(mState(k)<0) mSeen(k); } }catch(e){} });
+    setLessonStepDone(lessonId,'sayit',true);
+    bumpProd(lessonId);   /* one production item toward the minimum gate */
+    touchDay();
+    _sayitCleanup();
+    save();
+    try{ toast(v==='full'?'Said it \u00b7 step complete':v==='part'?'Good \u00b7 step complete':'Noted \u00b7 these come back in warm-up'); }catch(e){}
+    setTimeout(function(){ if(route.section==='runner') runnerGoNext(); },700);
+  };});
 }
 /* ---- Sectioned lesson hub (R14): the lesson's home. Replaces the teacher-dump
    page and the linear overview-first runner. Lessons open straight into this hub;
@@ -8272,12 +8509,13 @@ function _hubSectionMeta(key){
     newlang:{name:'What is new',desc:'The new language this lesson introduces.',icon:'grammar'},
     vocab:{name:'Meet the words',desc:'The new vocabulary, with audio and self-rating.',icon:'vocab'},
     grammar:{name:'Grammar',desc:'The grammar point for this lesson, explained.',icon:'grammar'},
-    verbs:{name:'Verbs',desc:'The verbs in this lesson, fully conjugated.',icon:'vocab'},
+    verbs:{name:'Verbs',desc:'Conjugate this lesson’s verbs from memory.',icon:'vocab'},
     phrases:{name:'Phrases',desc:'Useful set phrases for this lesson.',icon:'vocab'},
     practice:{name:'Practice',desc:'Exercises drawn from this lesson.',icon:'practice'},
     story:{name:'Story',desc:'Read the short story for this lesson.',icon:'story'},
     conversa:{name:'Conversation',desc:'A roleplay scenario to practise.',icon:'dialogue'},
     writing:{name:'Writing',desc:'A short writing task.',icon:'vocab'},
+    sayit:{name:'Say it',desc:'Say it aloud, then check against the model.',icon:'dialogue'},
     output:{name:'Put it together',desc:'A final task using what you learned.',icon:'checkpoint'}
   };
   return M[key]||{name:key,desc:'',icon:'vocab'};
@@ -8300,6 +8538,7 @@ function estimateLessonMinutes(l, steps){
                       total+=st2?6:3; break; }
       case 'conversa': total+=5; break;
       case 'writing': total+=6; break;
+      case 'sayit': total+=4; break;
       default: total+=3;
     }
   });
@@ -8373,7 +8612,7 @@ let drill=null;
 function startVocabDrill(items,opts){opts=opts||{};
   items=items.filter(Boolean);
   if(!items.length){toast('Nothing to practise here yet');return;}
-  drill={typed:false,items:shuffle(items).slice(0,opts.max||Math.min(items.length,12)),i:0,score:0,wrong:[],answered:null,done:opts.onDone,title:opts.title||'Practice',back:opts.back||'practice',topic:opts.topic||null};
+  drill={typed:false,items:shuffle(items).slice(0,opts.max||Math.min(items.length,12)),i:0,score:0,wrong:[],answered:null,done:opts.onDone,title:opts.title||'Practice',back:opts.back||'practice',topic:opts.topic||null,prodLesson:opts.prodLesson||null,forceTyped:!!opts.forceTyped,produced:0};
   go('drill');}
 function startGrammarDrill(chItems,opts){opts=opts||{};
   drill={typed:true,items:shuffle(chItems).slice(0,opts.max||chItems.length),i:0,score:0,wrong:[],answered:null,done:opts.onDone,title:opts.title||'Practice',back:opts.back||'practice',topic:opts.topic||null};
@@ -8385,11 +8624,11 @@ function startVerbDrill(verbs,opts){opts=opts||{};
   verbs.forEach(v=>{
     tenses.forEach(t=>{const rows=v[t[0]];if(!rows)return;
       rows.forEach(r=>{
-        items.push({q:v.en+" \u00b7 "+t[1]+", "+r[0]+"  ("+v.inf[1]+")",a:[r[1][0],r[1][1]],hint:v.binyan+" \u00b7 root "+v.root});
+        items.push({q:v.en+" \u00b7 "+t[1]+", "+r[0]+"  ("+v.inf[1]+")",a:[r[1][0],r[1][1]],hint:v.binyan+" \u00b7 root "+v.root,key:'vb|'+v.inf[1]});
       });});
   });
   if(!items.length){toast("No verbs to drill");return;}
-  drill={typed:true,items:shuffle(items).slice(0,opts.max||12),i:0,score:0,wrong:[],answered:null,done:opts.onDone,title:opts.title||"Verb conjugation",back:opts.back||"practice"};
+  drill={typed:true,items:shuffle(items).slice(0,opts.max||12),i:0,score:0,wrong:[],answered:null,done:opts.onDone,title:opts.title||"Verb conjugation",back:opts.back||"practice",prodLesson:opts.prodLesson||null,produced:0};
   go("drill");}
 
 /* ===== Grammar exercise engine (workbook types, rotation-aware). Additive. ===== */
@@ -8481,7 +8720,11 @@ function vDrill(){
   return head+drillVocab(d);
 }
 function drillVocab(d){
-  const it=d.items[d.i];const type=d.i%4;const a=d.answered;d.vkind=type;
+  /* pass28: in the lesson practice step (d.prodLesson set) the drill is production-primary:
+     even items are typed recall (English -> type Hebrew = retrieval), odd items are MCQ
+     recognition kept as an interleaved scaffold. The first item is always typed recall, so
+     the learner meets production immediately. Free drills outside the lesson keep the i%4 mix. */
+  const it=d.items[d.i];const type=d.forceTyped?1:(d.prodLesson?(d.i%2===0?1:2):(d.i%4));const a=d.answered;d.vkind=type;
   if(type===1){ // translation: English -> type Hebrew
     const fb=a?`<div class="banner ${a.ok?'ok':'bad'}"><span><span class="lbl">${a.ok?'נכון · correct':'לא בדיוק · not quite'}</span><br>${it.en} = ${H(it.v,it.p)} (${it.tl})</span><button class="btn sm" data-drill-next="1">Continue</button></div>`:'';
     return `<div class="qprompt"><div class="en" style="font-size:20px">${it.en}</div><div class="sub">translate · type it in Hebrew (or transliteration)</div></div>
@@ -8530,7 +8773,7 @@ const TABS=[
 ];
 let route={section:'dash',item:null,sub:null};
 let lsStage=0;
-function go(section,item,sub,extra){route={section,item:item||null,sub:sub||null,extra:extra||null};buildNav();render();window.scrollTo(0,0);}
+function go(section,item,sub,extra){try{if(typeof _sayitCleanup==='function')_sayitCleanup();}catch(e){}route={section,item:item||null,sub:sub||null,extra:extra||null};buildNav();render();window.scrollTo(0,0);}
 function buildNav(){
   document.getElementById('nav').innerHTML=TABS.map(t=>`<button data-v="${t[0]}" class="${t[0]===route.section?'on':''}"><span class="ic">${t[2]}</span>${t[1]}</button>`).join('');
   document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>go(b.dataset.v));
@@ -8964,7 +9207,7 @@ function renderMini(lid){
     const wrap=b.closest('.card');wrap.querySelectorAll('.opt').forEach(o=>{o.disabled=true;
       const oc=decodeURIComponent(o.dataset.mini.split('|')[1]);
       if(oc===decodeURIComponent(correct))o.classList.add('ok');else if(o===b&&!ok)o.classList.add('bad');});
-    mAnswer(key,ok);save();
+    mAnswer(key,ok,'recognition');save();
     document.getElementById('mf-'+qi).innerHTML=ok?'<span class="ans-ok">נכון · correct ✓</span>':'<span class="ans-bad">לא בדיוק · the answer is highlighted</span>';
   });
   host.querySelectorAll('[data-gxmini]').forEach(b=>b.onclick=()=>{
@@ -10195,7 +10438,11 @@ function renderFlash(){const host=document.getElementById('flashHost');if(!host)
   document.getElementById('flashCard').onclick=()=>{flash.show=true;renderFlash();bindFlash();};
   bindFlash();
 }
-function bindFlash(){document.querySelectorAll('[data-flash-rate]').forEach(b=>b.onclick=()=>{const r=+b.dataset.flashRate;const it=flash.list[flash.i];mAnswer(it.key,r===2);if(r===1){const m=S.mastery[it.key];if(m){m.s=1;m.due=Date.now()+6e5;}}save();flash.i++;flash.show=false;renderFlash();});}
+function bindFlash(){document.querySelectorAll('[data-flash-rate]').forEach(b=>b.onclick=()=>{const r=+b.dataset.flashRate;const it=flash.list[flash.i];
+  /* flashcard self-rate is recognition/self-report, never retrieval: "got it" can confirm
+     seen but cannot promote to familiar; "hazy" demotes to weak; "didn't know" is wrong. */
+  if(r===1){mSetState(it.key,1);}else{mAnswer(it.key,r===2,'recognition');}
+  save();flash.i++;flash.show=false;renderFlash();});}
 
 /* ===================================================================
    LIVE DIALOGUE  (fill the missing speaker lines from chips)
@@ -10333,10 +10580,10 @@ function renderDictation(){const host=document.getElementById('dicHost');if(!hos
   const inp=document.getElementById('dicIn');if(inp&&a==null)inp.focus();
   const check=()=>{const got=norm(inp.value);const ans=[it.he[0],it.he[1],it.en].filter(Boolean);
     const ok=ans.some(x=>norm(x)===got||norm(x).replace(/-/g,'')===got.replace(/-/g,''));
-    d.checked=ok;if(ok){d.score++;}if(it.key)mAnswer(it.key,ok);save();renderDictation();};
+    d.checked=ok;if(ok){d.score++;}if(it.key)mAnswer(it.key,ok,'retrieval');save();renderDictation();};
   const cb=host.querySelector('[data-dic-check]');if(cb)cb.onclick=check;
   if(inp)inp.onkeydown=e=>{if(e.key==='Enter'&&a==null)check();};
-  const sk=host.querySelector('[data-dic-skip]');if(sk)sk.onclick=()=>{d.checked=false;if(it.key)mAnswer(it.key,false);save();renderDictation();};
+  const sk=host.querySelector('[data-dic-skip]');if(sk)sk.onclick=()=>{d.checked=false;if(it.key)mAnswer(it.key,false,'retrieval');save();renderDictation();};
   const nx=host.querySelector('[data-dic-next]');if(nx)nx.onclick=()=>{d.i++;d.checked=null;renderDictation();if(d.i<d.list.length)setTimeout(()=>speak(d.list[d.i].he[0]),250);};
 }
 
@@ -10363,7 +10610,7 @@ function renderMatch(){const host=document.getElementById('matHost');if(!host)re
     if(!m.sel){m.sel={side,key:k};m.wrong=null;renderMatch();return;}
     if(m.sel.side===side){m.sel={side,key:k};renderMatch();return;}
     // different columns: check match
-    if(m.sel.key===k){m.matched.push(k);const it=byKey(k);if(it.key)mAnswer(it.key,true);addXP(1);m.sel=null;touchDay();save();renderMatch();}
+    if(m.sel.key===k){m.matched.push(k);const it=byKey(k);if(it.key)mAnswer(it.key,true,'recognition');addXP(1);m.sel=null;touchDay();save();renderMatch();}
     else{m.wrong=[m.sel.side+':'+m.sel.key,side+':'+k];const sel=m.sel;m.sel=null;renderMatch();setTimeout(()=>{if(mat){mat.wrong=null;renderMatch();}},650);}
   });
 }
@@ -10805,8 +11052,10 @@ function plRecordHistory(res){
   S.placement.currentRecommendation=res;
 }
 function plSeedFamiliar(keys){
-  /* seed familiar (state 2) only where current mastery is lower; never downgrade */
-  (keys||[]).forEach(function(k){try{if(mState(k)<2)mSetState(k,2);}catch(e){}});
+  /* seed familiar (state 2) only where current mastery is lower; never downgrade.
+     The placement test is a graded assessment, not a word-card self-rating, so it
+     writes state directly and is unaffected by the pass28 mSetState familiar-cap. */
+  (keys||[]).forEach(function(k){try{if(mState(k)<2){var m=S.mastery[k]||{s:0,n:0,c:0,due:Date.now()};m.s=2;m.c=Math.max(m.c||0,2);m.due=Date.now()+2*864e5;S.mastery[k]=m;}}catch(e){}});
 }
 function plApply(mode){
   if(!plState||!plState.result)return; var res=plState.result;
@@ -11098,6 +11347,10 @@ function bind(){
   document.querySelectorAll('[data-runner-hub]').forEach(b=>b.onclick=()=>{var _id=b.dataset.runnerHub;setActiveSession(_id,'hub');go('runner',String(_id),'hub');});
   document.querySelectorAll('[data-hub-step]').forEach(b=>b.onclick=()=>{var _id=route.item;var _i=+b.dataset.hubStep;setActiveSession(_id,_i);go('runner',String(_id),String(_i));});
   document.querySelectorAll('[data-runner-vocab]').forEach(b=>b.onclick=()=>runnerLaunchVocab());
+  document.querySelectorAll('[data-runner-warmup-retrieve]').forEach(b=>b.onclick=()=>runnerLaunchWarmupRetrieve());
+  document.querySelectorAll('[data-runner-verbdrill]').forEach(b=>b.onclick=()=>runnerLaunchVerbDrill());
+  bindSayIt();
+  document.querySelectorAll('[data-runner-pilot-practice]').forEach(b=>b.onclick=()=>{ if(!runnerLaunchPilotPractice()) runnerLaunchPractice(); });
   document.querySelectorAll('[data-runner-practice]').forEach(b=>b.onclick=()=>runnerLaunchPractice());
   document.querySelectorAll('[data-runner-grammar-practice]').forEach(b=>b.onclick=()=>runnerLaunchGrammarPractice());
   document.querySelectorAll('[data-grate-set]').forEach(b=>b.onclick=()=>{var parts=b.dataset.grateSet.split('|');var tid=parts[0],lvl=+parts[1];S.gconf=S.gconf||{};S.gconf[tid]=lvl;save();if(route.section==='runner'){var _k=_curRunnerStepKey();if(_k)setLessonStepDone(route.item,_k,true);toast('Confidence noted - step complete');}else{toast('Confidence noted');}render();});
@@ -11351,7 +11604,7 @@ function bindDrill(){
     const remaining=d.items.length-d.i-(d.answered!=null?1:0);
     if(remaining>0&&!b.dataset.confirmExit){ b.dataset.confirmExit='1'; b.textContent=remaining+' unanswered \u00b7 tap again to leave'; return; }
     const back=d.back||'practice';drill=null;go(back);});
-  document.querySelectorAll('[data-drill-pick]').forEach(b=>b.onclick=()=>{if(d.answered)return;const chosen=decodeURIComponent(b.dataset.drillPick);const it=d.items[d.i];const ok=chosen===it.en;mAnswer(it.key,ok);if(ok)d.score++;else d.wrong.push(it);d.answered={chosen,ok};save();render();});
+  document.querySelectorAll('[data-drill-pick]').forEach(b=>b.onclick=()=>{if(d.answered)return;const chosen=decodeURIComponent(b.dataset.drillPick);const it=d.items[d.i];const ok=chosen===it.en;mAnswer(it.key,ok,'recognition');if(ok)d.score++;else d.wrong.push(it);d.answered={chosen,ok};save();render();});
   const ck=document.querySelector('[data-drill-check]');if(ck)ck.onclick=drillCheck;
   /* gx (grammar exercise) wiring */
   document.querySelectorAll('[data-gx-opt]').forEach(b=>b.onclick=()=>gxAnswer(decodeURIComponent(b.dataset.gxOpt)));
@@ -11359,18 +11612,26 @@ function bindDrill(){
   const gti=document.getElementById('gxType');if(gti&&gti.tagName==='INPUT')gti.onkeydown=e=>{if(e.key==='Enter'){const t=document.getElementById('gxType');gxAnswer(t.value||'');}};
   const ghb=document.querySelector('[data-gx-hint]');if(ghb)ghb.onclick=()=>{const x=d.items[d.i];const el=document.getElementById('gxHint');if(el)el.textContent='sounds like: '+(x.e.at||'')+(x.e.ae?(' \u00b7 '+x.e.ae):'');};
   const ti=document.getElementById('dType');if(ti)ti.onkeydown=e=>{if(e.key==='Enter')drillCheck();};
-  const sk=document.querySelector('[data-drill-skip]');if(sk)sk.onclick=()=>{const it=d.items[d.i];mAnswer(it.key,false);d.wrong.push(it);d.answered={chosen:'',ok:false};save();render();};
+  const sk=document.querySelector('[data-drill-skip]');if(sk)sk.onclick=()=>{const it=d.items[d.i];mAnswer(it.key,false,'recognition');d.wrong.push(it);d.answered={chosen:'',ok:false};save();render();};
   const hb=document.querySelector('[data-drill-hint]');if(hb)hb.onclick=()=>{const it=d.items[d.i];const h=document.getElementById('dHint');if(h)h.textContent=it.hint||('sounds like: '+(it.tl||''));};
   const nx=document.querySelector('[data-drill-next]');if(nx)nx.onclick=()=>{d.i++;d.answered=null;render();};
   const ag=document.querySelector('[data-drill-again]');if(ag)ag.onclick=()=>{if(d.gx){const gid=d.gid,bk=d.back,cb=d.done;drill=null;startGrammarEx(gid,{back:bk,onDone:cb});return;}d.i=0;d.score=0;d.wrong=[];d.answered=null;d.items=shuffle(d.items);render();};
-  const fn=document.querySelector('[data-drill-finish]');if(fn)fn.onclick=()=>{const cb=d.done;const back=d.back||'practice';drill=null;if(cb)cb();else go(back);};
+  const fn=document.querySelector('[data-drill-finish]');if(fn)fn.onclick=()=>{const cb=d.done;const back=d.back||'practice';window._lastDrillProduced=d.produced||0;drill=null;if(cb)cb();else go(back);};
 }
 function drillCheck(){const d=drill;const ti=document.getElementById('dType');if(!ti)return;const got=norm(ti.value);
-  if(d.typed){const it=d.items[d.i];const ok=it.a.some(a=>norm(a)===got||norm(a).replace(/-/g,'')===got.replace(/-/g,''));if(ok)d.score++;else d.wrong.push(it);d.answered={ok};render();}
+  if(d.typed){const it=d.items[d.i];const ok=it.a.some(a=>norm(a)===got||norm(a).replace(/-/g,'')===got.replace(/-/g,''));
+    /* typed conjugation production: route through retrieval-correct promotion when the
+       verb-drill item carries a mastery key (pass28: conjugation now feeds Knowledge). */
+    if(it.key)mAnswer(it.key,ok,'retrieval');
+    if(d.prodLesson){d.produced=(d.produced||0)+1;bumpProd(d.prodLesson);}  /* production gate */
+    if(ok)d.score++;else d.wrong.push(it);d.answered={ok};save();render();}
   else{const it=d.items[d.i];let ok;
     if(d.vkind===1){const ans=[it.v,it.p,it.tl].filter(Boolean);ok=ans.some(a=>norm(a)===got||norm(a).replace(/-/g,'')===got.replace(/-/g,''));}
     else{ok=(norm(it.en).includes(got)&&got.length>1)||norm(it.tl)===got;}
-    mAnswer(it.key,ok);if(ok)d.score++;else d.wrong.push(it);d.answered={chosen:'',ok};save();render();}
+    /* type-1 is typed recall (produced from memory) = retrieval; other typed paths stay recognition */
+    mAnswer(it.key,ok,d.vkind===1?'retrieval':'recognition');
+    if(d.vkind===1&&d.prodLesson){d.produced=(d.produced||0)+1;bumpProd(d.prodLesson);}  /* production gate */
+    if(ok)d.score++;else d.wrong.push(it);d.answered={chosen:'',ok};save();render();}
 }
 
 /* ===================================================================

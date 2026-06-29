@@ -1,8 +1,8 @@
 /* ivrit service worker - app-shell cache, network-first, non-destructive.
    Deploy at the site root next to index.html (e.g. /ivrit/sw.js on GitHub Pages).
    Cross-origin requests (Supabase, Anthropic, Google Fonts) are never intercepted. */
-var CACHE = 'ivrit-shell-v2';
-var SHELL = ['./', './index.html', './manifest.webmanifest', './icon192.png', './icon512.png'];
+var CACHE = 'ivrit-shell-v3';
+var SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', function (e) {
   self.skipWaiting();
