@@ -876,7 +876,7 @@ table.gtable td.say{font-style:italic;color:var(--muted)}
    Teaching engine: Course path · feedback drills · mastery + weak-spots
 =================================================================== */
 const USER_ID='vincenzo';
-const BUILD="pass29";   /* greppable internal build marker; HaMhandes bumps this every build */
+const BUILD="pass30";   /* greppable internal build marker; HaMhandes bumps this every build */
 const DRIVE_FOLDER='1jqZwxO-5IhaiMxn7WkS0_EDadN_4VQlr';
 const SUPA_URL='https://ygstriddcprzalnisbql.supabase.co';
 const SUPA_KEY='sb_publishable_QbkZ3-OMXm-LiIoZw3lApA_BzhOUtlS';
@@ -10997,9 +10997,9 @@ function plMicTest(){
    in the harness with a stubbed transcript; the live mic is environmental.
 =================================================================== */
 /* TUNE: the spot-on threshold. he-IL ASR is noisier than it-IT on short, vowel-less
-   words, so this may be lowered toward 0.80 after one real-device he-IL check
-   (SOT cycle 8). Keep it a named constant so that tuning is a one-line change. */
-var HE_SPEAK_SPOTON=0.85;
+   words, so this was lowered to 0.80 (pass30) from the initial 0.85; revisit after a
+   real-device he-IL check (SOT cycle 8). Named constant so tuning stays a one-line change. */
+var HE_SPEAK_SPOTON=0.80;
 var HE_SPEAK_CLOSE=0.6;
 
 /* classic Levenshtein edit distance (two-row DP). */
