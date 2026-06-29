@@ -876,7 +876,7 @@ table.gtable td.say{font-style:italic;color:var(--muted)}
    Teaching engine: Course path · feedback drills · mastery + weak-spots
 =================================================================== */
 const USER_ID='vincenzo';
-const BUILD="pass28";   /* greppable internal build marker; HaMhandes bumps this every build */
+const BUILD="pass29";   /* greppable internal build marker; HaMhandes bumps this every build */
 const DRIVE_FOLDER='1jqZwxO-5IhaiMxn7WkS0_EDadN_4VQlr';
 const SUPA_URL='https://ygstriddcprzalnisbql.supabase.co';
 const SUPA_KEY='sb_publishable_QbkZ3-OMXm-LiIoZw3lApA_BzhOUtlS';
@@ -1059,7 +1059,7 @@ function ttsText(t){
   return stripN(t);
 }
 /* ===IVRIT-EDITORIAL-OVERRIDES v1 START - do not edit outside these markers=== */
-const EDITORIAL_OVERRIDES = { sent:{}, vocab:{}, phrase:{}, story:{}, storyMetrics:{}, course:{"3":{"chunks":[{"f":"מָה שְׁלוֹמְךָ","n":"Fixed greeting for now. The ־ךָ (your) possessive suffix is analysed in a later lesson."}]},"7":{"chunks":[{"f":"בְּבֶּרְלִין","n":"Fixed form for now: attached בְּ means in. The attached-preposition rule is taught in Lesson 15."}]},"9":{"chunks":[{"f":"גָּר / עוֹבֵד","n":"Fixed present-tense forms for now. The Pa'al present pattern is taught in Lesson 19."}]},"13":{"story":"s90","chunks":[{"f":"יֵשׁ לִי","n":"Fixed expression for now: I have. The לִי dative ending is analysed in a later lesson."}]},"15":{"story":"s90"},"16":{"chunks":[{"f":"רוֹאֶה / אוֹהֵב / שׁוֹתֶה","n":"Fixed present-tense forms for now. The Pa'al present pattern is taught in Lesson 19."}]},"18":{"story":"s98"},"20":{"chunks":[{"f":"בְּשֶׁבַע","n":"At seven (the time). שֶׁבַע is the number seven, taught fully in Lesson 29; for now learn this as a fixed time phrase."}]},"21":{"chunks":[{"f":"מְדַבֵּר","n":"Learned as a chunk for now. This is the Pi'el binyan, explained at A2 (grammar Topic 13)."}]}}, alt:{}, tts:{}, translit:{}, spelling:{"סתו":"סתיו","הסתו":"הסתיו","בסתו":"בסתיו","מלים":"מילים","המלים":"המילים","ידים":"ידיים","הידים":"הידיים","שיך":"שייך","מחיך":"מחייך","גנה":"גינה","בגנה":"בגינה","תרביות":"תרבויות","התרביות":"התרבויות","ספור":"סיפור","הספור":"הסיפור","ספורים":"סיפורים","הספורים":"הסיפורים","מנקדת":"מנקודת","מרתא":"מרתה","התיקיה":"התיקייה","בתיקיה":"בתיקייה","ואפלו":"ואפילו","אמתית":"אמיתית","ומחיך":"ומחייך","והגנה":"והגינה"} };
+const EDITORIAL_OVERRIDES = { sent:{}, vocab:{}, phrase:{}, story:{}, storyMetrics:{}, course:{"3":{"chunks":[{"f":"מָה שְׁלוֹמְךָ","n":"Fixed greeting for now. The ־ךָ (your) possessive suffix is analysed in a later lesson."}]},"7":{"chunks":[{"f":"בְּבֶּרְלִין","n":"Fixed form for now: attached בְּ means in. The attached-preposition rule is taught in Lesson 15."}]},"9":{"chunks":[{"f":"גָּר / עוֹבֵד","n":"Fixed present-tense forms for now. The Pa'al present pattern is taught in Lesson 19."}]},"13":{"story":"s90","chunks":[{"f":"יֵשׁ לִי","n":"Fixed expression for now: I have. The לִי dative ending is analysed in a later lesson."}]},"14":{"sayit":[{"he":"זֶה כִּסֵּא","p":"זה כיסא","tl":"ze kise","en":"this is a chair (m)"},{"he":"זֹאת מִטָּה","p":"זאת מיטה","tl":"zot mita","en":"this is a bed (f)"}]},"15":{"story":"s90"},"16":{"chunks":[{"f":"רוֹאֶה / אוֹהֵב / שׁוֹתֶה","n":"Fixed present-tense forms for now. The Pa'al present pattern is taught in Lesson 19."}]},"18":{"story":"s98"},"20":{"chunks":[{"f":"בְּשֶׁבַע","n":"At seven (the time). שֶׁבַע is the number seven, taught fully in Lesson 29; for now learn this as a fixed time phrase."}]},"21":{"chunks":[{"f":"מְדַבֵּר","n":"Learned as a chunk for now. This is the Pi'el binyan, explained at A2 (grammar Topic 13)."}]}}, alt:{}, tts:{}, translit:{}, spelling:{"סתו":"סתיו","הסתו":"הסתיו","בסתו":"בסתיו","מלים":"מילים","המלים":"המילים","ידים":"ידיים","הידים":"הידיים","שיך":"שייך","מחיך":"מחייך","גנה":"גינה","בגנה":"בגינה","תרביות":"תרבויות","התרביות":"התרבויות","ספור":"סיפור","הספור":"הסיפור","ספורים":"סיפורים","הספורים":"הסיפורים","מנקדת":"מנקודת","מרתא":"מרתה","התיקיה":"התיקייה","בתיקיה":"בתיקייה","ואפלו":"ואפילו","אמתית":"אמיתית","ומחיך":"ומחייך","והגנה":"והגינה"} };
 /* ===IVRIT-EDITORIAL-OVERRIDES v1 END=== */
 /* ---------- Editorial override engine (additive, render-time, durable) ----------
    Canonical committed corrections live in the fenced EDITORIAL_OVERRIDES block above.
@@ -8399,19 +8399,26 @@ function renderLessonStepPlaceholder(step, lesson, index, total){
    Journey: completing the loop grants the step and counts one production item.
    Knowledge: self-rate never promotes; "fully"/"partly" only marks unseen goal
    words seen, "not yet" demotes goal words to weak. =================== */
-function _heRuns(s){
-  var m=(''+(s||'')).match(/[\u0590-\u05ff][\u0590-\u05ff0-9\s.,:;!?'"\u05be\u05f3\u05f4-]*[\u0590-\u05ff]/g);
-  return (m||[]).map(function(x){return x.trim();}).filter(function(x){return x.length>1;});
-}
+/* pass29: the Say-it model is built ONLY from this lesson's gated, taught bank
+   (allowed.phrases / allowed.vocab) or an editorial-override model, so an untaught
+   word can never enter a model. The old _heRuns scrape of the outputTask
+   instruction string is removed: it promoted authored, ungated example Hebrew into
+   model answers (e.g. the \u05e9\u05bb\u05c1\u05dc\u05b0\u05d7\u05b8\u05df exception leading the L14 masc/fem model). Where a
+   lesson's authored phrases lead with an exception, an editorial 'course' sayit
+   override supplies a rule-demonstrating model (additive; base arrays untouched). */
 function sayItModel(lesson){
   var goal=(typeof v2FieldShown==='function'&&v2FieldShown(lesson.communicationGoal))?v2FieldText(lesson.communicationGoal):escHTML(lesson.communicationGoal||'');
   var govr=getOverride('course',String(lesson.id),'goal'); if(govr) goal=escHTML(govr);
   var prompt=_sanitizeOutputTask(lesson);
   var models=[], seen={};
   function add(he,p,tl,en){ if(!he)return; var key=stripN(he); if(seen[key])return; seen[key]=1; models.push({he:he,p:p||stripN(he),tl:tl||'',en:en||''}); }
-  try{ var bk=pilotBank(lesson); if(bk){ (bk.allowed.phrases||[]).slice(0,3).forEach(function(ph){ add(ph.he||ph.plain, ph.plain, '', ph.en||''); }); } }catch(e){}
-  _heRuns(prompt).slice(0,3).forEach(function(h){ add(h,'','',''); });
-  if(!models.length){ try{ var bk2=pilotBank(lesson); if(bk2){ (bk2.allowed.vocab||[]).slice(0,4).forEach(function(it){ add(it.v,it.p,it.tl,it.en); }); } }catch(e){} }
+  var sayitOvr=getOverride('course',String(lesson.id),'sayit');
+  if(Array.isArray(sayitOvr)&&sayitOvr.length){
+    sayitOvr.forEach(function(o){ if(o&&o.he) add(o.he, o.p||'', o.tl||'', o.en||''); });
+  } else {
+    try{ var bk=pilotBank(lesson); if(bk){ (bk.allowed.phrases||[]).slice(0,3).forEach(function(ph){ add(ph.he||ph.plain, ph.plain, ph.tl||'', ph.en||''); }); } }catch(e){}
+    if(!models.length){ try{ var bk2=pilotBank(lesson); if(bk2){ (bk2.allowed.vocab||[]).slice(0,4).forEach(function(it){ add(it.v,it.p,it.tl,it.en); }); } }catch(e){} }
+  }
   var goalKeys=[]; try{ var bk3=pilotBank(lesson); if(bk3){ (bk3.allowed.vocab||[]).forEach(function(it){ if(it.key)goalKeys.push(it.key); }); (bk3.allowed.verbs||[]).forEach(function(v){ if(v&&v.inf&&v.inf[1])goalKeys.push('vb|'+v.inf[1]); }); } }catch(e){}
   if(!goalKeys.length){ try{ goalKeys=_lessonWordKeys(lesson)||[]; }catch(e){} }
   return {goal:goal, prompt:prompt, models:models.slice(0,3), goalKeys:goalKeys};
@@ -8429,6 +8436,19 @@ function sayItRender(lesson){
   if(mdl.goal) b+='<div class="rstep-h">Goal</div><div class="rstep-t" dir="auto">'+mdl.goal+'</div>';
   b+='<div class="rstep-h" style="margin-top:12px">Say it</div><div class="rstep-t" dir="auto">'+escHTML(mdl.prompt)+'</div>';
   if(hint) b+='<div style="margin-top:10px"><button class="btn ghost sm" data-sayit-hint="1">need a word? (hint)</button><div id="sayit-hintbody" style="display:none;margin-top:8px">'+hint+'</div></div>';
+  /* pass29: real speak-and-check when the mic is usable (he-IL recognition, https,
+     not in a sandboxed frame). The verdict GUIDES; the self-mark below RECORDS.
+     When the mic is unusable we hide this control and fall back to say-it -> reveal
+     -> self-rate, so the step never blocks on hardware. */
+  var canCheck=(typeof micUsable==='function')&&micUsable();
+  if(canCheck){
+    b+='<div id="sayit-check" style="margin-top:14px"><div class="rstep-h">Speak and check</div>'
+      +'<div class="rstep-meta">Say your answer in Hebrew out loud. Your browser asks to use the microphone, listens once, and tells you how close you were. The check transcribes on the spot; nothing is recorded or uploaded.</div>'
+      +'<div class="row" style="gap:10px;margin-top:8px;flex-wrap:wrap"><button class="btn" data-sayit-speak="1" style="font-size:15px;padding:10px 18px">🎙️ Speak and check</button></div>'
+      +'<div id="sayit-heard" style="display:none;margin-top:12px"></div></div>';
+  } else {
+    b+='<div class="rstep-meta" style="margin-top:12px">'+escHTML((typeof micBlockedMessage==='function')?micBlockedMessage():'Say your answer aloud, then reveal the model and self-rate.')+'</div>';
+  }
   b+='<div id="sayit-rec" style="margin-top:14px"><div class="rstep-meta" id="sayit-recstatus">Say your answer aloud. You can record yourself first to play back and compare, or just say it.</div>'
     +'<div class="row" style="gap:10px;margin-top:8px;flex-wrap:wrap"><button class="btn ghost sm" data-sayit-rec="1">\u25cf Record my attempt</button></div></div>';
   b+='<div class="row" style="gap:10px;margin-top:14px;flex-wrap:wrap"><button class="btn" data-sayit-commit="1" style="font-size:15px;padding:10px 18px">I have said it \u00b7 show the model</button></div>';
@@ -8454,7 +8474,15 @@ function bindSayIt(){
   var lesson=_lessonById(lessonId);
   var mdl=lesson?sayItModel(lesson):{goalKeys:[]};
   _sayitCleanup();
-  var recorder=null, chunks=[], recording=false;
+  var recorder=null, chunks=[], recording=false, machineGraded=false;
+  /* pass29: reveal the model + self-rate (shared by the commit button and a
+     speak-and-check result), wire the model's tap-to-hear, and lock the commit. */
+  function revealModel(){
+    var mb=document.getElementById('sayit-model'); if(mb)mb.style.display='';
+    var rt=document.getElementById('sayit-rate'); if(rt)rt.style.display='';
+    var cb=box.querySelector('[data-sayit-commit]'); if(cb){ cb.disabled=true; cb.textContent='Model shown · compare and self-rate'; }
+    box.querySelectorAll('#sayit-model [data-speak]').forEach(function(s){ s.onclick=function(e){ e.stopPropagation(); speak(decodeURIComponent(s.dataset.speak)); }; });
+  }
   var hintBtn=box.querySelector('[data-sayit-hint]');
   if(hintBtn) hintBtn.onclick=function(){ var hb=document.getElementById('sayit-hintbody'); if(hb) hb.style.display=(hb.style.display==='none'?'block':'none'); };
   var recBtn=box.querySelector('[data-sayit-rec]');
@@ -8479,17 +8507,54 @@ function bindSayIt(){
   var commit=box.querySelector('[data-sayit-commit]');
   if(commit) commit.onclick=function(){
     if(recording){ try{recorder&&recorder.stop();}catch(e){} }
-    var mb=document.getElementById('sayit-model'); if(mb)mb.style.display='';
-    var rt=document.getElementById('sayit-rate'); if(rt)rt.style.display='';
-    commit.disabled=true; commit.textContent='Model shown \u00b7 compare and self-rate';
-    box.querySelectorAll('#sayit-model [data-speak]').forEach(function(s){ s.onclick=function(e){ e.stopPropagation(); speak(decodeURIComponent(s.dataset.speak)); }; });
+    revealModel();
+  };
+  /* pass29 speak-and-check: he-IL recognition -> score the transcript against the
+     model (Hebrew or transliteration, whichever scores higher) -> show "Heard: ..."
+     dir=rtl + the verdict, pre-highlight the matching self-mark, and reveal the model.
+     A clean spot-on verdict feeds the Knowledge meter ONCE as a single retrieval
+     increment; a graded miss demotes the goal words to weak so they resurface in
+     warm-up. The self-mark below still RECORDS the session; when the machine has
+     graded, the self-mark stays inert (machine-checked speech is retrieval; self-
+     report is not). This EXTENDS pass28's retrieval-only promotion rule. */
+  var speakBtn=box.querySelector('[data-sayit-speak]');
+  var heard=document.getElementById('sayit-heard');
+  if(speakBtn) speakBtn.onclick=function(){
+    if(heard){ heard.style.display=''; heard.innerHTML='<span class="muted">Listening... say your answer now.</span>'; }
+    speakBtn.disabled=true; speakBtn.textContent='Listening...';
+    startHeRecognition(function(transcript){
+      speakBtn.disabled=false; speakBtn.textContent='\ud83c\udf99\ufe0f Speak and check again';
+      var res=speakScoreModel(transcript, mdl.models||[]);
+      var sim=res.sim, pct=Math.round(sim*100);
+      var cls=sim>=HE_SPEAK_SPOTON?'rstep-ok':(sim>=HE_SPEAK_CLOSE?'rstep-meta':'rstep-fb');
+      if(heard) heard.innerHTML='<div class="rstep-h">Heard</div>'
+        +'<div class="rstep-heb" dir="rtl" style="margin:4px 0">'+escHTML(transcript)+'</div>'
+        +'<div class="'+cls+'" style="margin-top:6px">'+escHTML(res.label)+' \u00b7 '+pct+'% match</div>';
+      revealModel();
+      box.querySelectorAll('[data-sayit-rate]').forEach(function(rb){ rb.style.boxShadow=''; });
+      var hi=sim<HE_SPEAK_CLOSE?'no':(sim>=HE_SPEAK_SPOTON?'full':null);
+      if(hi){ var hb=box.querySelector('[data-sayit-rate="'+hi+'"]'); if(hb)hb.style.boxShadow='0 0 0 2px #2563eb'; }
+      if(!machineGraded){
+        machineGraded=true;
+        try{
+          if(sim>=HE_SPEAK_SPOTON){ (mdl.goalKeys||[]).forEach(function(k){ mAnswer(k,true,'retrieval'); }); }
+          else if(sim<HE_SPEAK_CLOSE){ (mdl.goalKeys||[]).forEach(function(k){ mSetState(k,1); }); }
+          save();
+        }catch(e){}
+      }
+    }, function(err,msg){
+      speakBtn.disabled=false; speakBtn.textContent='\ud83c\udf99\ufe0f Speak and check';
+      if(heard) heard.innerHTML='<div class="rstep-fb">'+escHTML(msg||'Could not check that. Say it aloud, reveal the model, and self-rate.')+'</div>';
+    });
   };
   if(playBtn) playBtn.onclick=function(){ if(window._sayitURL){ try{ new Audio(window._sayitURL).play(); }catch(e){} } };
   box.querySelectorAll('[data-sayit-rate]').forEach(function(rb){ rb.onclick=function(){
     var v=rb.dataset.sayitRate;
     /* Knowledge: self-report never promotes. fully/partly -> expose unseen goal words as
-       seen (floor only); not yet -> demote goal words to weak so they resurface in warm-up. */
-    (mdl.goalKeys||[]).forEach(function(k){ try{ if(v==='no'){ mSetState(k,1); } else { if(mState(k)<0) mSeen(k); } }catch(e){} });
+       seen (floor only); not yet -> demote goal words to weak so they resurface in warm-up.
+       pass29: if the machine already graded this attempt, Knowledge was moved by the
+       verdict (retrieval), so the self-mark only RECORDS the session and stays inert here. */
+    if(!machineGraded){ (mdl.goalKeys||[]).forEach(function(k){ try{ if(v==='no'){ mSetState(k,1); } else { if(mState(k)<0) mSeen(k); } }catch(e){} }); }
     setLessonStepDone(lessonId,'sayit',true);
     bumpProd(lessonId);   /* one production item toward the minimum gate */
     touchDay();
@@ -10921,6 +10986,145 @@ function plMicTest(){
     r.onend=function(){};
     r.start();
   }catch(err){if(out)out.textContent='Microphone unavailable here. Typing always works.';}
+}
+
+/* ===================================================================
+   pass29 HEBREW SPEAK-AND-CHECK ENGINE
+   Mirrors the Italian app's startVoiceRecognition / normSpeak / speakSimilarity /
+   speakVerdict / micUsable, adapted for Hebrew script, RTL, nikud and the masculine
+   learner voice. he-IL recognition; the verdict GUIDES, the self-mark RECORDS.
+   Deterministic (normalize / similarity / verdict / scoring) so it is unit-testable
+   in the harness with a stubbed transcript; the live mic is environmental.
+=================================================================== */
+/* TUNE: the spot-on threshold. he-IL ASR is noisier than it-IT on short, vowel-less
+   words, so this may be lowered toward 0.80 after one real-device he-IL check
+   (SOT cycle 8). Keep it a named constant so that tuning is a one-line change. */
+var HE_SPEAK_SPOTON=0.85;
+var HE_SPEAK_CLOSE=0.6;
+
+/* classic Levenshtein edit distance (two-row DP). */
+function levenshtein(a,b){
+  a=''+(a||''); b=''+(b||''); var m=a.length, n=b.length;
+  if(!m) return n; if(!n) return m;
+  var prev=new Array(n+1), cur=new Array(n+1), i, j;
+  for(j=0;j<=n;j++) prev[j]=j;
+  for(i=1;i<=m;i++){ cur[0]=i; var ca=a.charCodeAt(i-1);
+    for(j=1;j<=n;j++){ var cost=(ca===b.charCodeAt(j-1))?0:1; cur[j]=Math.min(prev[j]+1, cur[j-1]+1, prev[j-1]+cost); }
+    var t=prev; prev=cur; cur=t;
+  }
+  return prev[n];
+}
+/* Canonical compare form. Lowercases Latin, strips nikud (the Hebrew points range),
+   strips maqaf and geresh/gershayim, strips the Latin apostrophe-s and remaining
+   punctuation, and collapses whitespace. When compare=true it also drops a leading
+   definite article ה and an attached one-letter preposition ב/ל/כ/מ/ו/ש from each
+   Hebrew word, so "be-Berlin" never false-fails against "Berlin" (the Hebrew
+   adaptation the Italian normSpeak does not need). */
+function normSpeak(s,compare){
+  s=(''+(s||'')).toLowerCase();
+  s=s.replace(/[֑-ׇ]/g,'');            /* nikud (points) */
+  s=s.replace(/[־׳״]/g,'');        /* maqaf, geresh, gershayim */
+  s=s.replace(/['’]s\b/g,'');                /* Latin apostrophe-s */
+  s=s.replace(/[^א-תa-z0-9\s]/g,' ');   /* keep Hebrew letters, Latin, digits */
+  s=s.replace(/\s+/g,' ').trim();
+  if(compare){
+    /* drop a leading run of proclitics (the definite article ה plus the attached
+       one-letter prepositions/conjunction ב/ל/כ/מ/ו/ש), keeping at least one trailing
+       letter, so "be-Berlin"/"ha-bayit" compare equal to "Berlin"/"bayit". Stripped
+       greedily and symmetrically on both said and target, so it forgives the leading
+       particle without ever causing a false mismatch (the lenient direction, right for
+       a verdict that only GUIDES while the self-mark records). */
+    s=s.split(' ').map(function(w){
+      return w.replace(/^[הבלכמוש]+(?=[א-ת])/,'');
+    }).filter(Boolean).join(' ');
+  }
+  return s;
+}
+/* edit-distance similarity over max length, 0..1, on the Hebrew compare form. */
+function heSimilarity(said,target){
+  var a=normSpeak(said,true), b=normSpeak(target,true);
+  if(!a||!b) return 0; if(a===b) return 1;
+  var d=levenshtein(a,b);
+  return Math.max(0, 1 - d/Math.max(a.length,b.length));
+}
+/* same, but on the transliteration form (kh/ch and tz/ts folded together via the
+   app's translitNorm), so a transliteration transcript is accepted too. */
+function translitSimilarity(said,target){
+  var a=translitNorm(normSpeak(said,true)), b=translitNorm(normSpeak(target,true));
+  if(!a||!b) return 0; if(a===b) return 1;
+  var d=levenshtein(a,b);
+  return Math.max(0, 1 - d/Math.max(a.length,b.length));
+}
+/* score a transcript against a single target, accepting EITHER the Hebrew or its
+   transliteration (take the higher), then map to a verdict. */
+function heSpeakVerdict(said,target,tl){
+  var sim=Math.max(heSimilarity(said,target), tl?translitSimilarity(said,tl):0);
+  if(sim>=HE_SPEAK_SPOTON) return {label:'Spot on', sim:sim};
+  if(sim>=HE_SPEAK_CLOSE) return {label:'Close, listen and refine', sim:sim};
+  return {label:'Needs work, try again', sim:sim};
+}
+/* score a transcript against the whole model (its lines); return the best match and
+   its verdict label. The model lines are already gated to the lesson's taught bank. */
+function speakScoreModel(transcript, models){
+  var best={sim:0, target:''};
+  (models||[]).forEach(function(m){
+    var heT=m.p||m.he||'';
+    var tl=m.tl?khTL(m.tl,m.he):'';
+    var sim=Math.max(heSimilarity(transcript, heT), tl?translitSimilarity(transcript, tl):0);
+    if(sim>best.sim) best={sim:sim, target:heT};
+  });
+  best.label = best.sim>=HE_SPEAK_SPOTON?'Spot on':(best.sim>=HE_SPEAK_CLOSE?'Close, listen and refine':'Needs work, try again');
+  return {sim:best.sim, label:best.label, target:best.target};
+}
+/* mic availability. Speak-and-check needs SpeechRecognition, a secure (https) page,
+   and a page that is NOT a sandboxed/cross-origin frame (the claude.ai preview frame
+   blocks the mic). When false we hide the check control and fall back to self-rate. */
+function inSandboxedFrame(){
+  try{ if(window.top===window.self) return false; }   /* top-level page: fine */
+  catch(e){ return true; }                            /* reading top threw: cross-origin/sandboxed */
+  return true;                                         /* inside a frame: treat as mic-blocked */
+}
+function micUsable(){ return plHasSR() && plSecure() && !inSandboxedFrame(); }
+/* Hebrew-app micBlockedMessage: tell the learner WHY the check is off and that the
+   say-it-then-self-rate fallback still works. Distinguishes no-recognition, the
+   file:// open, the claude.ai/sandboxed frame, and the iOS-permission cases. */
+function micBlockedMessage(){
+  if(!plHasSR()) return 'This browser does not support speech recognition, so the spoken check is off here. Say your answer aloud, reveal the model, and self-rate.';
+  if((''+location.protocol)==='file:') return 'The spoken check needs the app served over https, not opened as a local file. Say your answer aloud and self-rate for now.';
+  if(inSandboxedFrame()) return 'The spoken check is off inside this embedded preview (for example the claude.ai frame). Open the app in its own browser tab over https to speak and check. For now, say it aloud and self-rate.';
+  if(!plSecure()) return 'The spoken check needs a secure (https) page. Say your answer aloud and self-rate for now.';
+  return 'If you are on an iPhone or iPad, allow the microphone when Safari asks. Say your answer aloud and self-rate for now.';
+}
+/* he-IL recognition engine, mirroring the Italian startVoiceRecognition: one final
+   result, no streaming partials, stops itself after one utterance, single best
+   hypothesis. Four tailored error branches plus a no-result branch. onResult gets the
+   transcript string; onError gets (errorCode, humanMessage). */
+function startHeRecognition(onResult,onError){
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){ if(onError)onError('no-recognition', micBlockedMessage()); return null; }
+  if(inSandboxedFrame()){ if(onError)onError('sandboxed', micBlockedMessage()); return null; }
+  var rec;
+  try{ rec=new SR(); }catch(e){ if(onError)onError('init-failed', micBlockedMessage()); return null; }
+  rec.lang='he-IL';            /* the modern code; NOT the deprecated iw-IL */
+  rec.interimResults=false;    /* one final result, no streaming partials */
+  rec.continuous=false;        /* stops itself after one utterance */
+  rec.maxAlternatives=1;       /* single best hypothesis */
+  var got=false;
+  rec.onresult=function(e){ got=true; var t=''; try{ t=e.results[0][0].transcript; }catch(_){ }
+    if(t&&onResult) onResult(t);
+    else if(onError) onError('no-result','I heard something but could not read it. Try again, a little slower.'); };
+  rec.onerror=function(e){
+    var err=(e&&e.error)||'error', msg;
+    if(err==='not-allowed'||err==='service-not-allowed') msg='Microphone permission was blocked. Allow the mic in your browser, or just say it aloud and self-rate.';
+    else if(err==='no-speech') msg='I did not hear anything. Tap Speak and check, then say your full answer.';
+    else if(err==='network') msg='Hebrew speech recognition needs internet. Reconnect, or say it aloud and self-rate.';
+    else if(err==='audio-capture') msg='No microphone was found on this device. Say your answer aloud and self-rate.';
+    else msg='Could not capture audio ('+err+'). You can still say it aloud and self-rate.';
+    if(onError) onError(err, msg);
+  };
+  rec.onend=function(){ if(!got&&onError) onError('no-result','I did not catch that. Tap Speak and check and try again, a little louder.'); };
+  try{ rec.start(); }catch(e){ if(onError)onError('start-failed','Could not start the microphone here. Say your answer aloud and self-rate.'); return null; }
+  return rec;
 }
 
 /* ===================================================================
