@@ -845,6 +845,54 @@ table.gtable td.say{font-style:italic;color:var(--muted)}
 .cg-lab{font-weight:600;font-size:14.5px;color:var(--ink)}
 .cgroup .cg-prog{margin-inline-start:auto;font-size:11px;color:var(--accent);background:var(--accent-wash);border-radius:999px;padding:2px 10px;font-weight:600}
 .sgroup>summary .cg-chev{margin-inline-start:0}
+/* ===================================================================
+   pass35: UNIFIED STATE + WAYFINDING VISUAL LANGUAGE (additive, render-time)
+   The owner's goal: state is unmistakable through COLOUR + PATTERN. One system,
+   never colour-only - every state pairs a colour with an icon/shape. RTL-safe via
+   logical properties (inset-inline-end), so chips and trails mirror correctly.
+   Tokens reused from the pass28 system: --accent (selected/current), --good
+   (correct/completed), --bad (wrong), --gold (incomplete). Matches/exceeds the
+   Italian .ex-option / lesson-row clarity (Italian relies on colour+wash; pass35
+   adds the explicit check/cross/marker shapes the owner asked for).
+=================================================================== */
+/* ---- PART A: in-lesson answer feedback (shared by .opt and .pq-opt) ---- */
+.opt,.pq-opt{position:relative}
+.opt:focus-visible,.pq-opt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.opt:active,.pq-opt:active{transform:translateY(1px) scale(.99)}
+/* 1) SELECTION - a tapped choice lands hard and reads as SELECTED (accent), never as a grade */
+.opt.sel,.pq-opt.sel{background:var(--accent-wash);border-color:var(--accent);border-width:2px;box-shadow:0 0 0 3px var(--accent-wash),var(--shadow-sm);transform:translateY(-1px);font-weight:650;color:var(--accent)}
+.opt.sel::after,.pq-opt.sel::after{content:"";position:absolute;inset-inline-end:12px;top:50%;transform:translateY(-50%);width:11px;height:11px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
+/* 2) CORRECT - pronounced success + a check chip (colour + shape) */
+.opt.ok,.pq-opt.ok{background:var(--good-wash);border-color:var(--good);border-width:2px;color:var(--good);font-weight:650;box-shadow:0 0 0 3px var(--good-wash);padding-inline-end:42px}
+.opt.ok::after,.pq-opt.ok::after{content:"\2713";position:absolute;inset-inline-end:11px;top:50%;transform:translateY(-50%);width:23px;height:23px;border-radius:50%;background:var(--good);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:800;line-height:1;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+/* 2) WRONG - pronounced error + a cross chip; the correct option is marked .ok in parallel so it is clearly indicated */
+.opt.bad,.pq-opt.bad{background:var(--bad-wash);border-color:var(--bad);border-width:2px;color:var(--bad);font-weight:650;box-shadow:0 0 0 3px var(--bad-wash);padding-inline-end:42px}
+.opt.bad::after,.pq-opt.bad::after{content:"\2717";position:absolute;inset-inline-end:11px;top:50%;transform:translateY(-50%);width:23px;height:23px;border-radius:50%;background:var(--bad);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:800;line-height:1;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+/* feedback banner leads with the matching icon, not colour alone */
+.banner.ok .lbl::before{content:"\2713  ";font-weight:900}
+.banner.bad .lbl::before{content:"\2717  ";font-weight:900}
+/* ---- PART B: journey wayfinding - the lesson hub phase map ---- */
+/* 4) PHASE STATE - four distinct, consistent treatments, each colour + shape:
+   completed (green fill + check), current (accent ring + number), incomplete
+   (gold ring + revisit arrow), not-started (muted number). */
+.lx-dot.incomplete{background:var(--gold-wash);color:var(--gold2);box-shadow:inset 0 0 0 2px var(--gold)}
+.lx-step.incomplete .lx-step-n{color:var(--gold2)}
+.lx-step.incomplete{background:linear-gradient(to var(--lx-end,right),var(--gold-wash),transparent)}
+/* 3) ACTIVE PATH ALWAYS CLEAR - the traveled trail (completed -> current) stays a
+   continuous accent line; incomplete branches read gold; the not-started tail stays
+   muted, so the learner's path never blends into the rest. */
+.lx-step.active{background:linear-gradient(to var(--lx-end,right),var(--accent-wash),transparent)}
+.lx-step.active .lx-dot{box-shadow:0 0 0 5px var(--accent-wash)}
+.lx-step.active .lx-dot::after{background:var(--accent)}     /* path continues down into the current step */
+.lx-step.incomplete .lx-dot::after{background:var(--gold)}   /* a branched-past phase keeps a visible (gold) trail */
+.lx-step.todo .lx-dot::after{background:var(--line)}          /* untraveled tail stays muted */
+html[dir="rtl"] .lx-step.active,html[dir="rtl"] .lx-step.incomplete{--lx-end:left}
+/* 5) journey lesson rows (course/today) carry the same language: an in-progress
+   lesson is distinct from completed and not-started (colour + marker). */
+.lesson-row.inprogress{background:linear-gradient(to var(--lx-end,right),var(--gold-wash),var(--card));border-color:var(--gold)}
+.lesson-row.inprogress .lesson-title{color:var(--gold2)}
+.lesson-row.inprogress .lesson-marker{background:var(--gold);border-color:var(--gold);color:#fff}
+html[dir="rtl"] .lesson-row.inprogress{--lx-end:left}
 </style>
 </head>
 <body>
@@ -876,7 +924,7 @@ table.gtable td.say{font-style:italic;color:var(--muted)}
    Teaching engine: Course path · feedback drills · mastery + weak-spots
 =================================================================== */
 const USER_ID='vincenzo';
-const BUILD="pass34";   /* greppable internal build marker; HaMhandes bumps this every build */
+const BUILD="pass35";   /* greppable internal build marker; HaMhandes bumps this every build */
 const DRIVE_FOLDER='1jqZwxO-5IhaiMxn7WkS0_EDadN_4VQlr';
 const SUPA_URL='https://ygstriddcprzalnisbql.supabase.co';
 const SUPA_KEY='sb_publishable_QbkZ3-OMXm-LiIoZw3lApA_BzhOUtlS';
@@ -8689,12 +8737,19 @@ function renderLessonHub(l, st){
     ?'<div class="lx-goal"><div class="lx-goal-ic">'+LX_GOAL_SVG+'</div><div><div class="lx-goal-l">Goal</div><div class="lx-goal-t" dir="auto">'+v2FieldText(l.communicationGoal)+'</div></div></div>':'';
   var total=steps.length, doneN=steps.filter(function(s){return !!dm[s.key];}).length;
   var activeIdx=-1; for(var ai=0;ai<steps.length;ai++){ if(!dm[steps[ai].key]){activeIdx=ai;break;} }
+  /* pass35: the hub lets the learner branch to any phase (data-hub-step), so a phase can be
+     left not-done while a LATER one is completed. That makes a real 4th state: a not-done
+     phase sitting before the last completed one is INCOMPLETE (branched past), distinct from
+     the CURRENT phase (the first not-done) and from NOT-STARTED phases (after the frontier). */
+  var lastDoneIdx=-1; for(var li=0;li<steps.length;li++){ if(dm[steps[li].key]) lastDoneIdx=li; }
   var journey=steps.map(function(s,i){
     var meta=_hubSectionMeta(s.key); var isDone=!!dm[s.key]; var isActive=(i===activeIdx);
+    var isInc=(!isDone&&!isActive&&i<lastDoneIdx);   /* not done, but a later phase is done -> branched past */
     var dot= isDone?'<div class="lx-dot done">'+LX_CHECK+'</div>'
            : (isActive?'<div class="lx-dot active">'+(i+1)+'</div>'
-           : '<div class="lx-dot todo">'+(i+1)+'</div>');
-    return '<div class="lx-step'+(isDone?' done':'')+(isActive?' active':'')+'" data-hub-step="'+i+'">'
+           : (isInc?'<div class="lx-dot incomplete" title="started, not finished - come back">↺</div>'
+           : '<div class="lx-dot todo">'+(i+1)+'</div>'));
+    return '<div class="lx-step'+(isDone?' done':'')+(isActive?' active':'')+(isInc?' incomplete':'')+'" data-hub-step="'+i+'">'
       +dot
       +'<div class="lx-step-b"><div class="lx-step-n">'+escHTML(meta.name)+'</div><div class="lx-step-d">'+escHTML(meta.desc)+'</div></div>'
       +'<span class="lx-step-go">'+(isDone?'<span class="lx-rev">Review</span>':'')+LX_CHEV+'</span>'
@@ -8864,7 +8919,11 @@ function drillVocab(d){
   }
   // MCQ variants
   const en2he=(type===3);
-  const opts=shuffle([it,...distractors(it,3)]);
+  /* pass35: cache this question's options so the graded re-render shows the SAME set -
+     the chosen-wrong option stays visible and clearly marked (.bad) next to the correct
+     one (.ok). Regenerates only when the question index changes. (UI/render only.) */
+  if(!d._mcOpts||d._mcOptsFor!==d.i){d._mcOpts=shuffle([it,...distractors(it,3)]);d._mcOptsFor=d.i;}
+  const opts=d._mcOpts;
   const promptHTML = en2he
     ? `<div class="qprompt"><div class="en">${it.en}</div><div class="sub">choose the Hebrew word</div></div>`
     : (type===2
@@ -10862,7 +10921,7 @@ function startMatch(){const pool=learnedPool().length>=5?learnedPool():LEX;
 function renderMatch(){const host=document.getElementById('matHost');if(!host)return;const m=mat;const byKey=k=>m.items.find(x=>x.key===k);
   const done=m.matched.length===m.items.length;
   const col=(arr,side)=>arr.map(k=>{const it=byKey(k);const isM=m.matched.includes(k);const isSel=m.sel&&m.sel.key===k&&m.sel.side===side;const isWrong=m.wrong&&m.wrong.includes(side+':'+k);
-    let cls='opt'+(side==='he'?' heb':'');if(isM)cls+=' ok';if(isSel)cls+=' bad';if(isWrong)cls+=' bad';
+    let cls='opt'+(side==='he'?' heb':'');if(isM)cls+=' ok';if(isSel)cls+=' sel';if(isWrong)cls+=' bad';  /* pass35: a picked-but-not-yet-matched tile reads as SELECTED (accent), not as an error */
     return `<button class="${cls}" ${isM?'disabled':''} data-mat="${side}|${k}">${side==='he'?H(it.v,it.p):it.en}</button>`;}).join('');
   host.innerHTML=`<div class="row spread" style="margin-bottom:10px"><div class="steplabel" style="margin:0">Match pairs</div><button class="btn ghost sm" data-mat-again="1">↺ new round</button></div>
     <div class="card"><p class="muted" style="font-size:13px;margin-bottom:10px">Tap a Hebrew word, then its meaning. ${m.matched.length}/${m.items.length} matched.</p>
