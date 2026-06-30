@@ -876,7 +876,7 @@ table.gtable td.say{font-style:italic;color:var(--muted)}
    Teaching engine: Course path · feedback drills · mastery + weak-spots
 =================================================================== */
 const USER_ID='vincenzo';
-const BUILD="pass33";   /* greppable internal build marker; HaMhandes bumps this every build */
+const BUILD="pass34";   /* greppable internal build marker; HaMhandes bumps this every build */
 const DRIVE_FOLDER='1jqZwxO-5IhaiMxn7WkS0_EDadN_4VQlr';
 const SUPA_URL='https://ygstriddcprzalnisbql.supabase.co';
 const SUPA_KEY='sb_publishable_QbkZ3-OMXm-LiIoZw3lApA_BzhOUtlS';
@@ -8921,7 +8921,7 @@ function openMoreSheet(){
 }
 function closeMoreSheet(){var s=document.getElementById('moresheet');if(s)s.classList.remove('open');}
 function render(){const m=document.getElementById('main');
-  const f={dash:vDash,today:vToday,course:vCourse,runner:vRunner,grammar:vGrammar,binyanim:vBinyanim,vocab:vVocab,verbs:vVerbs,stories:vStories,practice:vPractice,drill:vDrill,conversa:vConversa,write:vWrite,phrases:vPhrases,pron:vPron,settings:vSettings}[route.section]||vDash;
+  const f={dash:vDash,today:vToday,course:vCourse,runner:vRunner,grammar:vGrammar,binyanim:vBinyanim,vocab:vVocab,verbs:vVerbs,stories:vStories,practice:vPractice,drill:vDrill,conversa:vConversa,write:vWrite,phrases:vPhrases,pron:vPron,frontier:vFrontier,settings:vSettings}[route.section]||vDash;
   m.innerHTML=runnerReturnBanner()+f();bind();}
 
 /* small helpers */
@@ -8958,15 +8958,122 @@ function todayMark(id){todayDoneSet()[id]=true;save();}
    if its content exists; the budget gate is applied ON TOP of that availability check.
    So picking 15 and 60 now yield visibly different sessions and the
    "{N} minutes, built for you" header is true. */
+/* ===================================================================
+   pass34 (Batch 3 gap 1): THE CONTENT FRONTIER (adapted for Hebrew)
+   Additive infrastructure. The authored A1 pilot flow (pilotBank /
+   PILOT_VOCAB_PICK) stays PRIMARY and unchanged: the frontier is DORMANT
+   while any course lesson remains, and only feeds the daily new-word flow
+   once all 223 lessons are done (courseExhausted). Every surfaced word
+   carries full data (vowelled Hebrew for audio, transliteration, meaning)
+   and is INTRODUCED (meaning + audio via _warmupCard) before it is ever
+   tested - exactly like an authored pick. Never a raw untaught word.
+   Mirrors the Italian THEME_FRONTIER_ORDER / FOUNDATION_FRONTIER_ORDER /
+   userLevelCap (index.html ~9851 / ~9878 / ~9993 in the Italian app).
+
+   FOUNDATIONAL SPOT-CHECK (pass34, empirical over pilotBank picks): of the
+   named A1 foundations, Numbers (16/20 picked + tens 7/7), days/time
+   (Time & calendar 22/22, Time expressions 20/20, Days & months 16/20) and
+   core function words (Question words 12/12, Pronouns & function 18/21) are
+   ALREADY taught on a path and are NOT duplicated. Only Colours [A1]
+   (0/20 picked) is genuinely missing, so it is the sole foundation segment,
+   placed AHEAD of the breadth themes.
+=================================================================== */
+var HE_FOUNDATION_CATS=['Colours'];   /* the genuinely-missing A1 foundation(s) per the spot-check */
+var _FRONTIER=null;                    /* memoized {foundation:[], theme:[]} built once, lazily */
+function _pickedKeySets(){
+  var pv={}, pvb={};
+  COURSE.forEach(function(l){ try{
+    if(typeof isPilotLesson==='function' && !isPilotLesson(l.id)) return;
+    var bk=pilotBank(l); if(!bk||!bk.allowed) return;
+    (bk.allowed.vocab||[]).forEach(function(it){ if(it.key) pv[it.key]=1; });
+    (bk.allowed.verbs||[]).forEach(function(v){ var k=v.key||(v.inf?('vb|'+(v.inf[1]||v.inf)):null); if(k) pvb[k]=1; });
+  }catch(e){} });
+  return {pv:pv, pvb:pvb};
+}
+/* Build the ordered frontiers ONCE: LEX/VERBS entries absent from every lesson's picks.
+   foundation = unpicked words of HE_FOUNDATION_CATS; theme = every other unpicked vocab
+   word in category order, then every unpicked verb. Each item carries full data. */
+function _frontierEnsure(){
+  if(_FRONTIER) return _FRONTIER;
+  if(!LEX.length){ try{ buildLex(); }catch(e){} }
+  var ps=_pickedKeySets(), pv=ps.pv, pvb=ps.pvb;
+  var foundation=[], theme=[], foundSet={};
+  LEX.forEach(function(it){ if(String(it.key).indexOf('v|')!==0||pv[it.key]) return;
+    if(HE_FOUNDATION_CATS.indexOf(it.cat)>=0){ foundation.push({key:it.key,v:it.v,p:it.p,tl:it.tl,en:it.en,lvl:it.lvl||'A1',cat:it.cat,kind:'vocab'}); foundSet[it.key]=1; } });
+  LEX.forEach(function(it){ if(String(it.key).indexOf('v|')!==0||pv[it.key]||foundSet[it.key]) return;
+    theme.push({key:it.key,v:it.v,p:it.p,tl:it.tl,en:it.en,lvl:it.lvl||'A1',cat:it.cat,kind:'vocab'}); });
+  try{ VERBS.forEach(function(v){ var k='vb|'+v.inf[1]; if(pvb[k]) return;
+    theme.push({key:k,v:v.inf[0],p:v.inf[1],tl:khTL('',v.inf[0]),en:v.en,lvl:v.lvl||'A1',cat:'Verbs',kind:'verb'}); }); }catch(e){}
+  _FRONTIER={foundation:foundation, theme:theme};
+  return _FRONTIER;
+}
+function _frontierLevelForKey(k){
+  if(String(k).indexOf('vb|')===0){ try{ var inf=k.slice(3); var v=VERBS.find(function(x){return x.inf[1]===inf;}); return v?(v.lvl||'A1'):null; }catch(e){ return null; } }
+  var it=LEX.find(function(x){return x.key===k;}); return it?(it.lvl||'A1'):null;
+}
+/* demonstrated-progress cap: highest CEFR the learner has actually MASTERED (s>=3), plus
+   one step, floored at A1. Governs ONLY frontier/breadth vocab; authored lessons keep their
+   own authored level. With gateCEFR=='allow' (item <= cap), the frontier never surfaces a
+   word more than one CEFR band above demonstrated mastery. */
+function learnerCap(){
+  var maxR=-1;
+  try{ for(var k in S.mastery){ var m=S.mastery[k]; if(!m||m.s<3) continue; var lvl=_frontierLevelForKey(k); if(lvl==null) continue; var r=_cefrRank(lvl); if(r>maxR)maxR=r; } }catch(e){}
+  var capR=Math.min((maxR<0?0:maxR+1), _CEFR_KEYS.length-1);
+  return _CEFR_KEYS[capR];
+}
+function courseExhausted(){ try{ return COURSE.length>0 && COURSE.every(function(l){return lessonDone(l.id);}); }catch(e){ return false; } }
+/* The combined frontier the daily new-word flow draws from: foundation first, then breadth,
+   gated by gateCEFR(level, learnerCap)==='allow' (never runs ahead of mastery) and untouched
+   only (mState<0, never introduced). */
+function frontierItems(){
+  var F=_frontierEnsure(), cap=learnerCap(), out=[];
+  function pass(it){ return (typeof mState==='function'?mState(it.key)<0:true) && gateCEFR(it.lvl||'A1',cap)==='allow'; }
+  F.foundation.forEach(function(it){ if(pass(it)) out.push(it); });
+  F.theme.forEach(function(it){ if(pass(it)) out.push(it); });
+  return out;
+}
+function frontierBatch(n){ return frontierItems().slice(0, n||6); }
+/* The frontier teach: introduce (meaning + audio) BEFORE testing, exactly like an authored
+   vocab pick. Reuses _warmupCard for the introduction and startVocabDrill for the test. */
+var _frontierBatch=null;
+function openFrontier(){
+  var batch=frontierBatch(6);
+  if(!batch.length){ try{toast('No new frontier words available right now.');}catch(e){} try{go('today');}catch(e){} return; }
+  _frontierBatch=batch; try{go('frontier');}catch(e){}
+}
+function vFrontier(){
+  var batch=(_frontierBatch&&_frontierBatch.length)?_frontierBatch:frontierBatch(6);
+  _frontierBatch=batch;
+  if(!batch.length) return '<div class="card" style="margin-top:14px">No new frontier words available right now. <button class="btn sm ghost" data-go2="today">Back to today</button></div>';
+  /* mark each seen here (the introduction event), exactly like the authored vocab-exposure
+     step: it enters the SRS, is never a raw untaught word when tested, and the next batch
+     advances to fresh words. The cards below introduce meaning + audio before any test. */
+  batch.forEach(function(it){ try{ if(mState(it.key)<0) mSeen(it.key); }catch(e){} });
+  try{ save(); }catch(e){}
+  var b='<div class="t-eyebrow">Beyond the course · new words</div>';
+  b+='<h1 class="t-h1">'+batch.length+' new words</h1>';
+  b+='<p class="t-lede">You have finished the 223-lesson course. These are useful words it did not cover, gated to your level and introduced here first. Tap to hear, flip for the meaning, then practise.</p>';
+  b+='<div class="wcards">'+batch.map(function(it){return _warmupCard(it,true);}).join('')+'</div>';
+  b+='<div class="row" style="margin-top:16px;gap:8px"><button class="btn" data-frontier-practice="1">Practice these words →</button><button class="btn ghost" data-go2="today">Back to today</button></div>';
+  return b;
+}
 function todaySteps(){
   var m=(S.cfg&&S.cfg.dailyMinutes)||30;     /* the daily time budget */
   var steps=[];
   /* --- CORE (always present, regardless of budget) --- */
   var weak=weakPool(15);
   if(weak.length){steps.push({id:'warm',kind:'weak',icon:'W',title:'Warm-up: weak words',sub:weak.length+' words due for review',mins:5});}
-  var lc=currentLesson();var sess=getActiveSession();
-  var resuming=!!(sess&&getLessonRunnerState(sess.lessonId)&&String(sess.lessonId)===String(lc.id));
-  steps.push({id:'lesson',kind:'lesson:'+lc.id,icon:'L',title:(resuming?'Resume: ':'Lesson: ')+escHTML(lc.title),sub:escHTML(chTitle(lc.ch)),mins:12});
+  /* pass34: while ANY course lesson remains, the authored lesson is the primary new-word
+     step (unchanged). Only once the 223-lesson course is exhausted does the content frontier
+     take over the daily new-word slot (and only when it has gated, untouched words to teach). */
+  if(courseExhausted() && frontierBatch(1).length){
+    var _fb=frontierBatch(6);
+    steps.push({id:'frontier',kind:'frontier',icon:'L',title:'New words: '+_fb.length+' beyond the course',sub:'Introduced, then practised',mins:8});
+  } else {
+    var lc=currentLesson();var sess=getActiveSession();
+    var resuming=!!(sess&&getLessonRunnerState(sess.lessonId)&&String(sess.lessonId)===String(lc.id));
+    steps.push({id:'lesson',kind:'lesson:'+lc.id,icon:'L',title:(resuming?'Resume: ':'Lesson: ')+escHTML(lc.title),sub:escHTML(chTitle(lc.ch)),mins:12});
+  }
   var _gpool=(typeof GRAMMAR_REF!=='undefined')?GRAMMAR_REF.filter(function(t){return /^A[12]/.test(t.cefr);}):[];
   if(_gpool.length){
     /* pass33: prefer a weak/overdue (or untouched-via-backfill) topic so grammar resurfaces
@@ -11655,6 +11762,7 @@ function bind(){
     else if(g.indexOf('lesson:')===0){var lid=g.slice(7); var s=getActiveSession(); if(s&&getLessonRunnerState(s.lessonId)&&String(s.lessonId)===String(lid)){resumeLessonRunner();}else{startLessonRunner(lid);}}
     else if(g.indexOf('story:')===0){go('stories',g.slice(6));}
     else if(g.indexOf('grammar:')===0){grefStart(g.slice(8));}
+    else if(g==='frontier'){openFrontier();}
   });
   document.querySelectorAll('[data-runner-resume]').forEach(b=>b.onclick=()=>resumeLessonRunner());
   document.querySelectorAll('[data-runner-nav]').forEach(b=>b.onclick=()=>goLessonStep(b.dataset.runnerNav==='next'?1:-1));
@@ -11675,6 +11783,7 @@ function bind(){
   document.querySelectorAll('[data-runner-finish]').forEach(b=>b.onclick=()=>finishLessonRunner(b.dataset.runnerFinish));
   document.querySelectorAll('[data-runner-hub]').forEach(b=>b.onclick=()=>{var _id=b.dataset.runnerHub;setActiveSession(_id,'hub');go('runner',String(_id),'hub');});
   document.querySelectorAll('[data-hub-step]').forEach(b=>b.onclick=()=>{var _id=route.item;var _i=+b.dataset.hubStep;setActiveSession(_id,_i);go('runner',String(_id),String(_i));});
+  document.querySelectorAll('[data-frontier-practice]').forEach(b=>b.onclick=()=>{var batch=(_frontierBatch&&_frontierBatch.length)?_frontierBatch:frontierBatch(6);if(!batch.length){try{toast('Nothing to practise');}catch(e){}return;}startVocabDrill(batch,{title:'New words · practice',back:'today',onDone:function(){try{go('today');}catch(e){}}});});
   document.querySelectorAll('[data-runner-vocab]').forEach(b=>b.onclick=()=>runnerLaunchVocab());
   document.querySelectorAll('[data-runner-warmup-retrieve]').forEach(b=>b.onclick=()=>runnerLaunchWarmupRetrieve());
   document.querySelectorAll('[data-runner-verbdrill]').forEach(b=>b.onclick=()=>runnerLaunchVerbDrill());
