@@ -876,7 +876,7 @@ table.gtable td.say{font-style:italic;color:var(--muted)}
    Teaching engine: Course path · feedback drills · mastery + weak-spots
 =================================================================== */
 const USER_ID='vincenzo';
-const BUILD="pass30";   /* greppable internal build marker; HaMhandes bumps this every build */
+const BUILD="pass31";   /* greppable internal build marker; HaMhandes bumps this every build */
 const DRIVE_FOLDER='1jqZwxO-5IhaiMxn7WkS0_EDadN_4VQlr';
 const SUPA_URL='https://ygstriddcprzalnisbql.supabase.co';
 const SUPA_KEY='sb_publishable_QbkZ3-OMXm-LiIoZw3lApA_BzhOUtlS';
@@ -1205,8 +1205,8 @@ function _storagePut(resolved,blob){ if(!SUPA_URL||!audioShared()) return Promis
     .then(function(r){ return r.ok; }).catch(function(){ return false; }); }
 var _curAudio=null;
 function _stopAudio(){ try{ if(_curAudio){_curAudio.pause();_curAudio=null;} }catch(e){} try{ if('speechSynthesis'in window)speechSynthesis.cancel(); }catch(e){} }
-function _playBlob(blob){ return new Promise(function(res){ try{ var url=URL.createObjectURL(blob); var a=new Audio(url); _curAudio=a; a.onended=function(){URL.revokeObjectURL(url);res(true);}; a.onerror=function(){URL.revokeObjectURL(url);res(false);}; var p=a.play(); if(p&&p.catch)p.catch(function(){res(false);}); }catch(e){res(false);} }); }
-function _speakDevice(t){ if(!('speechSynthesis'in window))return; try{speechSynthesis.cancel();}catch(e){} var u=new SpeechSynthesisUtterance(ttsForMode(t));u.lang='he-IL';var v=heVoice();if(v)u.voice=v;u.rate=S.rate||0.9;try{speechSynthesis.speak(u);}catch(e){} }
+function _playBlob(blob){ return new Promise(function(res){ try{ var url=URL.createObjectURL(blob); var a=new Audio(url); _curAudio=a; if(_heSlowOnce){try{a.playbackRate=_heSlowOnce;}catch(e){}_heSlowOnce=0;} a.onended=function(){URL.revokeObjectURL(url);res(true);}; a.onerror=function(){URL.revokeObjectURL(url);res(false);}; var p=a.play(); if(p&&p.catch)p.catch(function(){res(false);}); }catch(e){res(false);} }); }
+function _speakDevice(t){ if(!('speechSynthesis'in window))return; try{speechSynthesis.cancel();}catch(e){} var u=new SpeechSynthesisUtterance(ttsForMode(t));u.lang='he-IL';var v=heVoice();if(v)u.voice=v;u.rate=(_heSlowOnce||(S.rate||0.9));if(_heSlowOnce)_heSlowOnce=0;try{speechSynthesis.speak(u);}catch(e){} }
 function playHebrewAudio(t){
   if(typeof t!=='string'||!t) return Promise.resolve('empty');
   if(audioMuted()) return Promise.resolve('muted');
@@ -1228,6 +1228,11 @@ function playHebrewSeq(arr){
   next();
 }
 function speak(t){ playHebrewAudio(t); }
+/* pass31: one-shot SLOW playback for the Say-it "Slow" button. Reuses the existing
+   play path (no engine change): the next play applies a 0.7x rate (cached Google blob
+   via Audio.playbackRate, device-synthesis via utterance.rate), then resets itself. */
+var _heSlowOnce=0;
+function speakSlow(t){ _heSlowOnce=0.7; return playHebrewAudio(t); }
 function speakSeq(arr){ playHebrewSeq(arr); }
 function gttsListVoices(){
   var key=gttsKey(); if(!key) return Promise.resolve([]);
@@ -8423,41 +8428,24 @@ function sayItModel(lesson){
   if(!goalKeys.length){ try{ goalKeys=_lessonWordKeys(lesson)||[]; }catch(e){} }
   return {goal:goal, prompt:prompt, models:models.slice(0,3), goalKeys:goalKeys};
 }
+/* pass31: the Say-it SCREEN now matches the Italian "Parla" 1:1 - one taught sentence
+   per card, paged "X of N", the Hebrew big and dir=rtl with its English meaning under it,
+   a Listen + a Slow button, a primary "Speak and check", and a Next (quiet skip to
+   advance without checking). On a spoken result the verdict shows inline ("Spot on" /
+   "Needs work" with the % and a dir=rtl "Heard:" line). The pass28 bloat is GONE: the
+   Goal block, the "Say it" instructions paragraph, the "need a word?" hint, the "use what
+   this lesson taught" word list, the recording disclaimers, the "Record again" and the
+   verbose "I have said it - show the model" buttons, and the "How did it go?" self-rate
+   header with its explanatory text. The pass30 engine (startHeRecognition, normSpeak,
+   heSpeakVerdict, the meter feed) and every base array are reused UNCHANGED; the card is
+   painted and paged entirely by bindSayIt(). Mic-unavailable falls back to a minimal
+   say-then-mark on the same clean card (got it / not yet), never the old self-rate page. */
 function sayItRender(lesson){
   var mdl=sayItModel(lesson);
   var alreadyDone=getLessonStepState(lesson.id,'sayit');
-  var hint=pilotOutputHint(lesson);
-  var modelHTML=mdl.models.map(function(m){
-    return '<div class="rstep-heb" dir="rtl" style="margin:6px 0"><span data-speak="'+encodeURIComponent(m.he)+'" style="cursor:pointer">'+H(m.he,m.p)+'</span> <button class="spk" data-speak="'+encodeURIComponent(m.he)+'">\u266a</button></div>'
-      +(m.tl?'<div dir="ltr" style="opacity:.8;font-size:13px">'+escHTML(khTL(m.tl,m.he))+'</div>':'')
-      +(m.en?'<div dir="ltr" style="opacity:.7;font-size:13px">'+escHTML(m.en)+'</div>':'');
-  }).join('<div style="height:8px"></div>') || '<div class="rstep-meta">Build your answer from the words and phrases this lesson taught.</div>';
-  var b='<div class="sayit" data-sayit="'+lesson.id+'">';
-  if(mdl.goal) b+='<div class="rstep-h">Goal</div><div class="rstep-t" dir="auto">'+mdl.goal+'</div>';
-  b+='<div class="rstep-h" style="margin-top:12px">Say it</div><div class="rstep-t" dir="auto">'+escHTML(mdl.prompt)+'</div>';
-  if(hint) b+='<div style="margin-top:10px"><button class="btn ghost sm" data-sayit-hint="1">need a word? (hint)</button><div id="sayit-hintbody" style="display:none;margin-top:8px">'+hint+'</div></div>';
-  /* pass29: real speak-and-check when the mic is usable (he-IL recognition, https,
-     not in a sandboxed frame). The verdict GUIDES; the self-mark below RECORDS.
-     When the mic is unusable we hide this control and fall back to say-it -> reveal
-     -> self-rate, so the step never blocks on hardware. */
-  var canCheck=(typeof micUsable==='function')&&micUsable();
-  if(canCheck){
-    b+='<div id="sayit-check" style="margin-top:14px"><div class="rstep-h">Speak and check</div>'
-      +'<div class="rstep-meta">Say your answer in Hebrew out loud. Your browser asks to use the microphone, listens once, and tells you how close you were. The check transcribes on the spot; nothing is recorded or uploaded.</div>'
-      +'<div class="row" style="gap:10px;margin-top:8px;flex-wrap:wrap"><button class="btn" data-sayit-speak="1" style="font-size:15px;padding:10px 18px">🎙️ Speak and check</button></div>'
-      +'<div id="sayit-heard" style="display:none;margin-top:12px"></div></div>';
-  } else {
-    b+='<div class="rstep-meta" style="margin-top:12px">'+escHTML((typeof micBlockedMessage==='function')?micBlockedMessage():'Say your answer aloud, then reveal the model and self-rate.')+'</div>';
-  }
-  b+='<div id="sayit-rec" style="margin-top:14px"><div class="rstep-meta" id="sayit-recstatus">Say your answer aloud. You can record yourself first to play back and compare, or just say it.</div>'
-    +'<div class="row" style="gap:10px;margin-top:8px;flex-wrap:wrap"><button class="btn ghost sm" data-sayit-rec="1">\u25cf Record my attempt</button></div></div>';
-  b+='<div class="row" style="gap:10px;margin-top:14px;flex-wrap:wrap"><button class="btn" data-sayit-commit="1" style="font-size:15px;padding:10px 18px">I have said it \u00b7 show the model</button></div>';
-  b+='<div id="sayit-model" style="display:none;margin-top:16px"><div class="rstep-h">Model answer \u00b7 listen and compare</div>'+modelHTML
-    +'<div class="row" style="gap:10px;margin-top:10px;flex-wrap:wrap"><button class="btn ghost sm" data-sayit-play="1" style="display:none">\u25b6 play my recording</button></div></div>';
-  b+='<div id="sayit-rate" style="display:none;margin-top:16px"><div class="rstep-h">How did it go?</div>'
-    +'<div class="row" style="gap:8px;margin-top:6px;flex-wrap:wrap"><button class="btn sm" data-sayit-rate="full">I said it fully</button><button class="btn sm ghost" data-sayit-rate="part">partly</button><button class="btn sm ghost" data-sayit-rate="no">not yet</button></div>'
-    +'<div class="rstep-meta" style="margin-top:8px">This is an honest self-check. It completes the step and counts as production; it never marks a word known on its own.</div></div>';
-  if(alreadyDone) b+='<div class="rstep-ok" style="margin-top:12px">\u2713 You completed Say-it for this lesson.</div>';
+  var n=(mdl.models&&mdl.models.length)?mdl.models.length:0;
+  var b='<div class="sayit" data-sayit="'+lesson.id+'" data-sayit-n="'+n+'"'+(alreadyDone?' data-sayit-done="1"':'')+'>';
+  b+='<div id="sayit-stage"></div>';
   b+='</div>';
   return b;
 }
@@ -8472,97 +8460,126 @@ function bindSayIt(){
   var box=document.querySelector('[data-sayit]'); if(!box) return;
   var lessonId=box.dataset.sayit;
   var lesson=_lessonById(lessonId);
-  var mdl=lesson?sayItModel(lesson):{goalKeys:[]};
+  var mdl=lesson?sayItModel(lesson):{models:[],goalKeys:[]};
   _sayitCleanup();
-  var recorder=null, chunks=[], recording=false, machineGraded=false;
-  /* pass29: reveal the model + self-rate (shared by the commit button and a
-     speak-and-check result), wire the model's tap-to-hear, and lock the commit. */
-  function revealModel(){
-    var mb=document.getElementById('sayit-model'); if(mb)mb.style.display='';
-    var rt=document.getElementById('sayit-rate'); if(rt)rt.style.display='';
-    var cb=box.querySelector('[data-sayit-commit]'); if(cb){ cb.disabled=true; cb.textContent='Model shown · compare and self-rate'; }
-    box.querySelectorAll('#sayit-model [data-speak]').forEach(function(s){ s.onclick=function(e){ e.stopPropagation(); speak(decodeURIComponent(s.dataset.speak)); }; });
-  }
-  var hintBtn=box.querySelector('[data-sayit-hint]');
-  if(hintBtn) hintBtn.onclick=function(){ var hb=document.getElementById('sayit-hintbody'); if(hb) hb.style.display=(hb.style.display==='none'?'block':'none'); };
-  var recBtn=box.querySelector('[data-sayit-rec]');
-  var status=document.getElementById('sayit-recstatus');
-  var playBtn=box.querySelector('[data-sayit-play]');
-  var micOK=!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia&&typeof MediaRecorder!=='undefined');
-  if(!micOK&&recBtn){ recBtn.style.display='none'; if(status) status.textContent='Microphone is not available here. Say your answer aloud, then commit and compare with the model.'; }
-  if(micOK&&recBtn) recBtn.onclick=function(){
-    if(recording){ try{recorder&&recorder.stop();}catch(e){} return; }
-    navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
-      window._sayitStream=stream; chunks=[];
-      try{ recorder=new MediaRecorder(stream); }catch(e){ if(status)status.textContent='Recording is not supported here. Just say it aloud and commit.'; recBtn.style.display='none'; try{stream.getTracks().forEach(function(t){t.stop();});}catch(_e){} window._sayitStream=null; return; }
-      recorder.ondataavailable=function(ev){ if(ev.data&&ev.data.size)chunks.push(ev.data); };
-      recorder.onstop=function(){
-        try{ var blob=new Blob(chunks,{type:(chunks[0]&&chunks[0].type)||'audio/webm'}); if(window._sayitURL)URL.revokeObjectURL(window._sayitURL); window._sayitURL=URL.createObjectURL(blob); if(playBtn)playBtn.style.display=''; }catch(e){}
-        recording=false; recBtn.textContent='\u25cf Record again'; if(status)status.textContent='Recorded on this device only (never uploaded). Commit, then play it back next to the model.';
-        try{ if(window._sayitStream){window._sayitStream.getTracks().forEach(function(t){t.stop();});window._sayitStream=null;} }catch(e){}
-      };
-      recorder.start(); recording=true; recBtn.textContent='\u25a0 Stop recording'; if(status)status.textContent='Recording on this device... say your full answer, then tap Stop. Nothing leaves your device.';
-    }).catch(function(){ if(status)status.textContent='Microphone permission was declined. Say your answer aloud, then commit and compare with the model.'; recBtn.style.display='none'; });
-  };
-  var commit=box.querySelector('[data-sayit-commit]');
-  if(commit) commit.onclick=function(){
-    if(recording){ try{recorder&&recorder.stop();}catch(e){} }
-    revealModel();
-  };
-  /* pass29 speak-and-check: he-IL recognition -> score the transcript against the
-     model (Hebrew or transliteration, whichever scores higher) -> show "Heard: ..."
-     dir=rtl + the verdict, pre-highlight the matching self-mark, and reveal the model.
-     A clean spot-on verdict feeds the Knowledge meter ONCE as a single retrieval
-     increment; a graded miss demotes the goal words to weak so they resurface in
-     warm-up. The self-mark below still RECORDS the session; when the machine has
-     graded, the self-mark stays inert (machine-checked speech is retrieval; self-
-     report is not). This EXTENDS pass28's retrieval-only promotion rule. */
-  var speakBtn=box.querySelector('[data-sayit-speak]');
-  var heard=document.getElementById('sayit-heard');
-  if(speakBtn) speakBtn.onclick=function(){
-    if(heard){ heard.style.display=''; heard.innerHTML='<span class="muted">Listening... say your answer now.</span>'; }
-    speakBtn.disabled=true; speakBtn.textContent='Listening...';
-    startHeRecognition(function(transcript){
-      speakBtn.disabled=false; speakBtn.textContent='\ud83c\udf99\ufe0f Speak and check again';
-      var res=speakScoreModel(transcript, mdl.models||[]);
-      var sim=res.sim, pct=Math.round(sim*100);
-      var cls=sim>=HE_SPEAK_SPOTON?'rstep-ok':(sim>=HE_SPEAK_CLOSE?'rstep-meta':'rstep-fb');
-      if(heard) heard.innerHTML='<div class="rstep-h">Heard</div>'
-        +'<div class="rstep-heb" dir="rtl" style="margin:4px 0">'+escHTML(transcript)+'</div>'
-        +'<div class="'+cls+'" style="margin-top:6px">'+escHTML(res.label)+' \u00b7 '+pct+'% match</div>';
-      revealModel();
-      box.querySelectorAll('[data-sayit-rate]').forEach(function(rb){ rb.style.boxShadow=''; });
-      var hi=sim<HE_SPEAK_CLOSE?'no':(sim>=HE_SPEAK_SPOTON?'full':null);
-      if(hi){ var hb=box.querySelector('[data-sayit-rate="'+hi+'"]'); if(hb)hb.style.boxShadow='0 0 0 2px #2563eb'; }
-      if(!machineGraded){
-        machineGraded=true;
-        try{
-          if(sim>=HE_SPEAK_SPOTON){ (mdl.goalKeys||[]).forEach(function(k){ mAnswer(k,true,'retrieval'); }); }
-          else if(sim<HE_SPEAK_CLOSE){ (mdl.goalKeys||[]).forEach(function(k){ mSetState(k,1); }); }
-          save();
-        }catch(e){}
-      }
-    }, function(err,msg){
-      speakBtn.disabled=false; speakBtn.textContent='\ud83c\udf99\ufe0f Speak and check';
-      if(heard) heard.innerHTML='<div class="rstep-fb">'+escHTML(msg||'Could not check that. Say it aloud, reveal the model, and self-rate.')+'</div>';
-    });
-  };
-  if(playBtn) playBtn.onclick=function(){ if(window._sayitURL){ try{ new Audio(window._sayitURL).play(); }catch(e){} } };
-  box.querySelectorAll('[data-sayit-rate]').forEach(function(rb){ rb.onclick=function(){
-    var v=rb.dataset.sayitRate;
-    /* Knowledge: self-report never promotes. fully/partly -> expose unseen goal words as
-       seen (floor only); not yet -> demote goal words to weak so they resurface in warm-up.
-       pass29: if the machine already graded this attempt, Knowledge was moved by the
-       verdict (retrieval), so the self-mark only RECORDS the session and stays inert here. */
-    if(!machineGraded){ (mdl.goalKeys||[]).forEach(function(k){ try{ if(v==='no'){ mSetState(k,1); } else { if(mState(k)<0) mSeen(k); } }catch(e){} }); }
+  var stage=document.getElementById('sayit-stage'); if(!stage) return;
+  var items=(mdl.models||[]);
+  var N=items.length;
+  var idx=0;
+  var meterMoved=false;            /* pass31: the meter moves ONCE per step, exactly as pass30 */
+  var alreadyDone=!!box.dataset.sayitDone;
+  var canCheck=(typeof micUsable==='function')&&micUsable();
+
+  function finishStep(){
     setLessonStepDone(lessonId,'sayit',true);
-    bumpProd(lessonId);   /* one production item toward the minimum gate */
+    bumpProd(lessonId);            /* one production item toward the minimum gate */
     touchDay();
     _sayitCleanup();
     save();
-    try{ toast(v==='full'?'Said it \u00b7 step complete':v==='part'?'Good \u00b7 step complete':'Noted \u00b7 these come back in warm-up'); }catch(e){}
+    try{ toast('Said it · step complete'); }catch(e){}
     setTimeout(function(){ if(route.section==='runner') runnerGoNext(); },700);
-  };});
+  }
+  function advance(){ idx++; if(idx>=N){ finishStep(); } else { paint(); } }
+  /* pass31 meter feed, IDENTICAL to pass30: a clean spot-on promotes the lesson's goal
+     words ONE retrieval increment; a graded miss demotes them to weak. Once per step, so
+     paging never inflates the meter beyond the single increment pass30 grants. */
+  function feedMeterMachine(sim){
+    if(meterMoved) return; meterMoved=true;
+    try{
+      if(sim>=HE_SPEAK_SPOTON){ (mdl.goalKeys||[]).forEach(function(k){ mAnswer(k,true,'retrieval'); }); }
+      else if(sim<HE_SPEAK_CLOSE){ (mdl.goalKeys||[]).forEach(function(k){ mSetState(k,1); }); }
+      save();
+    }catch(e){}
+  }
+  /* pass31 fallback meter feed, IDENTICAL to pass28/30 self-rate: self-report never
+     promotes; "not yet" demotes goal words to weak, "got it" only floors unseen goal
+     words to seen. Once per step, and inert once the machine has already graded. */
+  function feedMeterSelf(v){
+    if(meterMoved) return; meterMoved=true;
+    (mdl.goalKeys||[]).forEach(function(k){ try{ if(v==='no'){ mSetState(k,1); } else { if(mState(k)<0) mSeen(k); } }catch(e){} });
+    save();
+  }
+
+  function listenRow(it){
+    var enc=encodeURIComponent(it.he);
+    return '<div class="row" style="gap:10px;margin:14px 0 4px">'
+      +'<button class="btn ghost sm" data-say-listen="'+enc+'" style="flex:1">▸ Listen</button>'
+      +'<button class="btn ghost sm" data-say-slow="'+enc+'" style="flex:1">🐢 Slow</button></div>';
+  }
+  function head(){
+    return '<div class="rstep-meta" style="margin:0 0 6px;text-transform:uppercase;letter-spacing:.06em;font-size:11px">'
+      +escHTML(lesson?lesson.title:'Say it')+' · '+(idx+1)+' of '+N+'</div>';
+  }
+  function heBlock(it){
+    return '<div class="rstep-heb" dir="rtl" style="font-size:27px;line-height:1.6;font-weight:600;color:var(--ink);margin:6px 0 2px">'+H(it.he,it.p)+'</div>'
+      +(it.en?'<div dir="ltr" style="font-size:14px;color:var(--muted)">'+escHTML(it.en)+(it.tl?' · <span style="opacity:.85">'+escHTML(khTL(it.tl,it.he))+'</span>':'')+'</div>':'');
+  }
+  function wire(it){
+    var l=stage.querySelector('[data-say-listen]'); if(l) l.onclick=function(){ speak(decodeURIComponent(l.dataset.sayListen)); };
+    var sl=stage.querySelector('[data-say-slow]'); if(sl) sl.onclick=function(){ if(typeof speakSlow==='function') speakSlow(decodeURIComponent(sl.dataset.saySlow)); else speak(decodeURIComponent(sl.dataset.saySlow)); };
+    var sp=stage.querySelector('[data-say-speak]');
+    if(sp) sp.onclick=function(){
+      var out=document.getElementById('sayit-result'); if(out) out.innerHTML='<span class="rstep-meta" style="margin:0">Listening... say your answer now.</span>';
+      sp.disabled=true; sp.textContent='Listening...';
+      startHeRecognition(function(transcript){ paintResult(it,transcript); }, function(err,msg){
+        sp.disabled=false; sp.textContent='🎙️ Speak and check';
+        if(out) out.innerHTML='<div class="rstep-fb">'+escHTML(msg||'Could not check that. Say it aloud and use skip to move on.')+'</div>';
+      });
+    };
+    var sk=stage.querySelector('[data-say-skip]'); if(sk) sk.onclick=function(){ advance(); };
+    Array.prototype.forEach.call(stage.querySelectorAll('[data-say-mark]'),function(mk){ mk.onclick=function(){ feedMeterSelf(mk.dataset.sayMark==='no'?'no':'ok'); advance(); }; });
+  }
+  function paintResult(it,transcript){
+    /* reuse the pass30 engine verdict UNCHANGED, scored against THIS card's gated sentence
+       (Hebrew or its transliteration, whichever is closer), exactly like the Italian. */
+    var res=heSpeakVerdict(transcript, it.p||it.he, it.tl?khTL(it.tl,it.he):'');
+    var sim=res.sim, pct=Math.round(sim*100);
+    var cls=sim>=HE_SPEAK_SPOTON?'rstep-ok':(sim>=HE_SPEAK_CLOSE?'rstep-meta':'rstep-fb');
+    feedMeterMachine(sim);
+    var out=document.getElementById('sayit-result');
+    if(out){
+      out.innerHTML='<div class="'+cls+'" style="margin:0">'+escHTML(res.label)+' · '+pct+'% match</div>'
+        +'<div class="rstep-heb" dir="rtl" style="font-size:16px;line-height:1.6;margin:8px 0 0;color:var(--muted)">Heard: '+escHTML(transcript)+'</div>'
+        +'<button class="btn full" data-say-next="1" style="margin-top:12px;font-size:15px;padding:12px 18px">'+(idx+1>=N?'Finish →':'Next →')+'</button>';
+      var nx=out.querySelector('[data-say-next]'); if(nx) nx.onclick=function(){ advance(); };
+    }
+    var sp=stage.querySelector('[data-say-speak]'); if(sp){ sp.disabled=false; sp.textContent='🎙️ Speak and check again'; }
+    var skrow=stage.querySelector('[data-say-skiprow]'); if(skrow) skrow.style.display='none';
+  }
+  function paint(){
+    var it=items[idx];
+    if(!it){ finishStep(); return; }
+    var h='';
+    h+=head();
+    h+=heBlock(it);
+    h+=listenRow(it);
+    if(canCheck){
+      h+='<button class="btn full" data-say-speak="1" style="margin-top:8px;font-size:15px;padding:12px 18px">🎙️ Speak and check</button>';
+      h+='<div id="sayit-result" style="margin-top:12px"></div>';
+      h+='<div class="row" data-say-skiprow="1" style="justify-content:center;margin-top:10px"><button class="btn ghost sm" data-say-skip="1">'+(idx+1>=N?'skip · finish':'skip')+' →</button></div>';
+    } else {
+      h+='<div class="rstep-meta" style="margin-top:10px">'+escHTML((typeof micBlockedMessage==='function')?micBlockedMessage():'Say your answer aloud, then mark how it went.')+'</div>';
+      h+='<div class="row" style="gap:10px;margin-top:12px">'
+        +'<button class="btn ghost sm" data-say-mark="no" style="flex:1">not yet</button>'
+        +'<button class="btn sm" data-say-mark="ok" style="flex:1">got it →</button></div>';
+    }
+    if(alreadyDone) h+='<div class="rstep-ok" style="margin-top:12px">✓ You completed Say-it for this lesson.</div>';
+    stage.innerHTML=h;
+    wire(it);
+  }
+
+  if(N===0){
+    /* no gated model sentences for this lesson: keep the step honest with a minimal
+       self-mark card that shows NO untaught Hebrew (content gating preserved), then
+       finish. The prompt is the already-sanitized output task. */
+    var hd='<div class="rstep-meta" style="margin:0 0 6px;text-transform:uppercase;letter-spacing:.06em;font-size:11px">'+escHTML(lesson?lesson.title:'Say it')+' · 1 of 1</div>';
+    var pr='<div class="rstep-t" dir="auto" style="font-size:16px;margin:6px 0">'+escHTML(mdl.prompt||'Say aloud what this lesson taught.')+'</div>';
+    var mk='<div class="row" style="gap:10px;margin-top:12px"><button class="btn ghost sm" data-say-mark="no" style="flex:1">not yet</button><button class="btn sm" data-say-mark="ok" style="flex:1">got it →</button></div>';
+    stage.innerHTML=hd+pr+mk;
+    Array.prototype.forEach.call(stage.querySelectorAll('[data-say-mark]'),function(mk2){ mk2.onclick=function(){ feedMeterSelf(mk2.dataset.sayMark==='no'?'no':'ok'); finishStep(); }; });
+    return;
+  }
+  paint();
 }
 /* ---- Sectioned lesson hub (R14): the lesson's home. Replaces the teacher-dump
    page and the linear overview-first runner. Lessons open straight into this hub;
