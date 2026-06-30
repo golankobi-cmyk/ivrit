@@ -928,7 +928,7 @@ html[dir="rtl"] .lesson-row.inprogress{--lx-end:left}
    Teaching engine: Course path · feedback drills · mastery + weak-spots
 =================================================================== */
 const USER_ID='vincenzo';
-const BUILD="pass37";   /* greppable internal build marker; HaMhandes bumps this every build */
+const BUILD="pass38";   /* greppable internal build marker; HaMhandes bumps this every build */
 const DRIVE_FOLDER='1jqZwxO-5IhaiMxn7WkS0_EDadN_4VQlr';
 const SUPA_URL='https://ygstriddcprzalnisbql.supabase.co';
 const SUPA_KEY='sb_publishable_QbkZ3-OMXm-LiIoZw3lApA_BzhOUtlS';
@@ -8525,13 +8525,15 @@ function _phraseCard(p,i){
   var key=phraseKey(p);
   var ovEn=getOverride('phrase',key,'en');
   var en=ovEn||p.en||p.lit;
+  var heStr=Array.isArray(p.he)?(p.he[0]||p.he[1]||''):(p.he||'');
+  var tl=p.tl?TL(p.tl,heStr):(typeof heTL==='function'?heTL(heStr):'');
   var back, missing=false;
   if(en){ back=escHTML(en); }
-  else if(p.tl){ back='<span style="opacity:.85">'+escHTML(khTL(p.tl,(p.he&&p.he[0])||''))+'</span>'; }
+  else if(tl){ back='<span style="opacity:.85">'+escHTML(tl)+'</span>'; }
   else { missing=true; back='<span class="wc-missing">tap to hear it</span>'; if(key&&_PHRASE_MISSING.indexOf(key)<0)_PHRASE_MISSING.push(key); }
-  var tlLine=p.tl?'<div class="t">'+escHTML(TL(p.tl,(p.he&&p.he[0])||p.he))+'</div>':'';
+  var tlLine=(en&&tl)?'<div class="t">'+escHTML(tl)+'</div>':'';
   var litLine=(p.lit&&p.lit!==en)?'<div class="t" style="opacity:.7">lit. '+escHTML(p.lit)+'</div>':'';
-  return '<div class="wcard flip'+(missing?' wc-nogloss':'')+'" data-wcard="ph'+i+'" data-phrase-key="'+escHTML(key||'')+'" data-speak="'+encodeURIComponent(p.he)+'">'
+  return '<div class="wcard flip'+(missing?' wc-nogloss':'')+'" data-wcard="ph'+i+'" data-phrase-key="'+escHTML(key||'')+'" data-speak="'+encodeURIComponent(heStr)+'">'
     +'<div class="wc-front"><div class="h">'+H(p.he,p.plain)+'</div><div class="wc-hint">tap to hear \u00b7 flip</div></div>'
     +'<div class="wc-back"><div class="e">'+back+'</div>'+tlLine+litLine+'</div></div>';
 }
@@ -10698,14 +10700,17 @@ function vocabCategory(encName){const name=decodeURIComponent(encName);const ite
    <div class="topbar"><div><h1>${name}</h1><div class="lead">${items.length} words</div></div>${nikToggle()}</div>
    <div class="row" style="margin-bottom:12px"><button class="btn sm" data-practice-cat="${encName}">Practise this set</button></div>
    ${items.map(it=>{
+    const ed_p=getEdit('vocab',it.key,'p')||it.p;
     const ed_v=getEdit('vocab',it.key,'v')||it.v;
     const ed_en=getEdit('vocab',it.key,'en')||it.en;
     const ed_tl=getEdit('vocab',it.key,'tl')||it.tl;
+    const sayForm=getEdit('vocab',it.key,'p')?ed_p:ed_v;
+    const tlShown=getEdit('vocab',it.key,'tl')!=null?escHTML(ed_tl):escHTML(TL(ed_tl,ed_v));
     return `<div class="item" style="cursor:default">
-      <div class="row" style="gap:12px">${speakBtn(ed_v)}
-        <div class="meta" style="flex:1"><div class="row" style="gap:4px">${hebClick(ed_v,it.p)}
-          <button class="edit-btn" data-edit-key="vocab|${it.key}|v" data-edit-val="${encodeURIComponent(ed_v)}" data-edit-label="Hebrew (with nikud)" title="Edit Hebrew">&#9998;</button>
-        </div><div class="tl">${escHTML(TL(ed_tl,ed_v))}</div></div>
+      <div class="row" style="gap:12px">${speakBtn(sayForm)}
+        <div class="meta" style="flex:1"><div class="row" style="gap:4px">${hebClick(ed_v,ed_p)}
+          <button class="edit-btn" data-edit-key="vocab|${it.key}|p" data-edit-val="${encodeURIComponent(ed_p)}" data-edit-label="Hebrew word (full spelling, no nikud)" title="Edit Hebrew word">&#9998;</button>
+        </div><div class="row" style="gap:4px"><div class="tl">${tlShown}</div><button class="edit-btn" data-edit-key="vocab|${it.key}|tl" data-edit-val="${encodeURIComponent(ed_tl)}" data-edit-label="Transliteration (reading guide)" data-edit-rtl="false" title="Edit transliteration" style="font-size:9px">&#9998;</button></div></div>
       </div>
       <div class="row" style="gap:10px">
         <div class="meta" style="text-align:end">
