@@ -26,6 +26,7 @@
   --border:rgba(16,19,26,.10); --line:rgba(16,19,26,.07); --line2:rgba(16,19,26,.045);
   --hover:rgba(16,19,26,.04); --track:rgba(16,19,26,.08);
   --good:#0E7C5A; --good-wash:rgba(14,124,90,.12); --bad:#C0492E; --bad-wash:rgba(192,73,46,.10); --info:#3A6E8C;
+  --sel:#3D54D6; --sel2:#2C40B8; --sel-wash:rgba(61,84,214,.12); /* pass36: pre-grade SELECTED hue (indigo); distinct from green=correct/red=wrong/gold=incomplete/info=teal */
   --shadow:0 1px 2px rgba(16,19,26,.04),0 8px 24px -14px rgba(16,19,26,.18); --shadow-sm:0 1px 2px rgba(16,19,26,.05);
   --serif:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Roboto,system-ui,sans-serif; --sans:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,system-ui,sans-serif; --heb:'Arial','Arial Hebrew',Arial,sans-serif;
   --r:18px; --ease:cubic-bezier(.32,.72,0,1);
@@ -42,6 +43,7 @@
   --border:rgba(255,255,255,.11); --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.05);
   --hover:rgba(255,255,255,.06); --track:rgba(255,255,255,.10);
   --good:#2BBE89; --good-wash:rgba(43,190,137,.16); --bad:#E08A78; --bad-wash:rgba(216,138,120,.16); --info:#7FA8C9;
+  --sel:#8092F2; --sel2:#9AA9F6; --sel-wash:rgba(128,146,242,.22); /* pass36: pre-grade SELECTED hue (indigo), dark */
   --shadow:0 1px 2px rgba(0,0,0,.5),0 18px 44px -20px rgba(0,0,0,.7); --shadow-sm:0 1px 3px rgba(0,0,0,.5);
 }
 }
@@ -58,6 +60,7 @@
   --border:rgba(16,19,26,.10); --line:rgba(16,19,26,.07); --line2:rgba(16,19,26,.045);
   --hover:rgba(16,19,26,.04); --track:rgba(16,19,26,.08);
   --good:#0E7C5A; --good-wash:rgba(14,124,90,.12); --bad:#C0492E; --bad-wash:rgba(192,73,46,.10); --info:#3A6E8C;
+  --sel:#3D54D6; --sel2:#2C40B8; --sel-wash:rgba(61,84,214,.12); /* pass36: pre-grade SELECTED hue (indigo); distinct from green=correct/red=wrong/gold=incomplete/info=teal */
   --shadow:0 1px 2px rgba(16,19,26,.04),0 8px 24px -14px rgba(16,19,26,.18); --shadow-sm:0 1px 2px rgba(16,19,26,.05);
   --serif:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Roboto,system-ui,sans-serif; --sans:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,system-ui,sans-serif; --heb:'Arial','Arial Hebrew',Arial,sans-serif;
   --r:18px; --ease:cubic-bezier(.32,.72,0,1);
@@ -73,6 +76,7 @@
   --border:rgba(255,255,255,.11); --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.05);
   --hover:rgba(255,255,255,.06); --track:rgba(255,255,255,.10);
   --good:#2BBE89; --good-wash:rgba(43,190,137,.16); --bad:#E08A78; --bad-wash:rgba(216,138,120,.16); --info:#7FA8C9;
+  --sel:#8092F2; --sel2:#9AA9F6; --sel-wash:rgba(128,146,242,.22); /* pass36: pre-grade SELECTED hue (indigo), dark */
   --shadow:0 1px 2px rgba(0,0,0,.5),0 18px 44px -20px rgba(0,0,0,.7); --shadow-sm:0 1px 3px rgba(0,0,0,.5);
 }
 
@@ -860,8 +864,8 @@ table.gtable td.say{font-style:italic;color:var(--muted)}
 .opt:focus-visible,.pq-opt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .opt:active,.pq-opt:active{transform:translateY(1px) scale(.99)}
 /* 1) SELECTION - a tapped choice lands hard and reads as SELECTED (accent), never as a grade */
-.opt.sel,.pq-opt.sel{background:var(--accent-wash);border-color:var(--accent);border-width:2px;box-shadow:0 0 0 3px var(--accent-wash),var(--shadow-sm);transform:translateY(-1px);font-weight:650;color:var(--accent)}
-.opt.sel::after,.pq-opt.sel::after{content:"";position:absolute;inset-inline-end:12px;top:50%;transform:translateY(-50%);width:11px;height:11px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
+.opt.sel,.pq-opt.sel{background:var(--sel-wash);border-color:var(--sel);border-width:2px;box-shadow:0 0 0 3px var(--sel-wash),var(--shadow-sm);transform:translateY(-1px);font-weight:650;color:var(--sel2)}
+.opt.sel::after,.pq-opt.sel::after{content:"";position:absolute;inset-inline-end:12px;top:50%;transform:translateY(-50%);width:11px;height:11px;border-radius:50%;background:var(--sel);box-shadow:0 0 0 3px var(--sel-wash)}
 /* 2) CORRECT - pronounced success + a check chip (colour + shape) */
 .opt.ok,.pq-opt.ok{background:var(--good-wash);border-color:var(--good);border-width:2px;color:var(--good);font-weight:650;box-shadow:0 0 0 3px var(--good-wash);padding-inline-end:42px}
 .opt.ok::after,.pq-opt.ok::after{content:"\2713";position:absolute;inset-inline-end:11px;top:50%;transform:translateY(-50%);width:23px;height:23px;border-radius:50%;background:var(--good);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:800;line-height:1;box-shadow:0 1px 3px rgba(0,0,0,.2)}
@@ -924,14 +928,14 @@ html[dir="rtl"] .lesson-row.inprogress{--lx-end:left}
    Teaching engine: Course path · feedback drills · mastery + weak-spots
 =================================================================== */
 const USER_ID='vincenzo';
-const BUILD="pass35";   /* greppable internal build marker; HaMhandes bumps this every build */
+const BUILD="pass36";   /* greppable internal build marker; HaMhandes bumps this every build */
 const DRIVE_FOLDER='1jqZwxO-5IhaiMxn7WkS0_EDadN_4VQlr';
 const SUPA_URL='https://ygstriddcprzalnisbql.supabase.co';
 const SUPA_KEY='sb_publishable_QbkZ3-OMXm-LiIoZw3lApA_BzhOUtlS';
 const LS='ivrit_state_'+USER_ID;
 
 const defaultState={
-  user:USER_ID, nikud:false, rate:0.9, voiceURI:'', pronunciationMode:'auto', ttsVoice:'', audioEngine:'', audioShared:false,
+  user:USER_ID, rate:0.9, voiceURI:'', pronunciationMode:'auto', ttsVoice:'', audioEngine:'', audioShared:false,
   streak:0, lastDay:null, xp:0,
   mastery:{},                 // key -> {s:0..3, n, c, due}
   grammar:{},                 // grammar topic id -> confidence 1..5
@@ -994,23 +998,33 @@ function load(){
     const raw=localStorage.getItem(LS);
     const saved=raw?JSON.parse(raw):null;
     const s=deepMerge(structuredClone(defaultState),saved||{});
-    /* BUG 1 FIX: nikud pref lives in its own key (never touched by save/sync) */
-    const nik=localStorage.getItem(LS+'_nik');
-    if(nik!==null)s.nikud=(nik==='1');
     /* Course V2 progress migration. Persist immediately when the saved blob was
        not already V2, so a reload before any save() does not re-run it. */
     const wasV2=!!(saved&&saved.courseVersion===COURSE_VERSION);
     migrateProgress(s,saved);
+    /* pass36 PIECE 5: the device-local TTS/LLM keys in localStorage are AUTHORITATIVE.
+       Restore them onto every load so no deepMerge default, migration, or stripped
+       cloud blob can wipe a real key. (load() runs before S exists, so operate on s.) */
+    _restoreLocalKeys(s);
     if(!wasV2){try{localStorage.setItem(LS,JSON.stringify(s));}catch(e){}}
     return s;
   }catch(e){return structuredClone(defaultState)}
 }
 function deepMerge(a,b){for(const k in b){if(b[k]&&typeof b[k]==='object'&&!Array.isArray(b[k])){a[k]=deepMerge(a[k]||{},b[k])}else{a[k]=b[k]}}return a}
-function save(){S.updated=Date.now();localStorage.setItem(LS,JSON.stringify(S));syncUp();}
+function save(){S.updated=Date.now();try{if(S&&S.cfg){if(S.cfg.gttsKey)localStorage.setItem('ivrit_gtts_key',S.cfg.gttsKey);if(S.cfg.anthropicKey)localStorage.setItem('ivrit_anthropic_key',S.cfg.anthropicKey);}}catch(e){}localStorage.setItem(LS,JSON.stringify(S));syncUp();}
 function stripSecrets(st){var c;try{c=structuredClone(st);}catch(e){c=JSON.parse(JSON.stringify(st));}if(c&&c.cfg&&typeof c.cfg==='object'){c.cfg.anthropicKey='';c.cfg.gttsKey='';}return c;}
 function khTL(tl,heb){if(typeof tl!=='string'||tl.indexOf('ch')<0)return tl;var h=''+(heb||'');if(/[חכך]/.test(h)){return tl.replace(/ch/g,'kh').replace(/Ch/g,'Kh');}return tl;}
-/* saveNikud: writes ONLY the display pref (never calls syncUp, never touches progress) */
-function saveNikud(){try{localStorage.setItem(LS+'_nik',S.nikud?'1':'0');}catch(e){}}
+/* pass36 PIECE 5: localStorage is the authoritative store for the device-local keys.
+   Restore them onto a state object whenever it is (re)built from defaults/cloud, so a
+   reset, migration, deepMerge default, or stripped cloud blob can never wipe a real key.
+   Literal LS key names (the consts below are assigned later; load() runs before them). */
+function _restoreLocalKeys(s){
+  try{ if(s&&typeof s==='object'){ if(!s.cfg||typeof s.cfg!=='object') s.cfg={};
+    var gk=localStorage.getItem('ivrit_gtts_key'); if(gk) s.cfg.gttsKey=gk;
+    var ak=localStorage.getItem('ivrit_anthropic_key'); if(ak) s.cfg.anthropicKey=ak;
+  } }catch(e){}
+  return s;
+}
 function touchDay(){const d=new Date().toDateString();if(S.lastDay!==d){const gap=S.lastDay?(new Date(d)-new Date(S.lastDay)):0;S.streak=(S.lastDay&&gap<=864e5*1.6)?S.streak+1:1;S.lastDay=d;}}
 function addXP(n){S.xp=(S.xp||0)+n;}
 /* TASK 1: single guarded daily-session completion. Marks Today done and awards
@@ -1034,8 +1048,115 @@ function stripN(t){return t.replace(/[\u0591-\u05C7]/g,'')}
 /* array shuffle (Fisher-Yates) - returns a new shuffled copy */
 function applyTheme(){try{var t=S.theme||'auto';var el=document.documentElement;if(t==='light'||t==='dark'){el.setAttribute('data-theme',t);}else{el.removeAttribute('data-theme');}}catch(e){}}
 function shuffle(arr){const a=(arr||[]).slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
-function H(v,plain){ if(S.nikud) return v; return (plain!=null&&plain!=='')?plain:stripN(v); }
+/* pass36: NIKUD DELETED from the UI. Every Hebrew display is full ktiv-male derived
+   at RENDER TIME from the fully-vowelled form (the vowelled forms remain ONLY as the
+   hidden engine for TTS + this derivation; never shown, no toggle). H() ignores the
+   defective authored plain form (was it.p) and the removed nikud toggle entirely. */
+function H(v,plain){ return kmDisp(v,plain); }
 function _maleify(s){s=''+(s==null?'':s);var out='';var i=0;var isC=function(ch){var c=ch.charCodeAt(0);return c>=0x05D0&&c<=0x05EA;};var isM=function(ch){var c=ch.charCodeAt(0);return c>=0x0591&&c<=0x05C7;};while(i<s.length){var ch=s[i];if(isC(ch)){var j=i+1,mk='';while(j<s.length&&isM(s[j])){mk+=s[j];j++;}var nx=(j<s.length&&isC(s[j]))?s[j]:'';out+=ch;var hol=mk.indexOf('ֹ')>=0;var kub=mk.indexOf('ֻ')>=0;if((hol||kub)&&ch!=='ו'&&nx!=='ו')out+='ו';i=j;}else if(isM(ch)){i++;}else{out+=ch;i++;}}return out;}
+/* ---- pass36 ktiv-male deriver (one well-tested deriver; all Hebrew display routes here) ----
+   From a fully-vowelled form, produce the full unvowelled ktiv-male spelling:
+   strip nikud, and insert a vav for a holam-haser / kubuts (the /o/ and /u/ that the
+   vowelled form writes as a bare dot, which is exactly where the old it.p dropped a
+   vowel letter). Existing matres (vav/yod already present as letters) are preserved.
+   Per-word residual fixes go through KTIV_OVERRIDE and the EDITORIAL spelling overrides,
+   keyed on the bare consonantal skeleton. The always-present transliteration is the net. */
+/* pass36 per-word ktiv-male fixes (HaBalshan pass), keyed by the bare consonantal skeleton.
+   Used ONLY for genuinely-defective authored plain forms found in the story bank that dropped a
+   holam-haser vav (a story plain wrote e.g. בבקר for בבוקר). Each key is verified NON-homographic
+   (no VOCAB/VERBS plain collides with it - re-checked: vocab/verbs stay 100% correct), so these
+   never affect any other word. The holam-haser EXCEPTIONS (לא, ראש, זאת, פה, איפה …) are already
+   correct via the authored plain and are deliberately NOT listed. */
+const KTIV_OVERRIDE={
+  "מאד":"מאוד",                 /* מאד -> מאוד (me'od) */
+  "כלם":"כולם",                 /* כלם -> כולם (kulam) */
+  "שכלם":"שכולם",     /* שכלם -> שכולם */
+  "השלחן":"השולחן", /* השלחן -> השולחן */
+  "שלחן":"שולחן",     /* שלחן -> שולחן (shulchan) */
+  "בבקר":"בבוקר",     /* בבקר -> בבוקר (ba-boker) */
+  "קפסה":"קופסה",     /* קפסה -> קופסה (kufsa) */
+  "לבדק":"לבדוק",     /* לבדק -> לבדוק (livdok) */
+  "לכתב":"לכתוב"      /* לכתב -> לכתוב (likhtov) */
+};
+function _bareCons(w){return stripN(''+(w==null?'':w)).replace(/[^א-ת]/g,'');}
+function _kmWord(w){
+  w=''+(w==null?'':w);
+  var lead=(w.match(/^[^א-ת֑-ׇ]+/)||[''])[0];
+  var trail=(w.match(/[^א-ת֑-ׇ]+$/)||[''])[0];
+  var core=w.slice(lead.length, w.length-trail.length);
+  if(!/[א-ת]/.test(core)) return w;
+  var bare=_bareCons(core);
+  var ov=(Object.prototype.hasOwnProperty.call(KTIV_OVERRIDE,bare)?KTIV_OVERRIDE[bare]:null);
+  if(ov==null){ try{ if(typeof mergedSpelling==='function'){ var sp=mergedSpelling(bare); if(sp) ov=sp; } }catch(e){} }
+  var full=(ov!=null)?ov:_maleify(core);
+  return lead+full+trail;
+}
+/* _cleanPlain: the authored plain form is the studio's VALIDATED full ktiv-male (it encodes
+   every yod/vav mater and the holam exceptions like לא / ראש / זאת that a naive rule-deriver
+   gets wrong). We only strip any stray nikud and patch the handful of genuinely-defective
+   spellings (mostly story words) through the KTIV_OVERRIDE / EDITORIAL spelling map, per token. */
+function _cleanPlain(p){
+  return (''+(p==null?'':p)).split(/(\s+)/).map(function(t){
+    if(/\s/.test(t)||!/[א-ת]/.test(t)) return stripN(t);
+    var bare=_bareCons(t);
+    var ov=(Object.prototype.hasOwnProperty.call(KTIV_OVERRIDE,bare)?KTIV_OVERRIDE[bare]:null);
+    if(ov==null){ try{ if(typeof mergedSpelling==='function'){ var sp=mergedSpelling(bare); if(sp) ov=sp; } }catch(e){} }
+    return ov!=null?ov:stripN(t);
+  }).join('');
+}
+/* kmDisp: the single ktiv-male display deriver every Hebrew render routes through.
+   PRIMARY: the validated authored plain (full ktiv-male, no diacritics). FALLBACK (no plain
+   available, e.g. free-text goal/notes fields): rule-derive from the vowelled form (strip
+   nikud + insert vav for holam-haser/kubuts). Either way the output carries NO nikud. The
+   always-present transliteration (TL) is the safety net for any residual edge case. */
+function kmDisp(v, plain){
+  if(plain!=null&&plain!==''&&/[א-ת]/.test(''+plain)) return _cleanPlain(plain);
+  var s=''+(v==null?'':v); if(!s) return s;
+  return s.split(/(\s+)/).map(function(t){return /\s/.test(t)?t:_kmWord(t);}).join('');
+}
+/* ---- pass36 transliteration as the always-present reading guide ----
+   Syllable-separated (hyphens), with the stressed syllable upper-cased (e.g. sha-LOM).
+   Hebrew default is final stress (milra); a curated set of high-frequency penult
+   (mil'el) words is overridden. khTL still maps author 'ch' to 'kh' by the throat letter. */
+/* Curated mil'el (penult-stress) high-frequency words; everything else defaults to the
+   Hebrew milra (final) stress, which is correct for the majority (infinitives, plurals,
+   most nouns, past tense). Wrong residual marks are tolerated: the transliteration is a
+   reading guide, not a phonetic authority (per the brief). Keys are the bare lowercase tl. */
+const TL_PENULT={ani:1,anachnu:1,atem:0,boker:1,erev:1,yeled:1,yalda:1,yeladim:1,sefer:1,delet:1,
+  kelev:1,melech:1,malka:1,shemesh:1,layla:1,mayim:1,regel:1,kesef:1,even:1,kerem:1,ozen:1,bayit:1,
+  gveret:1,geshem:1,choref:1,kayitz:1,stav:1,ima:1,aba:1,saba:1,savta:1,
+  okhel:1,ochel:1,shomer:1,kotev:1,gomer:1,lomed:1,oved:1,yoshev:1,holech:1,noten:1,rotzeh:0,
+  shulchan:0,mita:0,kise:0,chalon:0,aviv:0,mishpacha:0,dod:0,yom:0,toda:0,shalom:0 };
+function _isDigraph(a,b){ var d=(''+a+b).toLowerCase(); return d==='kh'||d==='ch'||d==='sh'||d==='tz'||d==='ts'||d==='ph'||d==='zh'; }
+function _sylSplit(w){
+  var V=/[aeiou]/i; var units=[]; var i=0;
+  while(i<w.length){
+    if(V.test(w[i])){ var j=i; while(j<w.length&&V.test(w[j]))j++; units.push(['v',i,j]); i=j; }
+    else if(i+1<w.length&&_isDigraph(w[i],w[i+1])){ units.push(['c',i,i+2]); i+=2; }
+    else { units.push(['c',i,i+1]); i++; }
+  }
+  var nuc=[]; for(var k=0;k<units.length;k++) if(units[k][0]==='v') nuc.push(k);
+  if(nuc.length<=1) return [w];
+  var sylls=[]; var startUnit=0;
+  for(var m=0;m<nuc.length;m++){
+    var nucIdx=nuc[m]; var endUnit;
+    if(m+1<nuc.length){ var nextNuc=nuc[m+1]; endUnit=(nextNuc-(nucIdx+1)>=1)?nextNuc-1:nextNuc; }
+    else { endUnit=units.length; }
+    var s=''; for(var u=startUnit;u<endUnit;u++) s+=w.slice(units[u][1],units[u][2]); sylls.push(s); startUnit=endUnit;
+  }
+  return sylls;
+}
+function tlSyl(tl,he){
+  tl=khTL(''+(tl==null?'':tl),he||''); if(!tl) return '';
+  return tl.split(/([^A-Za-z]+)/).map(function(tok){
+    if(!/[a-z]/i.test(tok)) return tok;
+    var sy=_sylSplit(tok); if(sy.length<=1) return tok;
+    var bare=tok.toLowerCase();
+    var stressIdx=(Object.prototype.hasOwnProperty.call(TL_PENULT,bare)&&TL_PENULT[bare])?sy.length-2:sy.length-1;
+    return sy.map(function(s,ix){return ix===stressIdx?s.toUpperCase():s.toLowerCase();}).join('-');
+  }).join('');
+}
+function TL(tl,he){ return tlSyl(tl,he); }
 function conversaHeb(v){var words=(''+(v==null?'':v)).split(/(\s+)/);return '<span class="heb" dir="rtl">'+words.map(function(w){if(/^\s+$/.test(w)||w==='')return w;var sf=_spellFull(w);var full=sf?sf.bare:_maleify(w);return '<span class="w" data-word="'+encodeURIComponent(full)+'">'+full+'</span>';}).join('')+'</span>';}
 function hebClick(v,plain,cls){
   const shown=H(v,plain);const words=shown.split(/(\s+)/);
@@ -1058,7 +1179,7 @@ function _spellFull(word){
   if(!bare) return null;
   var full=mergedSpelling(bare);
   if(!full) return null;
-  return { disp:(S.nikud? word : (lead+full+trail)), bare:full };
+  return { disp:(lead+full+trail), bare:full };
 }
 
 /* ---------- TTS source policy (language-trust repair) ----------
@@ -1377,8 +1498,7 @@ async function syncUp(){if(!SUPA_URL||!SUPA_KEY){cloudWriteOK=false;cloudWriteIn
         if(_cs&&_cloudDone>_localDone){
           evlog('push BLOCKED, cloud ahead ('+_cloudDone+' lessons) > local ('+_localDone+'); adopting cloud');
           S=deepMerge(structuredClone(defaultState),_cs);migrateProgress(S,_cs);
-          try{if(S&&S.cfg&&!S.cfg.gttsKey){var _lk=localStorage.getItem(GTTS_KEY_LS);if(_lk)S.cfg.gttsKey=_lk;}}catch(e){}
-          try{if(S&&S.cfg&&!S.cfg.anthropicKey){var _ak=localStorage.getItem(ANTHRO_KEY_LS);if(_ak)S.cfg.anthropicKey=_ak;}}catch(e){}
+          _restoreLocalKeys(S); /* pass36 PIECE 5: stripped cloud blob never wipes a real device key */
           localStorage.setItem(LS,JSON.stringify(S));cloudReadOK=true;cloudWriteOK=true;cloudWriteInfo='';lastSyncInfo='';render();paintSync();return;}
       }
     }catch(e){/* guard read failed (offline): fall through to a normal push */}}
@@ -1394,8 +1514,7 @@ async function syncDown(){if(!SUPA_URL||!SUPA_KEY){cloudReadOK=false;cloudReadIn
       if(_rs&&(_rs.updated||0)>(S.updated||0)&&!(_ls>0&&_progScore(_rs)<_ls)){
         evlog('pull ACCEPTED remote (remote '+_progScore(_rs)+' vs local '+_ls+')');
         S=deepMerge(structuredClone(defaultState),_rs);migrateProgress(S,_rs);
-        try{if(S&&S.cfg&&!S.cfg.gttsKey){var _lk=localStorage.getItem(GTTS_KEY_LS);if(_lk)S.cfg.gttsKey=_lk;}}catch(e){}
-        try{if(S&&S.cfg&&!S.cfg.anthropicKey){var _ak=localStorage.getItem(ANTHRO_KEY_LS);if(_ak)S.cfg.anthropicKey=_ak;}}catch(e){}
+        _restoreLocalKeys(S); /* pass36 PIECE 5: stripped cloud blob never wipes a real device key */
         localStorage.setItem(LS,JSON.stringify(S));render();}
       else if(_rs){evlog('pull kept local (remote '+_progScore(_rs)+' vs local '+_ls+', remote newer='+(((_rs.updated||0)>(S.updated||0))?'yes':'no')+')');}
       else{evlog('pull found no cloud row');}
@@ -1404,7 +1523,7 @@ function paintSync(){var ok,msg;if(cloudWriteOK===true){ok=true;msg='saved to cl
 
 /* ---------- Backup ---------- */
 function backupJSON(){const name='ivrit-backup-'+new Date().toISOString().slice(0,10)+'.json';const blob=new Blob([JSON.stringify(stripSecrets(S),null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();toast('Backup downloaded: '+name);}
-function importJSON(file){const r=new FileReader();r.onload=e=>{try{const imp=JSON.parse(e.target.result);S=deepMerge(structuredClone(defaultState),imp);migrateProgress(S,imp);/* a restored pre-V2 backup is migrated, not trusted, so old completion cannot leak */save();render();toast('Backup restored')}catch(_){toast('Invalid file')}};r.readAsText(file);}
+function importJSON(file){const r=new FileReader();r.onload=e=>{try{const imp=JSON.parse(e.target.result);S=deepMerge(structuredClone(defaultState),imp);migrateProgress(S,imp);_restoreLocalKeys(S);/* a restored pre-V2 backup is migrated, not trusted, so old completion cannot leak; a real device key is never wiped (PIECE 5) */save();render();toast('Backup restored')}catch(_){toast('Invalid file')}};r.readAsText(file);}
 
 /* ---------- toast ---------- */
 let toastT;function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2200);}
@@ -7817,12 +7936,11 @@ function pilotBank(lessonOrId){
 function pilotEvidence(lessonId, stepKey){
   if(lessonId==null||!stepKey) return;
   setLessonStepDone(lessonId, stepKey, true);
-  var mid=document.querySelector('.runner-nav-mid');
-  if(mid){ mid.innerHTML='<span class="rstep-doneflag">\u2713 done</span> <button class="btn sm ghost" data-runner-undone="1" title="undo this step">undo</button>';
-    var u=mid.querySelector('[data-runner-undone]'); if(u)u.onclick=function(){markCurrentLessonStepUndone();}; }
   try{toast('Step complete \u2713');}catch(e){}
-  /* R1: evidence completion advances to the next step automatically */
-  try{ if(route.section==='runner') setTimeout(function(){ if(route.section==='runner') runnerGoNext(); },1400); }catch(e){}
+  /* pass36 PIECE 3+4: NO auto-advance. The completed task waits on the learner's
+     explicit Continue press. Swap the nav to its done state so the forward control is
+     a real "Continue" (data-runner-next, completion already recorded), never a Skip. */
+  if(route.section==='runner') _runnerNavMarkDoneUI();
 }
 /* Resolve the step the learner is currently on in the runner, so evidence
    from generic (non-pilot) activities can complete the right step. */
@@ -8166,7 +8284,7 @@ function _warmupCard(it, withRate){
     +'<button class="wr wr-m '+(s===1?'on':'')+'" data-wrate="'+it.key+'|1">\u21bb review again</button></div>'):'';
   return '<div class="wcard flip" data-wcard="'+it.key+'" data-speak="'+encodeURIComponent(it.v)+'">'
     +'<div class="wc-front"><div class="h">'+H(it.v,it.p)+'</div><div class="wc-hint">tap to hear \u00b7 flip</div></div>'
-    +'<div class="wc-back"><div class="t">'+escHTML(it.tl||'')+'</div><div class="e">'+escHTML(it.en||'')+'</div>'+rate+'</div></div>';
+    +'<div class="wc-back"><div class="t">'+escHTML(TL(it.tl||'',it.v))+'</div><div class="e">'+escHTML(it.en||'')+'</div>'+rate+'</div></div>';
 }
 /* Phase 9B.4: return-to-runner context. Lets a later phase launch a real
    activity (a drill, the story reader, conversa, writing) from a runner step
@@ -8184,16 +8302,10 @@ function returnToRunnerStep(markDone){
   var r=getRunnerReturn(); if(!r){go('course');return;}
   if(markDone&&r.stepKey) setLessonStepDone(r.lessonId, r.stepKey, true);
   clearRunnerReturn();
-  /* R1: end of a completed step advances to the next step, never just back */
-  if(markDone){
-    var st=getLessonRunnerState(r.lessonId);
-    var idx=parseInt(r.stepIndex,10); if(isNaN(idx))idx=0;
-    if(st&&st.steps){
-      var nxt=idx+1;
-      if(nxt<st.steps.length&&st.steps[nxt].key!=='done'){ setActiveSession(r.lessonId,nxt); go('runner',String(r.lessonId),String(nxt)); return; }
-      setActiveSession(r.lessonId,'hub'); go('runner',String(r.lessonId),'hub'); return;
-    }
-  }
+  /* pass36 PIECE 3: NO auto-advance. A finished activity returns to ITS OWN step (now
+     marked done); the runner nav then shows "Continue" and only an explicit Continue
+     press advances to the next step. The completed task waits on the learner. */
+  if(markDone) setActiveSession(r.lessonId, r.stepIndex);
   go('runner', String(r.lessonId), String(r.stepIndex));
 }
 /* pass28 production gate: a production step (practice, verbs) is granted its done state
@@ -8320,7 +8432,7 @@ function _phraseCard(p,i){
   if(en){ back=escHTML(en); }
   else if(p.tl){ back='<span style="opacity:.85">'+escHTML(khTL(p.tl,(p.he&&p.he[0])||''))+'</span>'; }
   else { missing=true; back='<span class="wc-missing">tap to hear it</span>'; if(key&&_PHRASE_MISSING.indexOf(key)<0)_PHRASE_MISSING.push(key); }
-  var tlLine=p.tl?'<div class="t">'+escHTML(p.tl)+'</div>':'';
+  var tlLine=p.tl?'<div class="t">'+escHTML(TL(p.tl,(p.he&&p.he[0])||p.he))+'</div>':'';
   var litLine=(p.lit&&p.lit!==en)?'<div class="t" style="opacity:.7">lit. '+escHTML(p.lit)+'</div>':'';
   return '<div class="wcard flip'+(missing?' wc-nogloss':'')+'" data-wcard="ph'+i+'" data-phrase-key="'+escHTML(key||'')+'" data-speak="'+encodeURIComponent(p.he)+'">'
     +'<div class="wc-front"><div class="h">'+H(p.he,p.plain)+'</div><div class="wc-hint">tap to hear \u00b7 flip</div></div>'
@@ -8574,7 +8686,11 @@ function bindSayIt(){
     _sayitCleanup();
     save();
     try{ toast('Said it · step complete'); }catch(e){}
-    setTimeout(function(){ if(route.section==='runner') runnerGoNext(); },700);
+    /* pass36 PIECE 3+4: NO auto-advance. Mark done and swap the nav to its "Continue"
+       state; the learner presses Continue to move on. */
+    if(typeof _runnerNavMarkDoneUI==='function' && route.section==='runner'){ _runnerNavMarkDoneUI(); }
+    var stg=document.getElementById('sayit-stage');
+    if(stg) stg.innerHTML='<div class="rstep-ok" style="margin:6px 0">✓ Said it · this step is complete. Press <b>Continue</b> below when you are ready.</div>';
   }
   function advance(){ idx++; if(idx>=N){ finishStep(); } else { paint(); } }
   /* pass31 meter feed, IDENTICAL to pass30: a clean spot-on promotes the lesson's goal
@@ -8609,7 +8725,7 @@ function bindSayIt(){
   }
   function heBlock(it){
     return '<div class="rstep-heb" dir="rtl" style="font-size:27px;line-height:1.6;font-weight:600;color:var(--ink);margin:6px 0 2px">'+H(it.he,it.p)+'</div>'
-      +(it.en?'<div dir="ltr" style="font-size:14px;color:var(--muted)">'+escHTML(it.en)+(it.tl?' · <span style="opacity:.85">'+escHTML(khTL(it.tl,it.he))+'</span>':'')+'</div>':'');
+      +(it.en?'<div dir="ltr" style="font-size:14px;color:var(--muted)">'+escHTML(it.en)+(it.tl?' · <span style="opacity:.85">'+escHTML(TL(it.tl,it.he))+'</span>':'')+'</div>':'');
   }
   function wire(it){
     var l=stage.querySelector('[data-say-listen]'); if(l) l.onclick=function(){ speak(decodeURIComponent(l.dataset.sayListen)); };
@@ -8764,6 +8880,45 @@ function renderLessonHub(l, st){
   else { var nm=(activeIdx>=0)?_hubSectionMeta(steps[activeIdx].key).name:''; cta='<button class="lx-cta" data-hub-step="'+(activeIdx<0?0:activeIdx)+'">Continue<span class="lx-cta-s">Next: '+escHTML(nm)+'</span></button>'; }
   return head+goal+meter+'<div class="lx-steps-h">Your journey</div><div class="lx-journey">'+journey+'</div><div class="lx-cta-wrap">'+cta+'</div>';
 }
+/* pass36 PIECE 4: distinct Continue / Skip. Continue = the normal completion path
+   (marks the step done, never a skip); Skip = a clearly-secondary control and the ONLY
+   thing that records a skip. No single control means both. */
+function continueCurrentLessonStep(){ markCurrentLessonStepDone(); runnerGoNext(); }
+function _runnerNavHTML(l, idx, total, isLastStep, done){
+  var nextLabel=isLastStep?'Finish · back to lesson →':'Next step →';
+  var contLabel=isLastStep?'Continue · finish →':'Continue →';
+  var h='<div class="runner-nav"><button class="btn sm ghost" data-runner-hub="'+l.id+'">← back to lesson</button>';
+  if(done){
+    h+='<span class="runner-nav-mid"><span class="rstep-doneflag">✓ done</span> <button class="btn sm ghost" data-runner-undone="1" title="undo">undo</button></span>'
+      +'<button class="btn sm" data-runner-next="1">'+nextLabel+'</button>';
+  } else {
+    h+='<span class="runner-nav-mid"><button class="btn sm ghost" data-runner-skip="1" title="skip this step (recorded as skipped, not done)">Skip</button></span>'
+      +'<button class="btn sm" data-runner-continue="1">'+contLabel+'</button>';
+  }
+  h+='</div>';
+  return h;
+}
+function _bindRunnerNavEl(nav){
+  if(!nav) return; var b;
+  b=nav.querySelector('[data-runner-hub]'); if(b)b.onclick=function(){var _id=b.dataset.runnerHub;setActiveSession(_id,'hub');go('runner',String(_id),'hub');};
+  b=nav.querySelector('[data-runner-undone]'); if(b)b.onclick=function(){markCurrentLessonStepUndone();};
+  b=nav.querySelector('[data-runner-next]'); if(b)b.onclick=function(){runnerGoNext();};
+  b=nav.querySelector('[data-runner-skip]'); if(b)b.onclick=function(){skipCurrentLessonStep();};
+  b=nav.querySelector('[data-runner-continue]'); if(b)b.onclick=function(){continueCurrentLessonStep();};
+}
+/* Rebuild the runner nav to its DONE state in place after inline task completion, so the
+   forward control becomes "Continue" (completion already recorded) instead of the leftover
+   "Skip". No auto-advance: the learner presses Continue when ready (PIECE 3). */
+function _runnerNavMarkDoneUI(){
+  try{
+    var nav=document.querySelector('.runner-nav'); if(!nav) return;
+    var c=_runnerCtx(); if(!c||!c.st) return;
+    var idx=c.idx, steps=c.st.steps, total=steps.length;
+    var isLastStep=(idx+1>=total)||(steps[idx+1]&&steps[idx+1].key==='done');
+    var wrap=document.createElement('div'); wrap.innerHTML=_runnerNavHTML(c.st.lesson, idx, total, isLastStep, true);
+    var fresh=wrap.firstChild; nav.parentNode.replaceChild(fresh, nav); _bindRunnerNavEl(fresh);
+  }catch(e){}
+}
 function renderLessonRunner(lessonId, stepIndex){
   var st=getLessonRunnerState(lessonId);
   if(!st) return '<button class="back" data-go2="course">\u2190 course</button><div class="note">Lesson not found.</div>';
@@ -8777,11 +8932,7 @@ function renderLessonRunner(lessonId, stepIndex){
     +'<div class="topbar"><div><h1>'+escHTML(step.title)+'</h1><div class="lead">'+lvlBadge(l.lvl)+' \u00b7 '+escHTML(l.title)+'</div></div>'+nikToggle()+'</div>';
   var card='<div class="card runner-step"><div class="rstep-type">'+escHTML(step.title)+'</div>'+renderLessonStepPlaceholder(step,l,idx,total)+'</div>';
   var isLastStep=(idx+1>=total)||(steps[idx+1]&&steps[idx+1].key==='done');
-  var nextLabel=isLastStep?'Finish \u00b7 back to lesson \u2192':'Next step \u2192';
-  var nav='<div class="runner-nav"><button class="btn sm ghost" data-runner-hub="'+l.id+'">\u2190 back to lesson</button>';
-  nav+=(done?'<span class="runner-nav-mid"><span class="rstep-doneflag">✓ done</span> <button class="btn sm ghost" data-runner-undone="1" title="undo">undo</button></span><button class="btn sm" data-runner-next="1">'+nextLabel+'</button>':'<span class="runner-nav-mid"></span><button class="btn sm ghost" data-runner-skip="1">Skip \u00b7 '+(isLastStep?'finish \u2192':'next \u2192')+'</button>');
-  nav+='</div>';
-  return head+card+nav;
+  return head+card+_runnerNavHTML(l, idx, total, isLastStep, done);
 }
 function vRunner(){ var id=route.item, sub=route.sub; if(id==null){ var s=getActiveSession(); if(s){ id=s.lessonId; sub=s.stepIndex; } } return renderLessonRunner(id, sub); }
 function lessonStages(l){
@@ -8912,9 +9063,9 @@ function drillVocab(d){
      the learner meets production immediately. Free drills outside the lesson keep the i%4 mix. */
   const it=d.items[d.i];const type=d.forceTyped?1:(d.prodLesson?(d.i%2===0?1:2):(d.i%4));const a=d.answered;d.vkind=type;
   if(type===1){ // translation: English -> type Hebrew
-    const fb=a?`<div class="banner ${a.ok?'ok':'bad'}"><span><span class="lbl">${a.ok?'נכון · correct':'לא בדיוק · not quite'}</span><br>${it.en} = ${H(it.v,it.p)} (${it.tl})</span><button class="btn sm" data-drill-next="1">Continue</button></div>`:'';
+    const fb=a?`<div class="banner ${a.ok?'ok':'bad'}"><span><span class="lbl">${a.ok?'נכון · correct':'לא בדיוק · not quite'}</span><br>${it.en} = ${H(it.v,it.p)} (${escHTML(TL(it.tl,it.v))})</span><button class="btn sm" data-drill-next="1">Continue</button></div>`:'';
     return `<div class="qprompt"><div class="en" style="font-size:20px">${it.en}</div><div class="sub">translate · type it in Hebrew (or transliteration)</div></div>
-      <input class="inp heb" id="dType" placeholder="כְּתֹב כָּאן…" ${a?'disabled':''}>
+      <input class="inp heb" id="dType" placeholder="כתוב כאן…" ${a?'disabled':''}>
       <div class="row" style="margin-top:10px">${a?'':'<button class="btn" data-drill-check="1">check</button> <button class="btn ghost sm" data-drill-skip="1">skip</button> <button class="btn ghost sm" data-drill-hint="1">hint</button> <span class="muted" id="dHint" style="font-size:12.5px"></span>'}</div>${fb}`;
   }
   // MCQ variants
@@ -8986,8 +9137,10 @@ function render(){const m=document.getElementById('main');
 /* small helpers */
 function lvlBadge(l){if(!l)return '';const k=l.toLowerCase().replace('.','').slice(0,2);return `<span class="lvl ${k}">${l}</span>`;}
 function speakBtn(v){return `<button class="spk" data-speak="${encodeURIComponent(v)}">♪</button>`;}
-function nikToggle(){return `<label class="switch" title="vowel marks"><input type="checkbox" id="nikTop" ${S.nikud?'checked':''}><span class="track"></span></label>
-  <span class="info">i<span class="tip">Nikud are the vowel marks. Beginners keep them on. Real modern Hebrew has none, so turn them off to read the bare word. Spelling shifts slightly (extra ו/י): we show the true unvowelled form.</span></span>`;}
+/* pass36 PIECE 2: the nikud toggle is DELETED. Nikud is never displayed and there is
+   no toggle anywhere; every Hebrew word renders as full ktiv-male via kmDisp(). This
+   stub stays so the (many) header call sites keep their layout without rendering a control. */
+function nikToggle(){return '';}
 function stageHTML(s,i){let body='';
   if(s.p)body=`<p>${s.p}</p>`;
   if(s.tbl)body=`<table><tbody>${s.tbl.map(r=>`<tr>${r.map(c=>Array.isArray(c)?`<td>${hebClick(c[0],c[1])}</td>`:/[\u0590-\u05FF]/.test(c)?`<td>${hebClick(c)}</td>`:`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
@@ -9298,7 +9451,7 @@ function escHTML(s){return (''+s).replace(/&/g,'&amp;').replace(/</g,'&lt;').rep
    Hebrew (for example Phrases). Mirrors H()'s plain-mode fallback: when nikud
    is off, vowel marks are stripped for display only. Stored data is never
    rewritten and nikud/plain logic elsewhere is untouched (Requirement 8). */
-function v2FieldText(v){var t=escHTML(v);return S.nikud?t:stripN(t);}
+function v2FieldText(v){return kmDisp(escHTML(v));}
 /* One readable resource row (label + plain text). Not clickable in this phase
    (Human Decision 2). Returns '' for empty/none values so no row renders. */
 function v2Row(label,val){if(!v2FieldShown(val))return '';return '<div class="v2-row"><span class="v2-row-label">'+label+'</span><span class="v2-row-val" dir="auto">'+v2FieldText(val)+'</span></div>';}
@@ -10229,7 +10382,7 @@ function grammarRefGloss(sup){
   var rows=sup.map(function(w){
     var heDisp=H(w.nik||w.he,w.he);
     var spk=(w.nik||w.he)?'<button class="spk" data-speak="'+encodeURIComponent(w.nik||w.he)+'">♪</button>':'';
-    var tl=w.tl?'<span class="tl" style="font-style:italic">'+escHTML(w.tl)+'</span> · ':'';
+    var tl=w.tl?'<span class="tl" style="font-style:italic">'+escHTML(TL(w.tl,w.nik||w.he))+'</span> · ':'';
     var note=w.note?'<div class="muted" style="font-size:12px;margin-top:2px">'+escHTML(w.note)+'</div>':'';
     return '<div class="lx-row" style="cursor:default">'
       +'<div class="lx-meta"><div class="lx-title" dir="rtl" style="font-family:Arial,sans-serif">'+escHTML(heDisp)+' '+spk+'</div>'
@@ -10455,7 +10608,7 @@ function vocabCategory(encName){const name=decodeURIComponent(encName);const ite
       <div class="row" style="gap:12px">${speakBtn(ed_v)}
         <div class="meta" style="flex:1"><div class="row" style="gap:4px">${hebClick(ed_v,it.p)}
           <button class="edit-btn" data-edit-key="vocab|${it.key}|v" data-edit-val="${encodeURIComponent(ed_v)}" data-edit-label="Hebrew (with nikud)" title="Edit Hebrew">&#9998;</button>
-        </div><div class="tl">${ed_tl}</div></div>
+        </div><div class="tl">${escHTML(TL(ed_tl,ed_v))}</div></div>
       </div>
       <div class="row" style="gap:10px">
         <div class="meta" style="text-align:end">
@@ -10757,7 +10910,7 @@ function renderFlash(){const host=document.getElementById('flashHost');if(!host)
   if(flash.i>=flash.list.length){host.innerHTML='<div class="card" style="text-align:center"><h3>Done.</h3><button class="btn sm" id="flashAgain" style="margin-top:10px">Again</button></div>';document.getElementById('flashAgain').onclick=startFlash;return;}
   const it=flash.list[flash.i];
   host.innerHTML=`<div class="dprog"><div class="track"><i style="width:${Math.round(flash.i/flash.list.length*100)}%"></i></div><div class="num">${flash.i+1} / ${flash.list.length}</div></div>
-   <div class="flash" id="flashCard"><div class="h">${H(it.v,it.p)}</div>${flash.show?`<div class="tl">${it.tl}</div><div class="en" style="font-size:17px">${it.en}</div>`:'<div class="muted">tap to reveal</div>'}</div>
+   <div class="flash" id="flashCard"><div class="h">${H(it.v,it.p)}</div>${flash.show?`<div class="tl">${escHTML(TL(it.tl,it.v))}</div><div class="en" style="font-size:17px">${it.en}</div>`:'<div class="muted">tap to reveal</div>'}</div>
    ${flash.show?`<div class="row" style="margin-top:12px;gap:8px;justify-content:center"><button class="btn ghost sm" data-flash-rate="0">didn't know</button><button class="btn ghost sm" data-flash-rate="1">hazy</button><button class="btn sm" data-flash-rate="2">got it</button></div>`:''}`;
   document.getElementById('flashCard').onclick=()=>{flash.show=true;renderFlash();bindFlash();};
   bindFlash();
@@ -11454,18 +11607,18 @@ function plBuildItems(diag){
     var vv=LEX.filter(function(it){return it.lvl===L&&it.en;});
     plSample(vv,4).forEach(function(it){
       var mc=plMC(it.en,enPool,3);
-      items.push({block:L,skill:'vocab',key:it.key,html:'<div class="big heb" dir="rtl" style="font-size:32px">'+(S.nikud?it.v:it.p)+'</div><div class="sub">What does this word mean?</div>',opts:mc.opts,a:mc.a});
+      items.push({block:L,skill:'vocab',key:it.key,html:'<div class="big heb" dir="rtl" style="font-size:32px">'+kmDisp(it.v,it.p)+'</div>'+(it.tl?'<div class="tl" style="text-align:center">'+escHTML(TL(it.tl,it.v))+'</div>':'')+'<div class="sub">What does this word mean?</div>',opts:mc.opts,a:mc.a});
     });
     /* a phrase, for lower levels */
     if((L==='A1'||L==='A2')&&typeof PHRASEBOOK!=='undefined'&&PHRASEBOOK.length){
       var ph=plSample(PHRASEBOOK.filter(function(p){return p.he&&p.en;}),1);
-      ph.forEach(function(p){var pool=PHRASEBOOK.map(function(x){return x.en;}).filter(Boolean);var mc=plMC(p.en,pool.length>4?pool:enPool,3);items.push({block:L,skill:'phrases',html:'<div class="big heb" dir="rtl" style="font-size:26px">'+(S.nikud?p.he[0]:p.he[1])+'</div><div class="sub">What does this phrase mean?</div>',opts:mc.opts,a:mc.a});});
+      ph.forEach(function(p){var pool=PHRASEBOOK.map(function(x){return x.en;}).filter(Boolean);var mc=plMC(p.en,pool.length>4?pool:enPool,3);items.push({block:L,skill:'phrases',html:'<div class="big heb" dir="rtl" style="font-size:26px">'+kmDisp(p.he[0],p.he[1])+'</div>'+(p.tl?'<div class="tl" style="text-align:center">'+escHTML(TL(p.tl,p.he[0]))+'</div>':'')+'<div class="sub">What does this phrase mean?</div>',opts:mc.opts,a:mc.a});});
     }
     /* a story comprehension item */
     var st=(typeof STORIES!=='undefined')?STORIES.filter(function(s){return s.lvl===L&&s.quiz&&s.quiz.length;}):[];
     if(st.length){
       var s=plSample(st,1)[0]; var q=s.quiz[0];
-      var sample=s.s.slice(0,3).map(function(x){return (S.nikud?x[0][0]:x[0][1]);}).join(' ');
+      var sample=s.s.slice(0,3).map(function(x){return kmDisp(x[0][0],x[0][1]);}).join(' ');
       items.push({block:L,skill:'comprehension',html:'<div class="heb" dir="rtl" style="font-size:20px;line-height:1.7">'+sample+'</div><div class="sub" style="margin-top:8px">'+escHTML(q.q)+'</div>',opts:q.opts.slice(),a:q.a});
     }
   });
@@ -11676,9 +11829,7 @@ function editorialCard(){
 }
 function vSettings(){const c=S.cfg||{};const vlist=voices.filter(v=>v.lang&&v.lang.toLowerCase().startsWith('he'));
   const _G={
-    display:`<div class="card" style="margin-top:14px"><h3>Reading</h3>
-     <div class="row spread" style="margin-top:10px"><span>Show vowel marks (nikud) by default <span class="info">i<span class="tip">Modern Hebrew normally has no vowel marks. Keep them on while learning, turn them off to read like real texts.</span></span></span>
-       <label class="switch"><input type="checkbox" id="setNik" ${S.nikud?'checked':''}><span class="track"></span></label></div></div><div class="card" style="margin-top:14px"><h3>Appearance</h3><div class="row spread" style="margin-top:10px;align-items:center"><span>Theme <span class="info">i<span class="tip">Auto follows your device. Pick Light or Dark to fix it.</span></span></span><div class="chips" style="gap:6px"><button class="chip ${(S.theme||'auto')==='light'?'on':''}" data-theme-set="light">Light</button><button class="chip ${(S.theme||'auto')==='dark'?'on':''}" data-theme-set="dark">Dark</button><button class="chip ${(S.theme||'auto')==='auto'?'on':''}" data-theme-set="auto">Auto</button></div></div></div>
+    display:`<div class="card" style="margin-top:14px"><h3>Appearance</h3><div class="row spread" style="margin-top:10px;align-items:center"><span>Theme <span class="info">i<span class="tip">Auto follows your device. Pick Light or Dark to fix it.</span></span></span><div class="chips" style="gap:6px"><button class="chip ${(S.theme||'auto')==='light'?'on':''}" data-theme-set="light">Light</button><button class="chip ${(S.theme||'auto')==='dark'?'on':''}" data-theme-set="dark">Dark</button><button class="chip ${(S.theme||'auto')==='auto'?'on':''}" data-theme-set="auto">Auto</button></div></div></div>
    `,
     audio:`<div class="card" style="margin-top:14px"><h3>Audio</h3>
      <label>Fallback voice ${vlist.length?'(device, used only if the neural voice is off or unavailable)':'(no Hebrew voice found on this device)'}</label>
@@ -11730,7 +11881,7 @@ function vSettings(){const c=S.cfg||{};const vlist=voices.filter(v=>v.lang&&v.la
    <div class="card" style="margin-top:14px"><h3>Reset progress</h3><p class="muted" style="font-size:13px">Clears mastery, course progress and streak. Cannot be undone.</p><button class="btn ghost sm" id="resetProg" style="margin-top:8px">Reset my progress</button></div>`,
     editorial:`${editorialCard()}${homographCard()}${gatingReportCard()}${pilotMiniBankCard()}${spokenAltCard()}${translitNoteCard()}`
   };
-  const _M=[['display','Display & reading','Vowel marks (nikud) and how text appears'],['audio','Audio & voice','Voices, speed, neural audio and offline download'],['learning','Learning','Daily study goal and level test'],['account','Account & data','API keys, sync, backup and reset'],['editorial','Editorial tools','Corrections, pronunciation, homographs and reports']];
+  const _M=[['display','Display & reading','How text appears'],['audio','Audio & voice','Voices, speed, neural audio and offline download'],['learning','Learning','Daily study goal and level test'],['account','Account & data','API keys, sync, backup and reset'],['editorial','Editorial tools','Corrections, pronunciation, homographs and reports']];
   var _g=route.item;
   if(_g&&_G[_g]){var _t=(_M.filter(function(m){return m[0]===_g;})[0]||['','Settings'])[1];
     return `<button class="back" data-back="settings">\u2190 back to settings</button><div class="t-eyebrow">Settings</div><h1 class="t-h1" style="margin-bottom:6px">${_t}</h1>`+_G[_g];}
@@ -11746,8 +11897,7 @@ function showEditOverlay(key,currentVal,opts){
   var overlay=document.getElementById('editpop');var box=document.getElementById('editbox');
   if(!overlay||!box)return;
   opts=opts||{};var isRTL=opts.rtl!==false;var label=opts.label||'Hebrew text';
-  var shownVal=currentVal;
-  try{ if(isRTL && !S.nikud && !/nikud/i.test(label)) shownVal=stripN(currentVal); }catch(e){}
+  var shownVal=currentVal; /* pass36: the gated ?edit=1 editor shows the true stored (vowelled) value so the owner can correct it; learner display is always ktiv-male via kmDisp */
   box.innerHTML='<div class="row spread" style="margin-bottom:12px"><h3 style="margin:0">Edit</h3>'
     +'<button onclick="document.getElementById(\'editpop\').classList.remove(\'open\')" class="btn ghost sm">&#10005;</button></div>'
     +'<label style="font-size:12px;color:var(--muted)">'+label+'</label>'
@@ -11807,7 +11957,7 @@ function bind(){
   };});
   document.querySelectorAll('[data-complete-lesson]').forEach(function(b){b.onclick=function(){var _id=+b.dataset.completeLesson;if(!lessonDone(_id))completeLesson(_id);else toast('Already completed \u2713');go('course','',''+currentLesson().ch);};});
   document.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>go(b.dataset.back));
-  const nt=document.getElementById('nikTop');if(nt)nt.onchange=()=>{S.nikud=nt.checked;saveNikud();render();};
+  /* pass36: nikud toggle deleted (nikTop handler removed) */
   document.querySelectorAll('[data-rate]').forEach(r=>r.querySelectorAll('b').forEach(b=>b.onclick=()=>{S.grammar[r.dataset.rate]=+b.dataset.n;touchDay();addXP(2);save();render();}));
 
   // dashboard
@@ -11827,6 +11977,7 @@ function bind(){
   document.querySelectorAll('[data-runner-nav]').forEach(b=>b.onclick=()=>goLessonStep(b.dataset.runnerNav==='next'?1:-1));
   document.querySelectorAll('[data-runner-done]').forEach(b=>b.onclick=()=>markCurrentLessonStepDone());
   document.querySelectorAll('[data-runner-skip]').forEach(b=>b.onclick=()=>skipCurrentLessonStep());
+  document.querySelectorAll('[data-runner-continue]').forEach(b=>b.onclick=()=>continueCurrentLessonStep()); /* pass36 PIECE 4 */
   document.querySelectorAll('[data-runner-next]').forEach(b=>b.onclick=()=>runnerGoNext());
   /* R1/Italian model: a lesson opens an activity. The practice step launches its
      session immediately, once per visit (exiting the drill early shows the page). */
@@ -11965,7 +12116,11 @@ function bind(){
   const ra=document.querySelector('[data-readall]');if(ra)ra.onclick=()=>{const st=STORIES.find(s=>s.id===ra.dataset.readall);speakSeq(st.s.map(x=>x[0][0]));};
   const sr=document.querySelector('[data-stopread]');if(sr)sr.onclick=()=>{queue=[];_stopAudio();if('speechSynthesis'in window)speechSynthesis.cancel();};
   document.querySelectorAll('[data-quiz]').forEach(b=>b.onclick=()=>{const[sid,qi,oi]=b.dataset.quiz.split('|');const st=STORIES.find(s=>s.id===sid);const q=st.quiz[+qi];const fb=document.getElementById('qf-'+qi);
-    if(+oi===q.a){fb.innerHTML='<span class="ans-ok">Correct ✓</span>';addXP(2);save();}else{fb.innerHTML='<span class="ans-bad">Not quite. Answer: '+q.opts[q.a]+'</span>';};(function(){var fbs=[].slice.call(document.querySelectorAll('[id^="qf-"]'));if(fbs.length&&fbs.every(function(f){return f.innerHTML&&f.innerHTML.length;})){var ov=runnerBackOverride('story',sid);if(ov){try{toast('Story quiz complete \u2713');}catch(e){}setTimeout(function(){returnToRunnerStep(true);},1200);}}})()});
+    if(+oi===q.a){fb.innerHTML='<span class="ans-ok">Correct ✓</span>';addXP(2);save();}else{fb.innerHTML='<span class="ans-bad">Not quite. Answer: '+q.opts[q.a]+'</span>';};(function(){var fbs=[].slice.call(document.querySelectorAll('[id^="qf-"]'));if(fbs.length&&fbs.every(function(f){return f.innerHTML&&f.innerHTML.length;})){var ov=runnerBackOverride('story',sid);if(ov){try{toast('Story quiz complete \u2713');}catch(e){}
+    /* pass36 PIECE 3: NO auto-return. The completed quiz waits on an explicit Continue press. */
+    var _qd=document.getElementById('qf-'+qi)&&document.getElementById('qf-'+qi).parentNode;
+    if(!document.getElementById('storyQuizContinue')){var _cb=document.createElement('button');_cb.id='storyQuizContinue';_cb.className='btn full';_cb.style.marginTop='12px';_cb.textContent='Continue \u2192';_cb.onclick=function(){returnToRunnerStep(true);};(_qd||document.body).appendChild(_cb);}
+  }}})()});
 
   // practice modes
   document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{const mode=b.dataset.mode;
@@ -12014,7 +12169,7 @@ function bind(){
     document.getElementById('wFeedback').onclick=()=>writeFeedback(wb.value);}
 
   // settings
-  const sn=document.getElementById('setNik');if(sn)sn.onchange=()=>{S.nikud=sn.checked;saveNikud();render();};
+  /* pass36: nikud toggle deleted (setNik handler removed) */
   const sv=document.getElementById('setVoice');if(sv)sv.onchange=()=>{S.voiceURI=sv.value;save();};
   const srng=document.getElementById('setRate');if(srng)srng.oninput=()=>{S.rate=+srng.value;document.getElementById('rateVal').textContent=(+srng.value).toFixed(2)+'x';save();};
   const tv=document.getElementById('testVoice');if(tv)tv.onclick=()=>speak('שלום, מה שלומך?');
@@ -12346,10 +12501,10 @@ function wordPopover(word,e){
     +'<button class="wp-audio" id="popSpk" aria-label="Listen">\u25b6</button></div>';
   var rows='';
   if(typ)rows+='<div class="wp-label">Type</div><div class="wp-val">'+typ+'</div>';
-  if(tl)rows+='<div class="wp-label">Sound</div><div class="wp-val">'+escHTML(tl)+'</div>';
+  if(tl)rows+='<div class="wp-label">Sound</div><div class="wp-val">'+escHTML(TL(tl,(entry&&entry.v)||clean))+'</div>';
   if(lvl)rows+='<div class="wp-label">Level</div><div class="wp-val">'+escHTML(lvl)+'</div>';
   if(enr&&enr.g)rows+='<div class="wp-label">Gender</div><div class="wp-val">'+(enr.g==='m'?'masculine':'feminine')+'</div>';
-  if(enr&&enr.pl)rows+='<div class="wp-label">Plural</div><div class="wp-val"><span class="heb" dir="rtl">'+enr.pl+'</span>'+(enr.pltl?' &#183; '+escHTML(enr.pltl):'')+'</div>';
+  if(enr&&enr.pl)rows+='<div class="wp-label">Plural</div><div class="wp-val"><span class="heb" dir="rtl">'+kmDisp(enr.pl)+'</span>'+(enr.pltl?' &#183; '+escHTML(TL(enr.pltl,enr.pl)):'')+'</div>';
   if(rows)html+='<div class="wp-grid">'+rows+'</div>';
   if(info||en){
     html+='<div class="wp-trans">'+escHTML(en||'')+'</div>';
@@ -12358,7 +12513,7 @@ function wordPopover(word,e){
   } else {
     html+='<div class="wp-trans wp-muted">Meaning not in the dictionary yet.</div>';
   }
-  if(enr&&enr.ex)html+='<div class="wp-ex"><div class="wp-ex-label">Example</div><div class="wp-ex-he heb" dir="rtl">'+enr.ex+'</div>'+(enr.extl?'<div class="wp-ex-tl">'+escHTML(enr.extl)+'</div>':'')+(enr.exen?'<div class="wp-ex-en">'+escHTML(enr.exen)+'</div>':'')+'</div>';
+  if(enr&&enr.ex)html+='<div class="wp-ex"><div class="wp-ex-label">Example</div><div class="wp-ex-he heb" dir="rtl">'+kmDisp(enr.ex)+'</div>'+(enr.extl?'<div class="wp-ex-tl">'+escHTML(TL(enr.extl,enr.ex))+'</div>':'')+(enr.exen?'<div class="wp-ex-en">'+escHTML(enr.exen)+'</div>':'')+'</div>';
   html+=_spokenAltLine(clean);
   if(verb)html+='<button class="wp-btn wp-accent" id="popVerb">See full conjugation \u2192</button>';
   if(key&&entry&&entry.v)html+='<div class="wp-actions"><button class="wp-btn" id="popFix">\u270e Fix this entry</button></div>';
@@ -12379,7 +12534,7 @@ function wordPopover(word,e){
   if(y+ph>vh-6)y=Math.max(6,e.clientY-ph-12); if(y<6)y=6;
   pop.style.cssText='position:fixed;display:block;left:'+x+'px;top:'+y+'px';
   pop.classList.add('show');
-  var sp=document.getElementById('popSpk'); if(sp)sp.onclick=function(ev){ev.stopPropagation();speak(clean);};
+  var sp=document.getElementById('popSpk'); if(sp)sp.onclick=function(ev){ev.stopPropagation();speak((entry&&entry.v)?entry.v:clean);}; /* pass36 PIECE 2: feed TTS the vowelled form (never the dropped-vowel display form) */
   if(verb){var vb=document.getElementById('popVerb'); if(vb)vb.onclick=function(ev){ev.stopPropagation();closeWordPop();go('verbs',verb.inf[0]);};}
   if(key&&entry&&entry.v){var fx=document.getElementById('popFix'); if(fx)fx.onclick=function(ev){ev.stopPropagation();closeWordPop();showEditOverlay('vocab|'+key+'|v',entry.v,{label:'Hebrew (with nikud)'});};}
   if(key){
