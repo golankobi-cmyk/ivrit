@@ -1109,10 +1109,58 @@ function _cleanPlain(p){
    available, e.g. free-text goal/notes fields): rule-derive from the vowelled form (strip
    nikud + insert vav for holam-haser/kubuts). Either way the output carries NO nikud. The
    always-present transliteration (TL) is the safety net for any residual edge case. */
+function _maleFull(s){
+  s=''+(s==null?'':s);
+  var EXC={'לא':1,'ראש':1,'זאת':1,'פה':1,'איפה':1,'שמאל':1,'כאן':1,'הוא':1,'הם':1,'הן':1,'כל':1};
+  var isC=function(c){c=c.charCodeAt(0);return c>=0x05D0&&c<=0x05EA;};
+  var isM=function(c){c=c.charCodeAt(0);return c>=0x0591&&c<=0x05C7;};
+  var FULLV=/[\u05B4\u05B5\u05B6\u05B7\u05B8\u05B9\u05BB]/;
+  return s.split(/(\s+)/).map(function(word){
+    if(/^\s*$/.test(word))return word;
+    var bare=stripN(word);
+    var stem=bare.replace(/^[\u05D5\u05D4\u05D1\u05DB\u05DC\u05DE\u05E9]/,'');
+    var skip=!!(EXC[bare]||EXC[stem]);
+    var ci=-1,out='',i=0;
+    while(i<word.length){
+      var ch=word[i];
+      if(isC(ch)){
+        ci++;
+        var j=i+1,mk='';while(j<word.length&&isM(word[j])){mk+=word[j];j++;}
+        var nx=(j<word.length&&isC(word[j]))?word[j]:'';
+        var k=j+1,nmk='';while(k<word.length&&isM(word[k])){nmk+=word[k];k++;}
+        out+=ch;
+        var holam=mk.indexOf('\u05B9')>=0,kubuts=mk.indexOf('\u05BB')>=0,hiriq=mk.indexOf('\u05B4')>=0;
+        var initialMemFrom=(ci===0&&ch==='\u05DE');
+        if((holam||kubuts)&&ch!=='\u05D5'&&nx!=='\u05D5'&&!(holam&&skip)){out+='\u05D5';}
+        else if(hiriq&&ch!=='\u05D9'&&nx&&nx!=='\u05D9'&&FULLV.test(nmk)&&!initialMemFrom){out+='\u05D9';}
+        i=j;
+      } else if(isM(ch)){i++;} else {out+=ch;i++;}
+    }
+    return out;
+  }).join('');
+}
+/* Resolve a (vowelled) Hebrew string to full ktiv-male. The authored plain ALWAYS wins
+   per word (VOCAB/VERBS/STORIES are the source of truth); the rule-based converter runs
+   only for words that exist in no bank. This fixes deficiently-stored forms (e.g. שלחנות,
+   מטה-as-bed) for both display and audio without altering any correct authored form. */
+function _resolveFull(v){
+  v=''+(v==null?'':v);
+  var pm=buildPlainMap();
+  return v.split(/(\s+)/).map(function(w){
+    if(/^\s*$/.test(w))return w;
+    if(Object.prototype.hasOwnProperty.call(pm,w))return pm[w];
+    return _maleFull(w);
+  }).join('');
+}
 function kmDisp(v, plain){
-  if(plain!=null&&plain!==''&&/[א-ת]/.test(''+plain)) return _cleanPlain(plain);
-  var s=''+(v==null?'':v); if(!s) return s;
-  return s.split(/(\s+)/).map(function(t){return /\s/.test(t)?t:_kmWord(t);}).join('');
+  var vv=Array.isArray(v)?(''+(v[0]||v[1]||'')):(''+(v==null?'':v));
+  if(plain!=null&&plain!==''&&/[א-ת]/.test(''+plain)){
+    var cp=_cleanPlain(plain);
+    if(vv&&stripN(vv)===stripN(cp)) return _resolveFull(vv); /* stored plain is bare/deficient: rule-upgrade */
+    return cp; /* authored or hand-edited plain carries real spelling: respect it */
+  }
+  if(!vv) return vv;
+  return _resolveFull(vv);
 }
 /* ---- pass36 transliteration as the always-present reading guide ----
    Syllable-separated (hyphens), with the stressed syllable upper-cased (e.g. sha-LOM).
@@ -1323,7 +1371,7 @@ function ttsText(t){
   if(Object.prototype.hasOwnProperty.call(TTS_OVERRIDE,t)) return TTS_OVERRIDE[t];
   const m=buildPlainMap();
   if(Object.prototype.hasOwnProperty.call(m,t)) return m[t];
-  return stripN(t);
+  return _resolveFull(t);
 }
 /* ===IVRIT-EDITORIAL-OVERRIDES v1 START - do not edit outside these markers=== */
 const EDITORIAL_OVERRIDES = { sent:{}, vocab:{}, phrase:{}, story:{}, storyMetrics:{}, course:{"3":{"chunks":[{"f":"מָה שְׁלוֹמְךָ","n":"Fixed greeting for now. The ־ךָ (your) possessive suffix is analysed in a later lesson."}]},"7":{"chunks":[{"f":"בְּבֶּרְלִין","n":"Fixed form for now: attached בְּ means in. The attached-preposition rule is taught in Lesson 15."}]},"9":{"chunks":[{"f":"גָּר / עוֹבֵד","n":"Fixed present-tense forms for now. The Pa'al present pattern is taught in Lesson 19."}]},"13":{"story":"s90","chunks":[{"f":"יֵשׁ לִי","n":"Fixed expression for now: I have. The לִי dative ending is analysed in a later lesson."}]},"14":{"sayit":[{"he":"זֶה כִּסֵּא","p":"זה כיסא","tl":"ze kise","en":"this is a chair (m)"},{"he":"זֹאת מִטָּה","p":"זאת מיטה","tl":"zot mita","en":"this is a bed (f)"}]},"15":{"story":"s90"},"16":{"chunks":[{"f":"רוֹאֶה / אוֹהֵב / שׁוֹתֶה","n":"Fixed present-tense forms for now. The Pa'al present pattern is taught in Lesson 19."}]},"18":{"story":"s98"},"20":{"chunks":[{"f":"בְּשֶׁבַע","n":"At seven (the time). שֶׁבַע is the number seven, taught fully in Lesson 29; for now learn this as a fixed time phrase."}]},"21":{"chunks":[{"f":"מְדַבֵּר","n":"Learned as a chunk for now. This is the Pi'el binyan, explained at A2 (grammar Topic 13)."}]}}, alt:{}, tts:{}, translit:{}, spelling:{"סתו":"סתיו","הסתו":"הסתיו","בסתו":"בסתיו","מלים":"מילים","המלים":"המילים","ידים":"ידיים","הידים":"הידיים","שיך":"שייך","מחיך":"מחייך","גנה":"גינה","בגנה":"בגינה","תרביות":"תרבויות","התרביות":"התרבויות","ספור":"סיפור","הספור":"הסיפור","ספורים":"סיפורים","הספורים":"הסיפורים","מנקדת":"מנקודת","מרתא":"מרתה","התיקיה":"התיקייה","בתיקיה":"בתיקייה","ואפלו":"ואפילו","אמתית":"אמיתית","ומחיך":"ומחייך","והגנה":"והגינה"} };
@@ -7218,6 +7266,15 @@ function resolvePhraseRefs(text){
     if(!o.en&&typeof DICT_PHRASES!=='undefined'&&DICT_PHRASES){ var dp=DICT_PHRASES.find(function(d){return d&&d[0]&&(d[0][0]===he||d[0][1]===bare||stripN(d[0][0])===bare);}); if(dp){o.en=dp[1];} }
     if(!o.en&&typeof IDIOMS!=='undefined'&&IDIOMS){ var idm=IDIOMS.find(function(x){return x&&x.he&&(x.he[0]===he||x.he[1]===bare||stripN(x.he[0])===bare);}); if(idm){o.tl=o.tl||idm.tl;o.en=idm.mean;o.lit=idm.lit;} }
     if(!o.en){var sg=_SET_GLOSS[bare];if(sg){o.en=sg.en;o.tl=o.tl||sg.tl;}}
+    if(!o.en){
+      var DEM={'זה':1,'זאת':1,'זו':1,'אלה':2,'אלו':2};
+      var tk=heMatch.split(/\s+/).filter(function(x){return /[\u05D0-\u05EA]/.test(x);});
+      if(tk.length>=2&&DEM[stripN(tk[0])]){
+        var sing=DEM[stripN(tk[0])]===1, nb=stripN(tk.slice(1).join(' ')), nen=null;
+        try{ for(var ci=0;ci<VOCAB.length&&!nen;ci++){ var ws=VOCAB[ci].words||[]; for(var wi=0;wi<ws.length;wi++){ var ww=ws[wi]; if(ww&&ww[0]&&(stripN(ww[0][0])===nb||ww[0][1]===nb)){ nen=ww[2]; break; } } } }catch(e){}
+        if(nen){ var cl=(''+nen).replace(/\s*\([^)]*\)\s*/g,'').split('/')[0].trim(); if(cl) o.en=(sing?'this is a ':'these are ')+cl; }
+      }
+    }
     if(o.tl)o.tl=khTL(o.tl,o.he);
     return o;
   });
@@ -8523,19 +8580,21 @@ function runnerReturnBanner(){
 }
 function _phraseCard(p,i){
   var key=phraseKey(p);
-  var ovEn=getOverride('phrase',key,'en');
-  var en=ovEn||p.en||p.lit;
   var heStr=Array.isArray(p.he)?(p.he[0]||p.he[1]||''):(p.he||'');
-  var tl=p.tl?TL(p.tl,heStr):(typeof heTL==='function'?heTL(heStr):'');
-  var back, missing=false;
-  if(en){ back=escHTML(en); }
-  else if(tl){ back='<span style="opacity:.85">'+escHTML(tl)+'</span>'; }
-  else { missing=true; back='<span class="wc-missing">tap to hear it</span>'; if(key&&_PHRASE_MISSING.indexOf(key)<0)_PHRASE_MISSING.push(key); }
-  var tlLine=(en&&tl)?'<div class="t">'+escHTML(tl)+'</div>':'';
+  var ePlain=getEdit('phrase',key,'he')||p.plain;
+  var en=getEdit('phrase',key,'en')||getOverride('phrase',key,'en')||p.en||p.lit;
+  var etl=getEdit('phrase',key,'tl');
+  var tl=etl!=null?etl:(p.tl?TL(p.tl,heStr):(typeof heTL==='function'?heTL(heStr):''));
+  var say=getEdit('phrase',key,'he')?(ePlain||heStr):heStr;
+  var pHe='<button class="edit-btn" data-edit-key="phrase|'+key+'|he" data-edit-val="'+encodeURIComponent(ePlain||heStr)+'" data-edit-label="Phrase (full spelling, no nikud)" title="Edit Hebrew" style="font-size:11px;vertical-align:middle">\u270e</button>';
+  var pEn='<button class="edit-btn" data-edit-key="phrase|'+key+'|en" data-edit-val="'+encodeURIComponent(en||'')+'" data-edit-label="English translation" data-edit-rtl="false" title="Edit English" style="font-size:9px">\u270e</button>';
+  var pTl='<button class="edit-btn" data-edit-key="phrase|'+key+'|tl" data-edit-val="'+encodeURIComponent(tl||'')+'" data-edit-label="Transliteration (reading guide)" data-edit-rtl="false" title="Edit transliteration" style="font-size:9px">\u270e</button>';
+  var enLine='<div class="e">'+(en?escHTML(en):'<span style="opacity:.4">add translation</span>')+' '+pEn+'</div>';
+  var tlLine='<div class="t">'+(tl?escHTML(tl):'<span style="opacity:.4">add reading</span>')+' '+pTl+'</div>';
   var litLine=(p.lit&&p.lit!==en)?'<div class="t" style="opacity:.7">lit. '+escHTML(p.lit)+'</div>':'';
-  return '<div class="wcard flip'+(missing?' wc-nogloss':'')+'" data-wcard="ph'+i+'" data-phrase-key="'+escHTML(key||'')+'" data-speak="'+encodeURIComponent(heStr)+'">'
-    +'<div class="wc-front"><div class="h">'+H(p.he,p.plain)+'</div><div class="wc-hint">tap to hear \u00b7 flip</div></div>'
-    +'<div class="wc-back"><div class="e">'+back+'</div>'+tlLine+litLine+'</div></div>';
+  return '<div class="wcard flip" data-wcard="ph'+i+'" data-phrase-key="'+escHTML(key||'')+'" data-speak="'+encodeURIComponent(say)+'">'
+    +'<div class="wc-front"><div class="h">'+H(p.he,ePlain)+' '+pHe+'</div><div class="wc-hint">tap to hear \u00b7 flip</div></div>'
+    +'<div class="wc-back">'+enLine+tlLine+litLine+'</div></div>';
 }
 function _phraseQuiz(items){
   var pool=items.filter(function(p){return p.en;});
@@ -10788,11 +10847,21 @@ function _hebInline(s){return String(s).replace(/[\u0590-\u05FF\u05B0-\u05C7]+(?
 function _verbBinyan(v){if(typeof BINYANIM==='undefined')return null;var key=(v.binyan||'').toLowerCase();return BINYANIM.find(function(b){return (b.tl&&b.tl.toLowerCase()===key)||(b.name&&String(b.name).toLowerCase().indexOf(key)>=0);})||null;}
 function _verbConjTable(vid,tenseKey,rows){var pfx=tenseKey==='present'?'pres':(tenseKey==='future'?'fut':'past');
   return '<table class="gtable"><thead><tr><th>person</th><th>hebrew</th><th>sound</th></tr></thead><tbody>'+rows.map(function(r,ri){
+    var base='verb|'+vid+'|'+pfx+'|'+ri;
     var ev=getEdit('verb',vid,pfx+'|'+ri)||r[1][0];
-    return '<tr><td>'+r[0]+'</td><td class="tgt"><span data-speak="'+encodeURIComponent(ev)+'" style="cursor:pointer">'+H(ev,r[1][1])+'</span> <button class="edit-btn" data-edit-key="verb|'+vid+'|'+pfx+'|'+ri+'" data-edit-val="'+encodeURIComponent(ev)+'" data-edit-label="'+r[0]+'" title="Edit">\u270e</button></td><td class="tl" style="font-style:italic">'+escHTML(heTL(ev))+'</td></tr>';
+    var ep=getEdit('verb',vid,pfx+'|'+ri+'|p')||r[1][1];
+    var etl=getEdit('verb',vid,pfx+'|'+ri+'|tl');
+    var say=getEdit('verb',vid,pfx+'|'+ri+'|p')?ep:ev;
+    var tlShow=etl!=null?escHTML(etl):escHTML(heTL(ev));
+    return '<tr><td>'+r[0]+'</td>'
+      +'<td class="tgt"><span data-speak="'+encodeURIComponent(say)+'" style="cursor:pointer">'+H(ev,ep)+'</span> '
+      +'<button class="edit-btn" data-edit-key="'+base+'|p" data-edit-val="'+encodeURIComponent(ep)+'" data-edit-label="'+r[0]+' (full spelling, no nikud)" title="Edit Hebrew">\u270e</button></td>'
+      +'<td class="tl" style="font-style:italic">'+tlShow+' <button class="edit-btn" data-edit-key="'+base+'|tl" data-edit-val="'+encodeURIComponent(etl!=null?etl:heTL(ev))+'" data-edit-label="'+r[0]+' transliteration" data-edit-rtl="false" title="Edit transliteration" style="font-size:9px">\u270e</button></td></tr>';
   }).join('')+'</tbody></table>';}
 function renderVerbDetail(v){
   var vid=v.inf[0];var ed_en=getEdit('verb',vid,'en')||v.en;var enc=encodeURIComponent(vid);
+  var ei_p=getEdit('verb',vid,'inf|p')||v.inf[1];var ei_tl=getEdit('verb',vid,'inf|tl');
+  var infSay=getEdit('verb',vid,'inf|p')?encodeURIComponent(ei_p):enc;
   var tenses=[['inf','Infinitive'],['present','Present'],['past','Past'],['future','Future']];
   var avail=tenses.filter(function(t){return t[0]==='inf'||(v[t[0]]&&v[t[0]].length);});
   var active=route.sub;if(!avail.some(function(t){return t[0]===active;}))active=(v.present&&v.present.length)?'present':'inf';
@@ -10800,9 +10869,9 @@ function renderVerbDetail(v){
   var panel='';
   if(active==='inf'){
     panel='<table class="gtable"><tbody>'
-      +'<tr><td>infinitive</td><td class="tgt"><span data-speak="'+enc+'" style="cursor:pointer">'+H(v.inf[0],v.inf[1])+'</span></td></tr>'
-      +'<tr><td>sound</td><td class="tl" style="font-style:italic">'+escHTML(heTL(v.inf[0]))+'</td></tr>'
-      +'<tr><td>meaning</td><td>'+ed_en+'</td></tr>'
+      +'<tr><td>infinitive</td><td class="tgt"><span data-speak="'+infSay+'" style="cursor:pointer">'+H(v.inf[0],ei_p)+'</span> <button class="edit-btn" data-edit-key="verb|'+vid+'|inf|p" data-edit-val="'+encodeURIComponent(ei_p)+'" data-edit-label="Infinitive (full spelling, no nikud)" title="Edit Hebrew">\u270e</button></td></tr>'
+      +'<tr><td>sound</td><td class="tl" style="font-style:italic">'+(ei_tl!=null?escHTML(ei_tl):escHTML(heTL(v.inf[0])))+' <button class="edit-btn" data-edit-key="verb|'+vid+'|inf|tl" data-edit-val="'+encodeURIComponent(ei_tl!=null?ei_tl:heTL(v.inf[0]))+'" data-edit-label="Infinitive transliteration" data-edit-rtl="false" title="Edit transliteration" style="font-size:9px">\u270e</button></td></tr>'
+      +'<tr><td>meaning</td><td>'+ed_en+' <button class="edit-btn" data-edit-key="verb|'+vid+'|en" data-edit-val="'+encodeURIComponent(ed_en)+'" data-edit-label="English meaning" data-edit-rtl="false" title="Edit English" style="font-size:9px">\u270e</button></td></tr>'
       +'<tr><td>root</td><td class="tgt">'+H(v.root)+'</td></tr></tbody></table>'
       +'<div class="gt-foot">The dictionary form. The <span class="h">ל</span> at the front carries "to ...". Drop it and conjugate to use the verb in a sentence.</div>';
   }else{
@@ -10817,10 +10886,10 @@ function renderVerbDetail(v){
   if(b)acc+='<details class="gt"><summary><span class="gt-num">iii</span><span class="gt-title">The pattern: '+(b.tl||v.binyan)+'</span><span class="gt-chev">\u203a</span></summary><div class="gt-body"><div class="gt-note">'+(b.voice?'<b style="color:var(--accent)">'+b.voice+'</b><br>':'')+(b.desc||'')+'</div><div class="row" style="margin-top:10px"><button class="btn ghost sm" data-binyan="'+b.id+'">Study '+(b.tl||'this binyan')+'</button></div></div></details>';
   return '<button class="back" data-go2="verbs">\u2190 all verbs</button>'
     +'<div class="row spread" style="align-items:flex-start"><div class="gtopic-crumbs"><span class="cz">Verbs</span><span class="sep">\u203a</span><span class="cz">'+escHTML(v.binyan||'')+'</span><span class="sep">\u203a</span><span class="cz">Level '+escHTML(v.lvl||'')+'</span></div>'+nikToggle()+'</div>'
-    +'<h1 class="gtopic-title" style="font-family:var(--heb);font-weight:500;direction:rtl">'+hebClick(v.inf[0],v.inf[1])+'</h1>'
-    +'<div class="tl" style="font-style:italic;font-size:15px;margin-bottom:2px">'+escHTML(heTL(v.inf[0]))+'</div>'
+    +'<h1 class="gtopic-title" style="font-family:var(--heb);font-weight:500;direction:rtl">'+hebClick(v.inf[0],ei_p)+'</h1>'
+    +'<div class="tl" style="font-style:italic;font-size:15px;margin-bottom:2px">'+(ei_tl!=null?escHTML(ei_tl):escHTML(heTL(v.inf[0])))+'</div>'
     +'<p class="gtopic-lede">'+escHTML(ed_en)+'</p>'
-    +'<div class="row" style="gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center">'+speakBtn(v.inf[0])
+    +'<div class="row" style="gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center">'+speakBtn(getEdit('verb',vid,'inf|p')?ei_p:v.inf[0])
     +'<span class="muted" style="font-size:12px">root</span> '+hebClick(v.root)
     +'<button class="btn sm ghost" data-verb-drill="'+enc+'">Drill all tenses</button>'
     +'<button class="edit-btn" data-edit-key="verb|'+vid+'|en" data-edit-val="'+encodeURIComponent(ed_en)+'" data-edit-label="English meaning" data-edit-rtl="false" title="Edit English">\u270e</button></div>'
