@@ -928,7 +928,7 @@ html[dir="rtl"] .lesson-row.inprogress{--lx-end:left}
    Teaching engine: Course path · feedback drills · mastery + weak-spots
 =================================================================== */
 const USER_ID='vincenzo';
-const BUILD="pass36";   /* greppable internal build marker; HaMhandes bumps this every build */
+const BUILD="pass37";   /* greppable internal build marker; HaMhandes bumps this every build */
 const DRIVE_FOLDER='1jqZwxO-5IhaiMxn7WkS0_EDadN_4VQlr';
 const SUPA_URL='https://ygstriddcprzalnisbql.supabase.co';
 const SUPA_KEY='sb_publishable_QbkZ3-OMXm-LiIoZw3lApA_BzhOUtlS';
@@ -1131,7 +1131,13 @@ function _isDigraph(a,b){ var d=(''+a+b).toLowerCase(); return d==='kh'||d==='ch
 function _sylSplit(w){
   var V=/[aeiou]/i; var units=[]; var i=0;
   while(i<w.length){
-    if(V.test(w[i])){ var j=i; while(j<w.length&&V.test(w[j]))j++; units.push(['v',i,j]); i=j; }
+    if(V.test(w[i])){
+      /* a vowel nucleus; split a hiatus of two IDENTICAL vowels (e.g. le-e, la-a) into two
+         syllables, but keep true diphthongs (ai/ei/oi, ...) as one nucleus. */
+      var j=i;
+      while(j<w.length&&V.test(w[j])){ if(j+1<w.length&&V.test(w[j+1])&&w[j+1].toLowerCase()===w[j].toLowerCase()){ j++; break; } j++; }
+      units.push(['v',i,j]); i=j;
+    }
     else if(i+1<w.length&&_isDigraph(w[i],w[i+1])){ units.push(['c',i,i+2]); i+=2; }
     else { units.push(['c',i,i+1]); i++; }
   }
@@ -1156,7 +1162,98 @@ function tlSyl(tl,he){
     return sy.map(function(s,ix){return ix===stressIdx?s.toUpperCase():s.toLowerCase();}).join('-');
   }).join('');
 }
-function TL(tl,he){ return tlSyl(tl,he); }
+/* pass37: render-time Hebrew->transliteration ROMANIZER. Vowelled Hebrew to transliteration
+   is deterministic, so this fills the gap for surfaces with no authored tl field (notably the
+   frozen VERBS array). It outputs the SAME scheme the authored tl fields use (so verbs read
+   like vocab): 'ch' for chet/soft-khaf (khTL then renders kh next to the throat letter), 'tz'
+   for tsadi, 's' for sin / 'sh' for shin, Italian vowels a/e/i/o/u, silent final he, furtive
+   patach on a final guttural, holam/shuruk vav and hiriq/tsere yod as matres. Per-form fixes
+   go through ROMAN_OVERRIDE (additive, bare-Hebrew keyed, like the nikud overrides). */
+const ROMAN_OVERRIDE={};
+function _romanize(s){
+  s=''+(s==null?'':s);
+  var n=s.length, i=0;
+  function isC(c){var x=c.charCodeAt(0);return x>=0x05D0&&x<=0x05EA;}
+  function isN(c){var x=c.charCodeAt(0);return x>=0x0591&&x<=0x05C7;}
+  function vowel(m){
+    if(m.indexOf('ֹ')>=0) return 'o';   /* holam */
+    if(m.indexOf('ֻ')>=0) return 'u';   /* kubuts */
+    if(m.indexOf('ִ')>=0) return 'i';   /* hiriq */
+    if(m.indexOf('ֵ')>=0) return 'e';   /* tsere */
+    if(m.indexOf('ֶ')>=0) return 'e';   /* segol */
+    if(m.indexOf('ֱ')>=0) return 'e';   /* chataf segol */
+    if(m.indexOf('ַ')>=0) return 'a';   /* patach */
+    if(m.indexOf('ָ')>=0) return 'a';   /* kamatz */
+    if(m.indexOf('ֲ')>=0) return 'a';   /* chataf patach */
+    if(m.indexOf('ֳ')>=0) return 'o';   /* chataf kamatz */
+    return null;
+  }
+  var units=[];
+  while(i<n){ var c=s[i]; if(isC(c)){ var j=i+1,m=''; while(j<n&&isN(s[j])){m+=s[j];j++;} units.push({c:c,m:m}); i=j; } else { i++; } }
+  var out=[], prevV=null, firstC=true;
+  for(var u=0;u<units.length;u++){
+    var c=units[u].c, m=units[u].m, last=(u===units.length-1);
+    var dag=m.indexOf('ּ')>=0, sin=m.indexOf('ׂ')>=0;
+    var shva=m.indexOf('ְ')>=0;
+    var v=vowel(m);
+    if(c==='ו'){ /* vav */
+      if(m.indexOf('ֹ')>=0){ out.push('o'); prevV='o'; firstC=false; continue; }      /* holam male */
+      if(dag && prevV===null && !shva){ out.push('u'); prevV='u'; firstC=false; continue; } /* shuruk */
+      out.push('v'+(v||'')); prevV=v; firstC=false; continue;
+    }
+    if(c==='י'){ /* yod */
+      if(v){ out.push('y'+v); prevV=v; firstC=false; continue; }
+      if(shva||dag){ out.push('y'); prevV=null; firstC=false; continue; }                   /* consonantal yod */
+      if(prevV==='i'||prevV==='e'){ firstC=false; continue; }                               /* silent mater */
+      out.push('y'); prevV=null; firstC=false; continue;
+    }
+    if(c==='ה' && last && !v){ continue; }                                              /* silent final he */
+    var cons='';
+    switch(c){
+      case 'א': cons=''; break;
+      case 'ב': cons=dag?'b':'v'; break;
+      case 'ג': cons='g'; break;
+      case 'ד': cons='d'; break;
+      case 'ה': cons='h'; break;
+      case 'ז': cons='z'; break;
+      case 'ח': cons='ch'; break;
+      case 'ט': cons='t'; break;
+      case 'כ': case 'ך': cons=dag?'k':'ch'; break;
+      case 'ל': cons='l'; break;
+      case 'מ': case 'ם': cons='m'; break;
+      case 'נ': case 'ן': cons='n'; break;
+      case 'ס': cons='s'; break;
+      case 'ע': cons=''; break;
+      case 'פ': case 'ף': cons=dag?'p':'f'; break;
+      case 'צ': case 'ץ': cons='tz'; break;
+      case 'ק': cons='k'; break;
+      case 'ר': cons='r'; break;
+      case 'ש': cons=sin?'s':'sh'; break;
+      case 'ת': cons='t'; break;
+      default: cons='';
+    }
+    if(last && (c==='ח'||c==='ע') && m.indexOf('ַ')>=0){ out.push('a'+cons); prevV=null; firstC=false; continue; } /* furtive patach */
+    var vo = v!=null ? v : (shva && firstC ? 'e' : '');
+    if((m.indexOf('ֵ')>=0||m.indexOf('ֶ')>=0) && u+1<units.length && units[u+1].c==='י' && !units[u+1].m){ vo='ei'; }
+    out.push(cons+vo);
+    prevV = (v!=null) ? v : ((shva&&firstC)?'e':null);
+    firstC=false;
+  }
+  return out.join('');
+}
+function heRomanize(vowelled){
+  var bare=_bareCons(vowelled);
+  if(Object.prototype.hasOwnProperty.call(ROMAN_OVERRIDE,bare)) return ROMAN_OVERRIDE[bare];
+  return _romanize(vowelled);
+}
+/* TL: if there is no authored transliteration but a vowelled Hebrew form is present, romanize
+   it (the fallback that makes "transliteration everywhere" true, including verbs). */
+function TL(tl,he){
+  if((tl==null||tl==='') && he && /[֑-ׇ]/.test(''+he)) tl=heRomanize(he);
+  return tlSyl(tl,he);
+}
+/* heTL: transliteration straight from a vowelled Hebrew form (verbs and any tl-less surface). */
+function heTL(he){ return TL('', he); }
 function conversaHeb(v){var words=(''+(v==null?'':v)).split(/(\s+)/);return '<span class="heb" dir="rtl">'+words.map(function(w){if(/^\s+$/.test(w)||w==='')return w;var sf=_spellFull(w);var full=sf?sf.bare:_maleify(w);return '<span class="w" data-word="'+encodeURIComponent(full)+'">'+full+'</span>';}).join('')+'</span>';}
 function hebClick(v,plain,cls){
   const shown=H(v,plain);const words=shown.split(/(\s+)/);
@@ -8545,7 +8642,7 @@ function renderLessonStepPlaceholder(step, lesson, index, total){
        banked verbs. The reference list stays as a warm-in scaffold; the step is completed by
        conjugating (typed), which promotes the verb's mastery on retrieval-correct. */
     var _vbList=(r.matched||[]).map(function(m){return m.inf;}).map(function(inf){return VERBS.find(function(x){return x&&x.inf&&x.inf[1]===inf;});}).filter(Boolean);
-    if(r.matched.length) b+='<div class="rstep-h">Verbs in this lesson</div><div class="rstep-t">Hear each one, then conjugate them from memory below. Typing a form yourself is what moves the verb toward mastery.</div><div class="rstep-heb" dir="rtl">'+r.matched.map(function(v){return '<span data-speak="'+encodeURIComponent(v.inf)+'" style="cursor:pointer">'+escHTML(H(v.inf,stripN(v.inf)))+'</span>';}).join(' \u00b7 ')+'</div>';
+    if(r.matched.length) b+='<div class="rstep-h">Verbs in this lesson</div><div class="rstep-t">Hear each one, then conjugate them from memory below. Typing a form yourself is what moves the verb toward mastery.</div><div class="rstep-heb" dir="rtl">'+r.matched.map(function(v){return '<span data-speak="'+encodeURIComponent(v.inf)+'" style="cursor:pointer">'+escHTML(H(v.inf,stripN(v.inf)))+' <span class="tl" style="font-size:12px;font-style:italic">'+escHTML(heTL(v.inf))+'</span></span>';}).join(' \u00b7 ')+'</div>';
     if(r.unmatched.length) b+='<div class="rstep-fb">Mentioned but not in the verb bank yet: <span dir="rtl">'+r.unmatched.map(escHTML).join(' \u00b7 ')+'</span></div>';
     if(!r.matched.length&&!r.unmatched.length) b+='<div class="rstep-fb">No verbs flagged for this lesson.</div>';
     if(_vbList.length){
@@ -10685,9 +10782,9 @@ function addVerbForm(){
 function _hebInline(s){return String(s).replace(/[\u0590-\u05FF\u05B0-\u05C7]+(?:[ \u05BE.,!?'"\u2013\u2014-]+[\u0590-\u05FF\u05B0-\u05C7]+)*/g,function(m){return '<span class="h">'+m+'</span>';});}
 function _verbBinyan(v){if(typeof BINYANIM==='undefined')return null;var key=(v.binyan||'').toLowerCase();return BINYANIM.find(function(b){return (b.tl&&b.tl.toLowerCase()===key)||(b.name&&String(b.name).toLowerCase().indexOf(key)>=0);})||null;}
 function _verbConjTable(vid,tenseKey,rows){var pfx=tenseKey==='present'?'pres':(tenseKey==='future'?'fut':'past');
-  return '<table class="gtable"><thead><tr><th>person</th><th>hebrew</th></tr></thead><tbody>'+rows.map(function(r,ri){
+  return '<table class="gtable"><thead><tr><th>person</th><th>hebrew</th><th>sound</th></tr></thead><tbody>'+rows.map(function(r,ri){
     var ev=getEdit('verb',vid,pfx+'|'+ri)||r[1][0];
-    return '<tr><td>'+r[0]+'</td><td class="tgt"><span data-speak="'+encodeURIComponent(ev)+'" style="cursor:pointer">'+H(ev,r[1][1])+'</span> <button class="edit-btn" data-edit-key="verb|'+vid+'|'+pfx+'|'+ri+'" data-edit-val="'+encodeURIComponent(ev)+'" data-edit-label="'+r[0]+'" title="Edit">\u270e</button></td></tr>';
+    return '<tr><td>'+r[0]+'</td><td class="tgt"><span data-speak="'+encodeURIComponent(ev)+'" style="cursor:pointer">'+H(ev,r[1][1])+'</span> <button class="edit-btn" data-edit-key="verb|'+vid+'|'+pfx+'|'+ri+'" data-edit-val="'+encodeURIComponent(ev)+'" data-edit-label="'+r[0]+'" title="Edit">\u270e</button></td><td class="tl" style="font-style:italic">'+escHTML(heTL(ev))+'</td></tr>';
   }).join('')+'</tbody></table>';}
 function renderVerbDetail(v){
   var vid=v.inf[0];var ed_en=getEdit('verb',vid,'en')||v.en;var enc=encodeURIComponent(vid);
@@ -10699,6 +10796,7 @@ function renderVerbDetail(v){
   if(active==='inf'){
     panel='<table class="gtable"><tbody>'
       +'<tr><td>infinitive</td><td class="tgt"><span data-speak="'+enc+'" style="cursor:pointer">'+H(v.inf[0],v.inf[1])+'</span></td></tr>'
+      +'<tr><td>sound</td><td class="tl" style="font-style:italic">'+escHTML(heTL(v.inf[0]))+'</td></tr>'
       +'<tr><td>meaning</td><td>'+ed_en+'</td></tr>'
       +'<tr><td>root</td><td class="tgt">'+H(v.root)+'</td></tr></tbody></table>'
       +'<div class="gt-foot">The dictionary form. The <span class="h">ל</span> at the front carries "to ...". Drop it and conjugate to use the verb in a sentence.</div>';
@@ -10715,6 +10813,7 @@ function renderVerbDetail(v){
   return '<button class="back" data-go2="verbs">\u2190 all verbs</button>'
     +'<div class="row spread" style="align-items:flex-start"><div class="gtopic-crumbs"><span class="cz">Verbs</span><span class="sep">\u203a</span><span class="cz">'+escHTML(v.binyan||'')+'</span><span class="sep">\u203a</span><span class="cz">Level '+escHTML(v.lvl||'')+'</span></div>'+nikToggle()+'</div>'
     +'<h1 class="gtopic-title" style="font-family:var(--heb);font-weight:500;direction:rtl">'+hebClick(v.inf[0],v.inf[1])+'</h1>'
+    +'<div class="tl" style="font-style:italic;font-size:15px;margin-bottom:2px">'+escHTML(heTL(v.inf[0]))+'</div>'
     +'<p class="gtopic-lede">'+escHTML(ed_en)+'</p>'
     +'<div class="row" style="gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center">'+speakBtn(v.inf[0])
     +'<span class="muted" style="font-size:12px">root</span> '+hebClick(v.root)
@@ -10745,6 +10844,7 @@ function verbsList(){
     var preview=pf.length?'<div class="vcardx-preview">'+pf.join('<span class="sep">\u00b7</span>')+'</div>':'';
     return '<div class="vcardx" data-verb="'+enc+'">'
       +'<div class="vcardx-head"><div class="vcardx-he">'+H(v.inf[0],v.inf[1])+'</div>'+speakBtn(v.inf[0])+'</div>'
+      +'<div class="tl" style="font-style:italic;font-size:13px;margin-top:-2px">'+escHTML(heTL(v.inf[0]))+'</div>'
       +'<div class="vcardx-en">'+escHTML(en)+'</div>'
       +'<div class="vcardx-meta"><span class="vcardx-group">'+escHTML(v.binyan||'')+'</span>'+lvlBadge(v.lvl)+edited+'</div>'
       +preview+'</div>';
