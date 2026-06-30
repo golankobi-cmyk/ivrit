@@ -876,7 +876,7 @@ table.gtable td.say{font-style:italic;color:var(--muted)}
    Teaching engine: Course path · feedback drills · mastery + weak-spots
 =================================================================== */
 const USER_ID='vincenzo';
-const BUILD="pass31";   /* greppable internal build marker; HaMhandes bumps this every build */
+const BUILD="pass32";   /* greppable internal build marker; HaMhandes bumps this every build */
 const DRIVE_FOLDER='1jqZwxO-5IhaiMxn7WkS0_EDadN_4VQlr';
 const SUPA_URL='https://ygstriddcprzalnisbql.supabase.co';
 const SUPA_KEY='sb_publishable_QbkZ3-OMXm-LiIoZw3lApA_BzhOUtlS';
@@ -891,7 +891,7 @@ const defaultState={
   session:null,               // active/resumable guided session pointer {lessonId, stepIndex, startedAt} (Phase 9B.1; unused until later phases)
   stories:{}, dailyDone:{},
   customVocab:[], writeEntries:[], writeDraft:'',
-  cfg:{anthropicKey:'',gttsKey:'',dailyMinutes:30},
+  cfg:{anthropicKey:'',gttsKey:'',dailyMinutes:30,onboarded:false}, // onboarded: first-run budget prompt shown (pass32)
   placement:{history:[],currentRecommendation:null}, // added: level-test history (backward compatible via deepMerge)
   edits:{},
   updated:Date.now()
@@ -5982,12 +5982,18 @@ function mSeen(k){if(!S.mastery[k])S.mastery[k]={s:0,n:0,c:0,due:Date.now()};}
    Default 'recognition', so anything unlabelled stays conservative. Recognition
    confirms 'seen' and reschedules but can never lift to familiar; c increments only
    on retrieval; any wrong demotes to weak. */
+/* pass32 (Batch 2, report section 4 gap 1): expanding spaced-review ladder, in days,
+   replacing the coarse 1/2/7 tiers. A word's next-due interval grows as it matures,
+   indexed by its retrieval streak (m.c), capped at the top of the ladder. This changes
+   only WHEN a known word resurfaces; the retrieval-only promotion rule (m.s) is
+   untouched. Mirrors the Italian per-word streak ladder. */
+const SRS_LADDER=[1,3,7,16,35,75];
 function mAnswer(k,ok,kind){let m=S.mastery[k]||{s:0,n:0,c:0,due:Date.now()};m.n++;
   if(ok){
     if(kind==='retrieval'){
-      m.c++;                                   /* only retrieval counts as recall */
-      m.s=m.c>=4?3:m.c>=2?2:Math.max(m.s,1);
-      m.due=Date.now()+(m.s===3?7:m.s===2?2:1)*864e5;
+      m.c++;                                   /* only retrieval counts as recall (the streak) */
+      m.s=m.c>=4?3:m.c>=2?2:Math.max(m.s,1);   /* promotion rule unchanged */
+      m.due=Date.now()+SRS_LADDER[Math.min(m.c-1,SRS_LADDER.length-1)]*864e5; /* expanding ladder by streak */
     } else {                                   /* recognition correct = exposure only */
       m.s=Math.max(m.s,0);                     /* can confirm seen, never familiar */
       if(m.s<2)m.due=Date.now()+1*864e5;       /* light reschedule for not-yet-owned words */
@@ -8900,8 +8906,19 @@ function todayDoneSet(){
   return S.today.done;
 }
 function todayMark(id){todayDoneSet()[id]=true;save();}
+/* pass32 (Batch 2, report section 2): the day is composed and GATED by the chosen
+   daily time budget (S.cfg.dailyMinutes), mirroring the Italian buildTodaySession
+   thresholds. The CORE is always present (warm-up if there is a weak pool, the next
+   course lesson, the daily grammar set if a pool exists). On top of the core, longer
+   optional pieces unlock with the budget: mixed review at >=20 min, a story (read
+   input) at >=30 min, a heavier deep-review at >=45 min. Every step still only shows
+   if its content exists; the budget gate is applied ON TOP of that availability check.
+   So picking 15 and 60 now yield visibly different sessions and the
+   "{N} minutes, built for you" header is true. */
 function todaySteps(){
+  var m=(S.cfg&&S.cfg.dailyMinutes)||30;     /* the daily time budget */
   var steps=[];
+  /* --- CORE (always present, regardless of budget) --- */
   var weak=weakPool(15);
   if(weak.length){steps.push({id:'warm',kind:'weak',icon:'W',title:'Warm-up: weak words',sub:weak.length+' words due for review',mins:5});}
   var lc=currentLesson();var sess=getActiveSession();
@@ -8909,10 +8926,15 @@ function todaySteps(){
   steps.push({id:'lesson',kind:'lesson:'+lc.id,icon:'L',title:(resuming?'Resume: ':'Lesson: ')+escHTML(lc.title),sub:escHTML(chTitle(lc.ch)),mins:12});
   var _gpool=(typeof GRAMMAR_REF!=='undefined')?GRAMMAR_REF.filter(function(t){return /^A[12]/.test(t.cefr);}):[];
   if(_gpool.length){var _gt=_gpool[Math.floor(Date.now()/864e5)%_gpool.length];steps.push({id:'grammar',kind:'grammar:'+_gt.id,icon:'G',title:'Grammar: '+escHTML(_gt.en),sub:escHTML(_gt.cefr)+' \u00b7 short practice set',mins:5});}
+  /* --- BUDGET-GATED TIERS (each still only shows if its content exists) --- */
+  /* >=30 min: a story to read (comprehensible input). Ordered before review so input feeds it. */
   var story=STORIES.find(function(s){return !S.stories[s.id]&&/A1/i.test(s.lvl||'');})
     ||STORIES.find(function(s){return !S.stories[s.id];})||STORIES[0];
-  if(story){steps.push({id:'story',kind:'story:'+story.id,icon:'S',title:'Read: '+escHTML(story.en),sub:escHTML((story.lvl||'')+' \u00b7 '+(story.rt||(story.s.length+' lines'))),mins:7});}
-  steps.push({id:'mixed',kind:'mixed',icon:'P',title:'Mixed practice',sub:'Spaced review across what you have seen',mins:6});
+  if(story&&m>=30){steps.push({id:'story',kind:'story:'+story.id,icon:'S',title:'Read: '+escHTML(story.en),sub:escHTML((story.lvl||'')+' \u00b7 '+(story.rt||(story.s.length+' lines'))),mins:7});}
+  /* >=20 min: mixed spaced review. */
+  if(m>=20){steps.push({id:'mixed',kind:'mixed',icon:'P',title:'Mixed practice',sub:'Spaced review across what you have seen',mins:6});}
+  /* >=45 min: a heavier deep-review set on top of the mixed one. */
+  if(m>=45){steps.push({id:'review2',kind:'mixed',icon:'R',title:'Deep review',sub:'A longer spaced-review set across everything you have seen',mins:6});}
   return steps;
 }
 function vToday(){
@@ -11006,6 +11028,38 @@ function plMicTest(){
 }
 
 /* ===================================================================
+   pass32 (Batch 2, report section 3.2): FIRST-RUN DAILY-BUDGET PROMPT
+   Shown once to a brand-new learner (no progress yet, not already onboarded), so the
+   daily time budget is set without hunting in Settings. Reuses the placement overlay
+   (placepop/placebox). Offers the existing graded placement test as the "seed what I
+   know" path. The Settings daily buttons remain the way to change the budget later.
+   Deterministic setters (firstRunNeeded / firstRunSetBudget) so the harness can prove
+   the flow sets S.cfg.dailyMinutes without any DOM.
+=================================================================== */
+function firstRunNeeded(){ try{ return !(S.cfg&&S.cfg.onboarded) && (typeof plIsFresh==='function'?plIsFresh():false); }catch(e){ return false; } }
+function firstRunSetBudget(mins){ if(!S.cfg)S.cfg={}; var v=+mins; if([15,20,30,45,60].indexOf(v)<0)v=30; S.cfg.dailyMinutes=v; S.cfg.onboarded=true; save(); return v; }
+function firstRunDismiss(){ if(!S.cfg)S.cfg={}; S.cfg.onboarded=true; save(); }
+function firstRunClose(){ var ov=document.getElementById('placepop'); if(ov)ov.classList.remove('open'); }
+function firstRunRender(){
+  var box=document.getElementById('placebox'); if(!box) return;
+  var cur=(S.cfg&&S.cfg.dailyMinutes)||30;
+  box.innerHTML='<div class="row spread" style="margin-bottom:10px"><b>Welcome</b></div>'
+    +'<h3 style="font-family:var(--serif);font-weight:500;font-size:19px;margin-bottom:6px">How much time most days?</h3>'
+    +'<p class="muted" style="font-size:13.5px;margin-bottom:14px">Your daily session is built to fit the time you have. You can change this any time in Settings.</p>'
+    +'<div class="row" style="gap:8px;flex-wrap:wrap;margin-bottom:16px">'
+    +[15,20,30,45,60].map(function(t){return '<button class="btn sm'+(cur===t?'':' ghost')+'" data-frbudget="'+t+'">'+t+' min</button>';}).join(' ')
+    +'</div>'
+    +'<div class="row" style="gap:8px;flex-wrap:wrap">'
+    +'<button class="btn sm ghost" id="frPlacement">Check my starting level</button>'
+    +'<button class="btn sm ghost" id="frSkip">Maybe later</button>'
+    +'</div>';
+  Array.prototype.forEach.call(box.querySelectorAll('[data-frbudget]'),function(b){ b.onclick=function(){ var v=firstRunSetBudget(b.dataset.frbudget); firstRunClose(); try{toast('Daily target set to '+v+' min');}catch(e){} try{render();}catch(e){} }; });
+  var p=box.querySelector('#frPlacement'); if(p)p.onclick=function(){ firstRunDismiss(); if(typeof plOpen==='function')plOpen(); };
+  var s=box.querySelector('#frSkip'); if(s)s.onclick=function(){ firstRunDismiss(); firstRunClose(); try{render();}catch(e){} };
+}
+function firstRunMaybe(){ if(!firstRunNeeded()) return; var ov=document.getElementById('placepop'); if(!ov) return; firstRunRender(); ov.classList.add('open'); }
+
+/* ===================================================================
    pass29 HEBREW SPEAK-AND-CHECK ENGINE
    Mirrors the Italian app's startVoiceRecognition / normSpeak / speakSimilarity /
    speakVerdict / micUsable, adapted for Hebrew script, RTL, nikud and the masculine
@@ -12195,7 +12249,7 @@ async function writeFeedback(text){const fb=document.getElementById('wFb');const
 /* ===================================================================
    BOOT
 =================================================================== */
-buildLex();buildNav();applyTheme();render();setSync(false);syncDown();
+buildLex();buildNav();applyTheme();render();setSync(false);syncDown();firstRunMaybe();
 setTimeout(()=>{loadVoices();if(route.section==='settings'||route.section==='pron')render();},600);
 </script>
 </body>
