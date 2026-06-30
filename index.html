@@ -876,7 +876,7 @@ table.gtable td.say{font-style:italic;color:var(--muted)}
    Teaching engine: Course path · feedback drills · mastery + weak-spots
 =================================================================== */
 const USER_ID='vincenzo';
-const BUILD="pass32";   /* greppable internal build marker; HaMhandes bumps this every build */
+const BUILD="pass33";   /* greppable internal build marker; HaMhandes bumps this every build */
 const DRIVE_FOLDER='1jqZwxO-5IhaiMxn7WkS0_EDadN_4VQlr';
 const SUPA_URL='https://ygstriddcprzalnisbql.supabase.co';
 const SUPA_KEY='sb_publishable_QbkZ3-OMXm-LiIoZw3lApA_BzhOUtlS';
@@ -891,6 +891,7 @@ const defaultState={
   session:null,               // active/resumable guided session pointer {lessonId, stepIndex, startedAt} (Phase 9B.1; unused until later phases)
   stories:{}, dailyDone:{},
   customVocab:[], writeEntries:[], writeDraft:'',
+  mistakes:[],                // pass33: timestamped wrong-answer log [{k,t}], capped; feeds composite weakPool rank
   cfg:{anthropicKey:'',gttsKey:'',dailyMinutes:30,onboarded:false}, // onboarded: first-run budget prompt shown (pass32)
   placement:{history:[],currentRecommendation:null}, // added: level-test history (backward compatible via deepMerge)
   edits:{},
@@ -6001,6 +6002,10 @@ function mAnswer(k,ok,kind){let m=S.mastery[k]||{s:0,n:0,c:0,due:Date.now()};m.n
     }
   } else {                                     /* wrong, either kind: honest demotion */
     m.c=0;m.s=1;m.due=Date.now()+6e5;
+    /* pass33 (Batch 3, report section 4 gap 3): timestamped mistake log, additive and
+       capped. Feeds the composite weakPool rank (miss count + recency). Does NOT alter
+       the demotion above. */
+    try{ if(!Array.isArray(S.mistakes))S.mistakes=[]; S.mistakes.push({k:k,t:Date.now()}); if(S.mistakes.length>200)S.mistakes=S.mistakes.slice(-200); }catch(e){}
   }
   S.mastery[k]=m;}
 /* explicit self-rating from word cards: a scheduling/awareness signal, never a
@@ -6023,11 +6028,49 @@ function verbTableList(){var rated=[],avail=[];VERBS.forEach(function(v){var s=m
 function _vbrow(v){var key='vb|'+v.inf[1];var s=mState(key);var en=getEdit('verb',v.inf[0],'en')||v.en;return '<div class="vocab-row krow">'+hebClick(v.inf[0],v.inf[1])+'<div class="vocab-en">'+escHTML(en||'')+'</div><button class="spk" data-speak="'+encodeURIComponent(v.inf[0])+'">♪</button>'+_kbtns(key,s)+'</div>';}
 function verbKnowSection(){var list=verbTableList();if(!list.length)return '';var c=verbKnowCounts();return '<div class="section-sub" style="margin-top:34px">Your verbs · rate what you know</div><p class="t-lede" style="font-size:13px;margin-top:4px">Set your level for each verb. What you mark as don’t know or hazy comes back in Weak spots practice.</p><div class="kcounts"><span><b>'+c.dk+'</b> don’t know</span><span><b>'+c.hz+'</b> hazy</span><span><b>'+c.gi+'</b> got it</span></div>'+list.map(_vbrow).join('');}
 function _verbDetailRate(v){var key='vb|'+v.inf[1];var s=mState(key);return '<div class="vrate-card"><span class="vrate-q">How well do you know this verb?</span>'+_kbtns(key,s)+'</div>';}
-function weakPool(limit){const now=Date.now();const arr=[];
-  LEX.forEach(it=>{const m=S.mastery[it.key];if(!m)return;if(m.s<=1)arr.push({it,pri:0});else if(m.due<=now)arr.push({it,pri:1});});
-  try{for(var _k in S.mastery){if(_k.indexOf('vb|')!==0)continue;var _m=S.mastery[_k];if(!_m)continue;var _vi=_verbItemFromKey(_k);if(!_vi)continue;if(_m.s<=1)arr.push({it:_vi,pri:0});else if(_m.due<=now)arr.push({it:_vi,pri:1});}}catch(e){}
-  arr.sort((a,b)=>a.pri-b.pri);return arr.slice(0,limit||20).map(x=>x.it);}
+/* pass33 (Batch 3, report section 4 gap 3): composite weak-word ranking. The SELECTION
+   set is unchanged (weak/seen items, plus familiar+ that are due), but the ORDER now
+   reflects how shaky each item is: mastery state + how many times it was missed + how
+   recently. Promotion/recognition/demotion rules are untouched; this only reorders and
+   selects what resurfaces. */
+function _missStats(){
+  var map={}, ms=Array.isArray(S.mistakes)?S.mistakes:[];
+  for(var i=0;i<ms.length;i++){var e=ms[i];if(!e||!e.k)continue;var r=map[e.k]||(map[e.k]={count:0,last:0});r.count++;if((e.t||0)>r.last)r.last=e.t;}
+  return map;
+}
+function _weakScore(m,stat){
+  var now=Date.now();
+  /* state: shakier (lower s) ranks higher; the weak/seen tier dominates due-familiar+ */
+  var stateScore=(m.s<=1)?(1.0+(1-Math.min(Math.max(m.s,0),1))*0.2):0.3;  /* s0->1.2, s1->1.0, due-fam->0.3 */
+  var missScore=Math.min((stat&&stat.count)||0,5)*0.15;                    /* more misses -> higher, capped */
+  var rec=0;
+  if(stat&&stat.last){var days=(now-stat.last)/864e5;rec=days<=1?0.3:days<=3?0.2:days<=7?0.1:0;} /* more recent miss -> higher */
+  return stateScore+missScore+rec;
+}
+function weakPool(limit){const now=Date.now();const arr=[];const stats=_missStats();
+  LEX.forEach(it=>{const m=S.mastery[it.key];if(!m)return;if(m.s<=1||m.due<=now)arr.push({it,sc:_weakScore(m,stats[it.key])});});
+  try{for(var _k in S.mastery){if(_k.indexOf('vb|')!==0)continue;var _m=S.mastery[_k];if(!_m)continue;var _vi=_verbItemFromKey(_k);if(!_vi)continue;if(_m.s<=1||_m.due<=now)arr.push({it:_vi,sc:_weakScore(_m,stats[_k])});}}catch(e){}
+  arr.sort((a,b)=>b.sc-a.sc);return arr.slice(0,limit||20).map(x=>x.it);}
 function learnedPool(){return LEX.filter(it=>S.mastery[it.key]);}
+/* pass33 (Batch 3, report section 4 gap 2): grammar spaced review. From a pool of
+   grammar-reference topics, return those that are weak (best < 0.8), overdue (a due
+   date that has arrived), or backfilled (untouched, or has progress but no schedule
+   yet => due now), ordered shakiest first (lowest best, then most overdue). The
+   daily grammar step picks the first of these; when none are due it falls back to the
+   existing day-rotation. Mirrors how vocabulary already resurfaces. */
+function grammarDuePool(pool){
+  var now=Date.now(); var gp=S.grefProg||{}; var out=[];
+  (pool||[]).forEach(function(t){
+    var pr=gp[t.id]; var best=(pr&&pr.best)||0;
+    var weak=best<0.8;
+    var hasDue=!!(pr&&typeof pr.due==='number');
+    var overdue=hasDue&&pr.due<=now;
+    var backfill=!pr||!hasDue;                 /* untouched OR progress with no schedule yet => due now */
+    if(weak||overdue||backfill) out.push({t:t, best:best, dueAt:(weak||backfill)?0:pr.due});
+  });
+  out.sort(function(a,b){ return (a.best-b.best)||(a.dueAt-b.dueAt); });
+  return out.map(function(x){return x.t;});
+}
 /* ---- Mastery/completion model helpers (locked model, Phase 1 slice 2).
    Single source of truth for every progress display (R23) and cross-tab
    propagation (R24). Additive; reads existing state, writes only via the
@@ -8925,7 +8968,13 @@ function todaySteps(){
   var resuming=!!(sess&&getLessonRunnerState(sess.lessonId)&&String(sess.lessonId)===String(lc.id));
   steps.push({id:'lesson',kind:'lesson:'+lc.id,icon:'L',title:(resuming?'Resume: ':'Lesson: ')+escHTML(lc.title),sub:escHTML(chTitle(lc.ch)),mins:12});
   var _gpool=(typeof GRAMMAR_REF!=='undefined')?GRAMMAR_REF.filter(function(t){return /^A[12]/.test(t.cefr);}):[];
-  if(_gpool.length){var _gt=_gpool[Math.floor(Date.now()/864e5)%_gpool.length];steps.push({id:'grammar',kind:'grammar:'+_gt.id,icon:'G',title:'Grammar: '+escHTML(_gt.en),sub:escHTML(_gt.cefr)+' \u00b7 short practice set',mins:5});}
+  if(_gpool.length){
+    /* pass33: prefer a weak/overdue (or untouched-via-backfill) topic so grammar resurfaces
+       like vocab; fall back to the day-rotation when nothing is due. */
+    var _due=grammarDuePool(_gpool);
+    var _gt=_due.length?_due[0]:_gpool[Math.floor(Date.now()/864e5)%_gpool.length];
+    steps.push({id:'grammar',kind:'grammar:'+_gt.id,icon:'G',title:'Grammar: '+escHTML(_gt.en),sub:(_due.length?'Spaced review \u00b7 ':'')+escHTML(_gt.cefr)+' \u00b7 short practice set',mins:5});
+  }
   /* --- BUDGET-GATED TIERS (each still only shows if its content exists) --- */
   /* >=30 min: a story to read (comprehensible input). Ordered before review so input feeds it. */
   var story=STORIES.find(function(s){return !S.stories[s.id]&&/A1/i.test(s.lvl||'');})
@@ -10058,7 +10107,12 @@ function grefAnswer(choice){
   grefQuiz.answered={choice:choice,ok:ok};
   render();
 }
-function grefNext(){ if(!grefQuiz)return; grefQuiz.i++; grefQuiz.answered=null; if(grefQuiz.i>=grefQuiz.list.length&&!grefQuiz.recorded){grefQuiz.recorded=true;var _f=grefQuiz.score/grefQuiz.list.length;if(!S.grefProg)S.grefProg={};var _pr=S.grefProg[grefQuiz.topic]||{best:0,rounds:0};_pr.best=Math.max(_pr.best||0,_f);_pr.rounds=(_pr.rounds||0)+1;S.grefProg[grefQuiz.topic]=_pr;save();} render(); }
+function grefNext(){ if(!grefQuiz)return; grefQuiz.i++; grefQuiz.answered=null; if(grefQuiz.i>=grefQuiz.list.length&&!grefQuiz.recorded){grefQuiz.recorded=true;var _f=grefQuiz.score/grefQuiz.list.length;if(!S.grefProg)S.grefProg={};var _pr=S.grefProg[grefQuiz.topic]||{best:0,rounds:0};_pr.best=Math.max(_pr.best||0,_f);_pr.rounds=(_pr.rounds||0)+1;
+/* pass33 (Batch 3, report section 4 gap 2): schedule the topic on the expanding SRS_LADDER.
+   A passing round (>=0.7) advances the streak along the ladder; a failing round resets it so
+   the topic comes back tomorrow. grammarDuePool reads _pr.due (no due-date yet = due now). */
+var _passed=_f>=0.7;_pr.streak=_passed?((_pr.streak||0)+1):0;_pr.interval=_passed?SRS_LADDER[Math.min(Math.max(_pr.streak-1,0),SRS_LADDER.length-1)]:1;_pr.due=Date.now()+_pr.interval*864e5;_pr.last=Date.now();
+S.grefProg[grefQuiz.topic]=_pr;save();} render(); }
 function grefQuit(){ grefQuiz=null; render(); }
 function grefRender(){
   var Q=grefQuiz;
